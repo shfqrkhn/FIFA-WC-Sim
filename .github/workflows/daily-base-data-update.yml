@@ -1,0 +1,23 @@
+name: Daily BASE_DATA update
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Guard companion UI
+        run: |
+          test -f docs/index.html
+          grep -q 'Whole Tournament Simulator' docs/index.html
+          grep -q 'data-tab="groups"' docs/index.html
+          grep -q 'data-tab="bracket"' docs/index.html
+          grep -q 'data-tab="prob"' docs/index.html
+          grep -q 'data-tab="stats"' docs/index.html
