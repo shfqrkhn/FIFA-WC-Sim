@@ -26,7 +26,9 @@ def is_final(ev):
     typ = ev.get('status', {}).get('type', {})
     return bool(typ.get('completed') or typ.get('name') in ('STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN'))
 def scoreboard_paths():
-    if len(sys.argv) > 1: return sys.argv[1:]
+    args = [a for a in sys.argv[1:] if a != '--no-fetch']
+    if '--no-fetch' in sys.argv: return args
+    if args: return args
     today = datetime.date.today()
     if today > STOP_DATE:
         print('World Cup update window ended.')
