@@ -22,27 +22,25 @@ const teamAliases = new Map(Object.entries({
   ENG: 'England', CRO: 'Croatia', GHA: 'Ghana', PAN: 'Panama'
 }));
 
-function ymd(d) {
-  return d.toISOString().slice(0, 10);
+function ymd(d) { return d.toISOString().slice(0, 10); }
+function compactDate(d) { return ymd(d).replaceAll('-', ''); }
+function constRange(html, name, nextName) {
+  const marker = `const ${name}=`;
+  const start = html.indexOf(marker);
+  if (start < 0) throw new Error(`Missing ${marker}`);
+  const from = start + marker.length;
+  const next = nextName ? html.indexOf(`const ${nextName}=`, from) : -1;
+  let end = next >= 0 ? html.lastIndexOf(';', next) : html.indexOf('\nlet ', from);
+  if (end < from) end = html.indexOf(';\n', from);
+  if (end < from) throw new Error(`Could not find end of const ${name}`);
+  return { from, end };
 }
-function compactDate(d) {
-  return ymd(d).replaceAll('-', '');
+function parseConst(html, name, nextName) {
+  const { from, end } = constRange(html, name, nextName);
+  return vm.runInNewContext(html.slice(from, end), Object.create(null), { timeout: 1000 });
 }
-function parseArray(html, name) {
-  const start = html.indexOf(`const ${name}=`);
-  if (start < 0) throw new Error(`Missing const ${name}`);
-  const from = start + `const ${name}=`.length;
-  const end = html.indexOf(';', from);
-  if (end < 0) throw new Error(`Missing semicolon after ${name}`);
-  const js = html.slice(from, end);
-  return vm.runInNewContext(js, Object.create(null), { timeout: 1000 });
-}
-function replaceArray(html, name, value) {
-  const start = html.indexOf(`const ${name}=`);
-  if (start < 0) throw new Error(`Missing const ${name}`);
-  const from = start + `const ${name}=`.length;
-  const end = html.indexOf(';', from);
-  if (end < 0) throw new Error(`Missing semicolon after ${name}`);
+function replaceConst(html, name, nextName, value) {
+  const { from, end } = constRange(html, name, nextName);
   return html.slice(0, from) + JSON.stringify(value) + html.slice(end);
 }
 function canonicalTeam(raw) {
@@ -61,9 +59,7 @@ function isFinal(status) {
   const type = status?.type;
   return !!(type?.completed || ['STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN'].includes(type?.name));
 }
-function matchKey(a, b) {
-  return [a, b].sort().join(' / ');
-}
+function matchKey(a, b) { return [a, b].sort().join(' / '); }
 function scoreForCompetitor(c) {
   const v = Number(c.score ?? c.curatedRank?.current);
   return Number.isFinite(v) ? v : null;
@@ -92,9 +88,9 @@ async function fetchScoresForDate(date) {
 }
 
 const html = fs.readFileSync(HTML_PATH, 'utf8');
-let matches = parseArray(html, 'M');
+let matches = parseConst(html, 'M', 'SRC');
 const index = new Map(matches.map((m, i) => [matchKey(m[2], m[3]), i]));
-const today = new Date(process.env.WC26_TODAY || new Date().toISOString().slice(0, 10));
+const today = new Date((process.env.WC26_TODAY || new Date().toISOString().slice(0, 10)) + 'T00:00:00Z');
 const stop = new Date(STOP_DATE + 'T00:00:00Z');
 const start = new Date(START_DATE + 'T00:00:00Z');
 const end = new Date(Math.min(today.getTime(), stop.getTime()));
@@ -128,7 +124,7 @@ for (let d = start; d <= end; d = new Date(d.getTime() + 86400000)) {
   }
 }
 
-let next = replaceArray(html, 'M', matches);
+let next = replaceConst(html, 'M', 'SRC', matches);
 const stamp = new Date().toISOString();
 next = next.replace(/version:'[^']+'/g, `version:'2026.06.25-auto-daily'`);
 next = next.replace(/updated:'[^']+'/g, `updated:'${stamp}'`);
