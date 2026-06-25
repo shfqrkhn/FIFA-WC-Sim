@@ -80,8 +80,8 @@ if applied:
     data['currentStats'] = current
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html[:start] + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + html[end:])
-os.makedirs('data', exist_ok=True)
-with open('data/latest-update.json', 'w', encoding='utf-8') as f:
-    json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, f, indent=2)
-    f.write('\n')
+    os.makedirs('data', exist_ok=True)
+    with open('data/latest-update.json', 'w', encoding='utf-8') as f:
+        json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, f, indent=2)
+        f.write('\n')
 print(json.dumps({'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, indent=2))
