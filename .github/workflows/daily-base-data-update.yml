@@ -9,15 +9,25 @@ permissions:
   contents: write
 
 jobs:
-  validate:
+  update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Guard companion UI
-        run: |
-          test -f docs/index.html
-          grep -q 'Whole Tournament Simulator' docs/index.html
-          grep -q 'data-tab="groups"' docs/index.html
-          grep -q 'data-tab="bracket"' docs/index.html
-          grep -q 'data-tab="prob"' docs/index.html
-          grep -q 'data-tab="stats"' docs/index.html
+      - run: grep -q 'Whole Tournament Simulator' docs/index.html
+      - run: grep -q 'data-tab="groups"' docs/index.html
+      - run: grep -q 'data-tab="bracket"' docs/index.html
+      - run: grep -q 'data-tab="prob"' docs/index.html
+      - run: grep -q 'data-tab="stats"' docs/index.html
+      - run: python3 scripts/apply_scoreboard.py
+      - run: grep -q 'Whole Tournament Simulator' docs/index.html
+      - run: grep -q 'data-tab="groups"' docs/index.html
+      - run: grep -q 'data-tab="bracket"' docs/index.html
+      - run: grep -q 'data-tab="prob"' docs/index.html
+      - run: grep -q 'data-tab="stats"' docs/index.html
+      - run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add docs/index.html data/latest-update.json
+          git commit -m 'Daily World Cup BASE_DATA update'
+          git push
