@@ -21,7 +21,6 @@ def parse_day(m):
         if not v: continue
         try: return datetime.date.fromisoformat(str(v)[:10])
         except Exception: pass
-    # Conservative fallback: preserve deterministic ordering without pretending real rest days are known.
     return None
 
 def haversine(a, b):
@@ -37,8 +36,7 @@ def rest_edge(a_rest, b_rest):
     if a_rest is None or b_rest is None: return 0
     return clamp((a_rest - b_rest) * 0.012, -0.045, 0.045)
 
-def travel_edge(a_km, b_km):
-    return clamp((b_km - a_km) / 12000.0, -0.035, 0.035)
+def travel_edge(a_km, b_km): return clamp((b_km - a_km) / 12000.0, -0.035, 0.035)
 
 html, start, end, data = load_data()
 venues = data.get('venues') or {}
@@ -64,11 +62,10 @@ for m in matches:
     if not m.get('played'):
         ctx = m.get('context') if isinstance(m.get('context'), dict) else {}
         a_ctx, b_ctx = dict(ctx.get('A', {})), dict(ctx.get('B', {}))
-        base_a, base_b = float(a_ctx.get('goalAdj') or 0), float(b_ctx.get('goalAdj') or 0)
-        next_a = round(clamp(base_a + edge, -0.18, 0.18), 3)
-        next_b = round(clamp(base_b - edge, -0.18, 0.18), 3)
-        a_ctx.update({'goalAdj': next_a, 'restTravelAdj': edge, 'restTravelSource': 'embedded schedule/venues'})
-        b_ctx.update({'goalAdj': next_b, 'restTravelAdj': -edge, 'restTravelSource': 'embedded schedule/venues'})
+        base_a = float(a_ctx.get('goalAdj') or 0) - float(a_ctx.get('restTravelAdj') or 0)
+        base_b = float(b_ctx.get('goalAdj') or 0) - float(b_ctx.get('restTravelAdj') or 0)
+        a_ctx.update({'goalAdj': round(clamp(base_a + edge, -0.18, 0.18), 3), 'restTravelAdj': edge, 'restTravelSource': 'embedded schedule/venues'})
+        b_ctx.update({'goalAdj': round(clamp(base_b - edge, -0.18, 0.18), 3), 'restTravelAdj': -edge, 'restTravelSource': 'embedded schedule/venues'})
         next_ctx = dict(ctx, A=a_ctx, B=b_ctx)
         if m.get('context') != next_ctx:
             m['context'] = next_ctx
