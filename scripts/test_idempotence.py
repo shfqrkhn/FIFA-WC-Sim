@@ -2,10 +2,10 @@ import hashlib, os, subprocess
 
 FILES = ['docs/index.html', 'data/latest-update.json']
 PIPELINE = [
-    ['python3', 'scripts/apply_scoreboard.py'],
+    ['python3', 'scripts/apply_scoreboard.py', '--no-fetch'],
     ['python3', 'scripts/enrich_predictions.py'],
     ['python3', 'scripts/enrich_rest_travel.py'],
-    ['python3', 'scripts/enrich_weather.py'],
+    ['python3', 'scripts/enrich_weather.py', '--no-fetch'],
 ]
 
 def digest(path):
