@@ -20,6 +20,7 @@ jobs:
       - run: grep -q 'data-tab="prob"' docs/index.html
       - run: grep -q 'data-tab="stats"' docs/index.html
       - run: python3 scripts/apply_scoreboard.py
+      - run: python3 scripts/enrich_predictions.py
       - run: grep -q 'Whole Tournament Simulator' docs/index.html
       - run: grep -q 'data-tab="groups"' docs/index.html
       - run: grep -q 'data-tab="bracket"' docs/index.html
