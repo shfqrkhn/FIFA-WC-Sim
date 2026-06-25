@@ -20,6 +20,7 @@ jobs:
       - run: python3 scripts/enrich_rest_travel.py
       - run: python3 scripts/enrich_weather.py
       - run: python3 scripts/validate_base_data.py
+      - run: python3 scripts/test_idempotence.py
       - run: |
           if git diff --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
