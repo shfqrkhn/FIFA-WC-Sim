@@ -14,18 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: grep -q 'Whole Tournament Simulator' docs/index.html
-      - run: grep -q 'data-tab="groups"' docs/index.html
-      - run: grep -q 'data-tab="bracket"' docs/index.html
-      - run: grep -q 'data-tab="prob"' docs/index.html
-      - run: grep -q 'data-tab="stats"' docs/index.html
+      - run: python3 scripts/validate_base_data.py
       - run: python3 scripts/apply_scoreboard.py
       - run: python3 scripts/enrich_predictions.py
-      - run: grep -q 'Whole Tournament Simulator' docs/index.html
-      - run: grep -q 'data-tab="groups"' docs/index.html
-      - run: grep -q 'data-tab="bracket"' docs/index.html
-      - run: grep -q 'data-tab="prob"' docs/index.html
-      - run: grep -q 'data-tab="stats"' docs/index.html
+      - run: python3 scripts/enrich_weather.py
+      - run: python3 scripts/validate_base_data.py
       - run: |
           if git diff --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
