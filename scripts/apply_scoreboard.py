@@ -1,6 +1,7 @@
 import datetime, json, os, sys, urllib.request
 
 HTML_PATH = 'docs/index.html'
+STOP_DATE = datetime.date(2026, 7, 20)
 TEAM = {
     'MEX':'Mexico','RSA':'South Africa','KOR':'South Korea','CZE':'Czechia','CAN':'Canada','BIH':'Bosnia and Herzegovina','QAT':'Qatar','SUI':'Switzerland',
     'BRA':'Brazil','MAR':'Morocco','HTI':'Haiti','SCO':'Scotland','USA':'United States','PAR':'Paraguay','AUS':'Australia','TUR':'Turkey',
@@ -26,9 +27,12 @@ def is_final(ev):
     return bool(typ.get('completed') or typ.get('name') in ('STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN'))
 def scoreboard_paths():
     if len(sys.argv) > 1: return sys.argv[1:]
-    os.makedirs('data/scoreboards', exist_ok=True)
     today = datetime.date.today()
-    end_day = min(today, datetime.date(2026, 7, 20))
+    if today > STOP_DATE:
+        print('World Cup update window ended.')
+        return []
+    os.makedirs('data/scoreboards', exist_ok=True)
+    end_day = min(today, STOP_DATE)
     day = datetime.date(2026, 6, 11)
     paths = []
     while day <= end_day:
