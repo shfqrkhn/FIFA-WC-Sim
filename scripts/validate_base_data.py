@@ -1,0 +1,67 @@
+import json, re, sys
+
+HTML = 'docs/index.html'
+REQUIRED_UI = [
+    'Whole Tournament Simulator',
+    'data-tab="groups"',
+    'data-tab="bracket"',
+    'data-tab="prob"',
+    'data-tab="stats"',
+    'Transparency ledger',
+    'Integrity audit',
+    'Maintenance ledger',
+    'const BASE_DATA = ',
+]
+
+def fail(msg):
+    print('VALIDATION FAILED:', msg)
+    raise SystemExit(1)
+
+html = open(HTML, encoding='utf-8').read()
+for marker in REQUIRED_UI:
+    if marker not in html:
+        fail('missing UI/data marker: %s' % marker)
+if '<title>World Cup 2026 Simulator</title>' in html and 'Whole Tournament Simulator' not in html[:1000]:
+    fail('compact shell regression detected')
+start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
+end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
+data = json.loads(html[start:end])
+errors = []
+teams = data.get('teams')
+matches = data.get('matches')
+knockout = data.get('knockout')
+venues = data.get('venues')
+if not isinstance(teams, list) or len(teams) != 48:
+    errors.append('expected 48 teams')
+else:
+    names = [t.get('name') for t in teams]
+    if len(set(names)) != 48 or any(not n for n in names): errors.append('team names not unique/complete')
+    groups = {g:0 for g in 'ABCDEFGHIJKL'}
+    for t in teams:
+        groups[t.get('group')] = groups.get(t.get('group'), 0) + 1
+    for g in 'ABCDEFGHIJKL':
+        if groups.get(g) != 4: errors.append('group %s team count %s' % (g, groups.get(g)))
+team_names = set(t.get('name') for t in teams or [])
+if not isinstance(matches, list) or len([m for m in matches if m.get('stage') == 'group']) != 72:
+    errors.append('expected 72 group matches')
+else:
+    seen = set()
+    for m in matches:
+        if m.get('stage') != 'group': continue
+        no = m.get('no')
+        if no in seen: errors.append('duplicate group match no %s' % no)
+        seen.add(no)
+        if m.get('teamA') not in team_names or m.get('teamB') not in team_names: errors.append('bad team reference on match %s' % no)
+        if m.get('teamA') == m.get('teamB'): errors.append('same-team match %s' % no)
+        if m.get('played') and not (isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)): errors.append('played match without integer score %s' % no)
+if not isinstance(knockout, list) or len(knockout) != 32:
+    errors.append('expected 32 knockout matches')
+if not isinstance(venues, dict) or not venues:
+    errors.append('missing venues')
+if not isinstance(data.get('sources'), list):
+    errors.append('missing sources')
+if not isinstance(data.get('maintenance'), dict):
+    errors.append('missing maintenance ledger')
+if errors:
+    fail('; '.join(errors[:12]))
+print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout)}, indent=2))
