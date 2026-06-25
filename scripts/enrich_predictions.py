@@ -1,4 +1,4 @@
-import datetime, json, math, os
+import datetime, json
 
 HTML_PATH = 'docs/index.html'
 MARKER = 'const BASE_DATA = '
@@ -22,11 +22,18 @@ def expected_edge(team_a, team_b, ranks):
 def result_points(gf, ga):
     return 3 if gf > ga else 1 if gf == ga else 0
 
+def set_changed(obj, key, value):
+    if obj.get(key) != value:
+        obj[key] = value
+        return True
+    return False
+
 html, start, end, data = load_data()
 teams = data.get('teams', [])
 ranks = {t['name']: int(t.get('rank') or 60) for t in teams}
 state = {t['name']: {'pts':0, 'gd':0, 'gf':0, 'ga':0, 'played':0, 'residual':0.0, 'last':0.0} for t in teams}
 played = []
+changed = False
 for m in data.get('matches', []):
     if m.get('stage') != 'group' or not m.get('played'):
         continue
@@ -50,11 +57,13 @@ for t in teams:
         gdpg = row['gd'] / row['played']
         ppg = row['pts'] / row['played']
         residual = row['residual'] / row['played']
-        t['morale'] = round(clamp((ppg - 1.35) * 14 + gdpg * 5 + row['last'] * 1.5, -22, 24), 2)
-        t['manualPowerAdj'] = round(clamp(residual * 12, -24, 24), 2)
+        morale = round(clamp((ppg - 1.35) * 14 + gdpg * 5 + row['last'] * 1.5, -22, 24), 2)
+        power = round(clamp(residual * 12, -24, 24), 2)
     else:
-        t['morale'] = round(float(t.get('morale') or 0) * 0.72, 2)
-        t['manualPowerAdj'] = round(float(t.get('manualPowerAdj') or 0) * 0.72, 2)
+        morale = round(float(t.get('morale') or 0) * 0.72, 2)
+        power = round(float(t.get('manualPowerAdj') or 0) * 0.72, 2)
+    changed |= set_changed(t, 'morale', morale)
+    changed |= set_changed(t, 'manualPowerAdj', power)
 
 for m in data.get('matches', []):
     if m.get('stage') != 'group' or m.get('played'):
@@ -64,18 +73,24 @@ for m in data.get('matches', []):
         continue
     sa, sb = state[a], state[b]
     adj_a = clamp(((sa['pts']/max(1, sa['played'])) - (sb['pts']/max(1, sb['played']))) * 0.018 + ((sa['gd']/max(1, sa['played'])) - (sb['gd']/max(1, sb['played']))) * 0.014, -0.08, 0.08)
-    m['context'] = m.get('context') if isinstance(m.get('context'), dict) else {}
-    m['context']['A'] = dict(m['context'].get('A', {}), goalAdj=round(adj_a, 3), note='Auto form/context adjustment from current tournament results.')
-    m['context']['B'] = dict(m['context'].get('B', {}), goalAdj=round(-adj_a, 3), note='Auto form/context adjustment from current tournament results.')
+    ctx = m.get('context') if isinstance(m.get('context'), dict) else {}
+    a_ctx = dict(ctx.get('A', {}), goalAdj=round(adj_a, 3), note='Auto form/context adjustment from current tournament results.')
+    b_ctx = dict(ctx.get('B', {}), goalAdj=round(-adj_a, 3), note='Auto form/context adjustment from current tournament results.')
+    next_ctx = dict(ctx, A=a_ctx, B=b_ctx)
+    if m.get('context') != next_ctx:
+        m['context'] = next_ctx
+        changed = True
 
-data['modelInputs'] = {
-    'updatedAt': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z',
-    'method': 'Auto-derived tournament form, rank-expectation residual, upcoming-match context edge, and UI-preserving BASE_DATA-only update.',
-    'features': ['rank', 'played results', 'points per game', 'goal difference per game', 'rank-adjusted result residual', 'last-match momentum', 'upcoming-match context goalAdj'],
-    'guardrail': 'Derived fields only tune existing morale/manualPowerAdj/context factors; missing external injury, lineup, xG, referee, and market data remain neutral unless patched explicitly.'
-}
-data['version'] = datetime.date.today().isoformat() + '-accuracy-enriched'
-data['generatedAt'] = data['modelInputs']['updatedAt']
-data['sourceNote'] = 'Automated BASE_DATA score update plus prediction-enrichment pass. Companion UI shell is not rewritten.'
-save_data(html, start, end, data)
-print(json.dumps({'teamsEnriched': len(teams), 'playedMatches': len(played), 'modelInputs': data['modelInputs']['features']}, indent=2))
+if changed:
+    updated = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    data['modelInputs'] = {
+        'updatedAt': updated,
+        'method': 'Auto-derived tournament form, rank-expectation residual, upcoming-match context edge, and UI-preserving BASE_DATA-only update.',
+        'features': ['rank', 'played results', 'points per game', 'goal difference per game', 'rank-adjusted result residual', 'last-match momentum', 'upcoming-match context goalAdj'],
+        'guardrail': 'Derived fields only tune existing morale/manualPowerAdj/context factors; missing external injury, lineup, xG, referee, and market data remain neutral unless patched explicitly.'
+    }
+    data['version'] = datetime.date.today().isoformat() + '-accuracy-enriched'
+    data['generatedAt'] = updated
+    data['sourceNote'] = 'Automated BASE_DATA score update plus prediction-enrichment pass. Companion UI shell is not rewritten.'
+    save_data(html, start, end, data)
+print(json.dumps({'teamsEnriched': len(teams), 'playedMatches': len(played), 'changed': changed}, indent=2))
