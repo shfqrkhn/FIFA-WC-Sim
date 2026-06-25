@@ -6,13 +6,20 @@ const html = fs.readFileSync('docs/index.html', 'utf8');
 const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 if (!scriptMatch) throw new Error('Missing inline script.');
 
-function extractConst(name) {
+function constRange(name, nextName) {
+  const script = scriptMatch[1];
   const marker = `const ${name}=`;
-  const start = scriptMatch[1].indexOf(marker);
+  const start = script.indexOf(marker);
   if (start < 0) throw new Error(`Missing ${marker}`);
   const from = start + marker.length;
-  const end = scriptMatch[1].indexOf(';', from);
-  if (end < 0) throw new Error(`Missing semicolon after ${name}`);
+  const next = nextName ? script.indexOf(`const ${nextName}=`, from) : -1;
+  let end = next >= 0 ? script.lastIndexOf(';', next) : script.indexOf('\nlet ', from);
+  if (end < from) end = script.indexOf(';\n', from);
+  if (end < from) throw new Error(`Could not find end of const ${name}`);
+  return { from, end };
+}
+function extractConst(name, nextName) {
+  const { from, end } = constRange(name, nextName);
   return vm.runInNewContext(scriptMatch[1].slice(from, end), Object.create(null), { timeout: 1000 });
 }
 
@@ -24,8 +31,8 @@ vm.runInNewContext(scriptMatch[1].replace(/render\(\);\s*$/m, ''), {
   }
 }, { timeout: 5000 });
 
-const teams = extractConst('T');
-const matches = extractConst('M');
+const teams = extractConst('T', 'M');
+const matches = extractConst('M', 'SRC');
 const names = new Set(teams.map(t => t[0]));
 const groups = new Set('ABCDEFGHIJKL'.split(''));
 const failures = [];
