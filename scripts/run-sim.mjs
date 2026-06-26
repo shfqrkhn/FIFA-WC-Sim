@@ -90,6 +90,10 @@ const initialBracketHtml = elements.get('#bracketView')?.innerHTML || '';
 if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsHtml.includes('MC:') || !initialBracketHtml.includes('MC:')) {
   throw new Error('Initial page load did not run Monte Carlo predictions into Groups and Bracket views.');
 }
+const initialRepresentativeOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
+if (!initialRepresentativeOk) {
+  throw new Error('Initial Monte Carlo representative did not inform Run Result, Groups, and Bracket views.');
+}
 const footerText = elements.get('#lastDataUpdate')?.textContent || '';
 if (!html.includes('id="lastDataUpdate"') || !footerText || footerText === 'Loading…') {
   throw new Error('Last data update footer was not rendered.');
@@ -140,6 +144,10 @@ const groupsHtml = elements.get('#groupsView')?.innerHTML || '';
 const bracketHtml = elements.get('#bracketView')?.innerHTML || '';
 if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsHtml.includes('MC:') || !bracketHtml.includes('MC:')) {
   throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
+}
+const representativeRunOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
+if (!representativeRunOk) {
+  throw new Error('Run Result, Groups, and Bracket were not informed by the Monte Carlo representative run.');
 }
 const predictionConsistency = vm.runInContext(`(() => {
   const groupOk = Object.values(MC.predictions.groups).every(p => {
