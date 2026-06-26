@@ -119,7 +119,11 @@ const ensembleModelOk = vm.runInContext(`(() => {
   const breakdown = ensembleBreakdown('Argentina', { matches: DATA.matches });
   const weightTotal = Object.values(ensembleWeights()).reduce((sum, x) => sum + x, 0);
   const dist = scorelineDistribution(1.15, 1.05, {});
+  const high = scorelineDistribution(5.8, 5.8, {});
+  const maxA = Math.max(...high.map(x => x.a));
+  const tailBucket = high.find(x => x.a === maxA && x.b === 0);
   const probTotal = dist.reduce((sum, x) => sum + x.p, 0);
+  const highTotal = high.reduce((sum, x) => sum + x.p, 0);
   const sampled = sampleScoreline(1.15, 1.05, rngFactory('ensemble-smoke'), {});
   const disclosure = String(DATA.config?.modelNotes || '') + ' ' + (DATA.config?.assumptions || []).join(' ');
   return Number.isFinite(breakdown.total) &&
@@ -127,6 +131,8 @@ const ensembleModelOk = vm.runInContext(`(() => {
     breakdown.parts.some(p => p.label === 'Attack/defense profile') &&
     Math.abs(weightTotal - 1) < 1e-9 &&
     Math.abs(probTotal - 1) < 1e-6 &&
+    Math.abs(highTotal - 1) < 1e-6 &&
+    tailBucket?.p > poissonPmf(maxA, 5.8) * poissonPmf(0, 5.8) &&
     Array.isArray(sampled) && sampled.length === 2 &&
     disclosure.includes('ensemble') &&
     disclosure.includes('low-score');

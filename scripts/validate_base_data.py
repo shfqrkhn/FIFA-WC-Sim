@@ -27,6 +27,7 @@ REQUIRED_UI = [
     'hydrateModelDisclosure',
     'ensembleBreakdown',
     'scorelineDistribution',
+    'poissonBucketPmf',
     'dixonColesTau',
     'id="appVersion"',
     'id="dataVersion"',
