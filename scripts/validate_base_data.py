@@ -40,6 +40,9 @@ REQUIRED_BRACKET_UI = [
     'title="${teamA}"',
 ]
 REQUIRED_WORKFLOW_STEPS = [
+    "on:\n  workflow_dispatch:\n  schedule:",
+    "cron: '17 8,12,18 11-30 6 *'",
+    "cron: '17 8,12,18 1-20 7 *'",
     'python3 scripts/validate_base_data.py',
     'node --check "$f"',
     'node scripts/build-html.mjs',
