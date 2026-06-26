@@ -41,6 +41,8 @@ REQUIRED_SCRIPT_MARKERS = {
         'if not NO_FETCH and (paths or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
         "'path': path",
+        'scoreboard file invalid shape',
+        'isinstance(events, list)',
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
