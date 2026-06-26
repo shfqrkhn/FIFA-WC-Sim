@@ -1,8 +1,9 @@
-import datetime, json, os, urllib.parse, urllib.request
+import datetime, json, os, sys, urllib.parse, urllib.request
 
 HTML_PATH = 'docs/index.html'
 MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
+NO_FETCH = '--no-fetch' in sys.argv
 
 def load_data():
     html = open(HTML_PATH, encoding='utf-8').read()
@@ -23,7 +24,9 @@ def iso_day(value):
 def weather_signature(w):
     return {k: w.get(k) for k in ('source','date','tempC','highC','lowC','precipProb','windKph','error')}
 
-def fetch_weather(venue, day):
+def fetch_weather(venue, day, existing=None):
+    if NO_FETCH:
+        return existing
     lat, lon = venue.get('lat'), venue.get('lon')
     if not isinstance(lat, (int, float)) or not isinstance(lon, (int, float)) or not day: return None
     params = urllib.parse.urlencode({'latitude': lat,'longitude': lon,'start_date': day.isoformat(),'end_date': day.isoformat(),'daily': 'temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max','timezone': 'UTC'})
@@ -56,7 +59,7 @@ for m in data.get('matches', []):
     day = iso_day(m.get('date') or m.get('kickoff') or m.get('kickoffLocal') or m.get('utc'))
     venue = venues.get(m.get('venue')) or {}
     try:
-        weather = fetch_weather(venue, day)
+        weather = fetch_weather(venue, day, weather_by_match.get(no))
     except Exception as e:
         weather = {'source': 'open-meteo', 'date': day.isoformat() if day else None, 'error': str(e), 'fetchedAt': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'} if day else None
     if not weather: continue
@@ -80,4 +83,4 @@ if changed:
     data['generatedAt'] = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
     data['sourceNote'] = 'Automated BASE_DATA update including scoreboard, tournament-form enrichment, rest/travel, and weather context. Companion UI shell is not rewritten.'
     save_data(html, start, end, data)
-print(json.dumps({'weatherMatches': len(weather_by_match), 'changed': changed}, indent=2))
+print(json.dumps({'weatherMatches': len(weather_by_match), 'changed': changed, 'noFetch': NO_FETCH}, indent=2))
