@@ -87,6 +87,24 @@ const bracketHtml = elements.get('#bracketView')?.innerHTML || '';
 if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsHtml.includes('MC:') || !bracketHtml.includes('MC:')) {
   throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
 }
+const predictionConsistency = vm.runInContext(`(() => {
+  const groupOk = Object.values(MC.predictions.groups).every(p => {
+    const outcome = topCount(p.outcomes);
+    const score = outcome && topCount(p.outcomeScores?.[outcome[0]]);
+    if (!outcome || !score) return false;
+    const [a, b] = score[0].split('-').map(Number);
+    return outcome[0] === 'Draw' ? a === b : outcome[0] === p.teamA ? a > b : a < b;
+  });
+  const bracketOk = Object.values(MC.predictions.knockout).every(p => {
+    const winner = topCount(p.winners);
+    const pairing = winner && topCount(p.winnerPairings?.[winner[0]]);
+    return !!winner && !!pairing && pairing[0].split(' vs ').includes(winner[0]);
+  });
+  return { groupOk, bracketOk };
+})()`, sandbox, { timeout: 5000 });
+if (!predictionConsistency.groupOk || !predictionConsistency.bracketOk) {
+  throw new Error('Monte Carlo prediction summaries are internally inconsistent.');
+}
 fs.mkdirSync('data', { recursive: true });
 fs.writeFileSync('data/latest-simulation.json', JSON.stringify({
   generatedAt: new Date().toISOString(),
