@@ -1,111 +1,100 @@
-# World Cup 2026 Simulator 🏆⚽
+# World Cup 2026 Simulator
 
-**Current Data Version:** shown in the deployed app's Maintenance view from embedded `BASE_DATA`.
+**Current Data Version:** shown in the deployed app's Data health view from embedded `BASE_DATA`.
 
-**A fast, offline-first tournament simulator for exploring the 2026 FIFA World Cup.**
+World Cup 2026 Simulator is a static, offline-capable web app for exploring the 48-team, 104-match FIFA World Cup 2026 format. It combines embedded match results, an ensemble prediction engine, venue/weather context, host advantage, seeded randomness, FIFA-style group ranking, knockout rules, and Monte Carlo tournament simulation in one portable HTML file.
 
-Welcome to World Cup 2026 Simulator, a single-file web app built for quick tournament runs, Monte Carlo probability estimates, group-stage tracking, knockout-path exploration, and transparent model inspection.
-
-[**Live Demo**](https://shfqrkhn.github.io/FIFA-WC-Sim/)
+[Live Demo](https://shfqrkhn.github.io/FIFA-WC-Sim/)
 
 ## Screenshot
 
 ![World Cup 2026 Simulator dashboard](docs/assets/simulator-dashboard.png)
 
-## 🌟 What is World Cup 2026 Simulator?
+## Quick Start
 
-World Cup 2026 Simulator is a **free, static, offline-capable** app for simulating the full 48-team, 104-match FIFA World Cup 2026 format. It combines embedded group results, an ensemble match-strength model, venue effects, weather context, home/co-host advantage, seeded randomness, knockout logic, and Monte Carlo runs into one portable HTML file.
+1. Open the live app.
+2. On the **Sim** tab, keep the defaults or adjust the scenario name, number of prediction runs, match style, host boost, and weather setting.
+3. Press **Run predictions**.
+4. Read **Most likely champions** first. This is the quickest summary of the tournament outlook.
+5. Review **Sample tournament path** to see one representative bracket path that matches the top Monte Carlo outcome.
+6. Use **Groups**, **Bracket**, and **Odds** for more detail.
+7. Use **How**, **Data**, **Checks**, **Health**, and **Sources** only when you want deeper transparency or maintenance detail.
 
-The app is designed to be transparent: model assumptions, coefficients, match explanations, data patches, source notes, and audit checks are visible inside the interface.
+## Main Tabs
 
-## 🚀 Getting Started
+### Sim
 
-Using the simulator is simple.
+The main screen is designed to answer the most common question first: who is most likely to win?
 
-1. **Visit the App:** Open your browser and go to: [shfqrkhn.github.io/FIFA-WC-Sim/](https://shfqrkhn.github.io/FIFA-WC-Sim/)
-2. **Run Monte Carlo:** Choose a seed, number of runs, model mode, home-advantage setting, and weather mode, then click **Run Monte Carlo**.
-3. **Review the Probability Board:** Stay on the Simulator page to compare top champion probabilities and likely tournament paths.
-4. **Explore Detail:** Use Groups, Bracket, Monte Carlo, Stats, Transparency, Model/Data, Audit, Maintenance, and Sources when deeper inspection is needed.
-5. **Save Offline:** Because the app is a standalone HTML file with no required dependencies, you can save it locally and keep using the embedded simulator without a network connection. Optional live data refreshes require internet access.
+Controls:
 
-## 🧭 Main Features
+* **Scenario name:** a seed for repeatable results. The same seed and settings produce the same sample tournament path.
+* **Prediction runs:** how many Monte Carlo tournament runs to perform. More runs produce smoother probabilities and take longer.
+* **Match style:** balanced, steadier, or more upsets.
+* **Host boost:** turns host/co-host expected-goal advantage on or off.
+* **Weather:** uses live weather if available, venue climate estimates, or no weather adjustment.
 
-### 📊 Simulator Dashboard
+### Groups
 
-The main dashboard is optimized around the probability board and core controls:
+Shows current group standings, played results, projected upcoming scores, and the best third-place queue. Played matches stay fixed; unplayed matches are filled by the prediction engine.
 
-* **Monte Carlo runs:** Estimate title probabilities across repeated seeded tournament simulations.
-* **Ensemble match model:** Blend ranking prior, tournament pedigree, current form, and attack/defense profile before sampling scorelines.
-* **Compact controls:** Adjust seed, run count, mode, home advantage, and weather behavior.
-* **Auto-refresh flow:** Relevant optional data refreshes are triggered through the Monte Carlo workflow instead of extra manual buttons.
-* **Responsive UI:** Designed for desktop, tablet, mobile, touch, mouse, keyboard, and constrained input conditions.
+### Bracket
 
-### 🏟️ Group Stage
+Shows the projected knockout bracket from the Round of 32 through the final. The bracket wraps across smaller desktop and mobile screens to avoid horizontal scrolling.
 
-The Groups section shows the full group-stage picture:
+### Odds
 
-* Embedded played results.
-* Projected unplayed results when simulated.
-* FIFA-style group ranking logic.
-* Best third-place qualification queue.
+Shows each team's Monte Carlo probability of winning the cup and reaching later rounds.
+
+### How
+
+Explains the prediction model, coefficients, assumptions, match inputs, expected goals, venue/weather effects, host terms, and scoreline logic.
+
+### Data, Checks, Health, Sources
+
+These are advanced sections. They keep transparency and maintenance information available without crowding the main user flow:
+
+* **Data:** JSON import/export/reset tools.
+* **Checks:** built-in regression and tournament-shape self-tests.
+* **Health:** data version, validation history, patch history, known risks, and update checklist.
+* **Sources:** source list and update protocol.
+
+## How the Prediction Engine Works
+
+The app keeps Monte Carlo as the tournament-level simulator. Under each tournament run, individual matches are predicted by an ensemble match model:
+
+1. **Ranking prior:** FIFA ranking provides a broad strength baseline.
+2. **Tournament pedigree proxy:** titles, deep runs, and listed star depth add historical and squad-strength context.
+3. **Current form:** embedded tournament points, goal difference, goals for, and goals against adjust teams as results arrive.
+4. **Attack/defense profile:** played-match scoring and defending patterns influence expected goals.
+5. **Context terms:** venue, climate, weather, rest/travel, host/co-host advantage, and editable match context adjust expected goals.
+6. **Scoreline sampler:** expected goals are converted into scorelines with a bounded low-score correlation adjustment, then knockout draws go to extra time and penalties.
+7. **Tournament simulation:** group standings, best third-place teams, legal knockout slots, and each knockout round are resolved.
+8. **Monte Carlo aggregation:** thousands of runs are counted into champion, finalist, semifinal, quarterfinal, and round-of-16 probabilities.
+
+The displayed sample path is selected from the Monte Carlo run that represents the top champion/finalist pairing, so the main result, Groups, Bracket, and favorites board stay aligned.
+
+## Data Sources and Updates
+
+The embedded data includes:
+
+* Teams, groups, venues, and knockout slots.
+* Played group-stage results.
+* FIFA ranking priors and team-strength assumptions.
+* Venue, climate, rest/travel, and weather context.
 * Fair-play/team-conduct inputs where available.
+* Source notes, validation history, and known data-quality gaps.
 
-### 🧩 Knockout Bracket
+Scheduled update workflows refresh available BASE_DATA inputs and run validation. Missing factors such as lineups, injuries, suspensions, and referee assignments remain neutral unless reliable data is added.
 
-The Bracket section simulates the full knockout stage:
+## Privacy and Offline Use
 
-* Round of 32 through Final.
-* Legal third-place assignment.
-* FIFA Annex C-aware exact mapping when available.
-* Legal fallback allocator when exact external mapping is unavailable.
-* Extra time and penalty shootout modeling.
+The app runs in the browser and does not require an account, backend service, tracking script, or build step. Data edits are stored locally when browser storage is available. Optional live weather and external bracket data requests only run when triggered by the app flow and available in the browser.
 
-### 🎲 Monte Carlo Table
-
-The Monte Carlo section provides deeper probability output:
-
-* Champion probability.
-* Final appearance.
-* Semifinal, quarterfinal, round-of-16, and round-of-32 appearance rates.
-* Seeded repeatability for comparable runs.
-
-### 🔎 Transparency Ledger
-
-The Transparency section explains how results are generated:
-
-* Power formulas.
-* Ensemble weights and scoreline-sampling settings.
-* Expected-goals calculations.
-* Venue, climate, altitude, and host/co-host adjustments.
-* Manual match-context modifiers.
-* Match-by-match explanation ledgers.
-
-### 🛠️ Model/Data, Audit, and Maintenance
-
-The app includes built-in reliability tooling:
-
-* Editable JSON data patching.
-* Import/export support.
-* Safe local persistence.
-* Structural data repair.
-* Integrity audit.
-* Regression checks for bracket allocation, cached data, storage failures, malformed saved data, Monte Carlo accounting, and UI accessibility paths.
-* Maintenance handoff prompt for future AI-assisted updates.
-
-## 🔒 Privacy and Offline Use
-
-World Cup 2026 Simulator runs in your browser. Data edits are stored locally through browser storage when available, and the app continues to work when storage is blocked or unavailable.
-
-No account, tracking script, backend service, or required third-party dependency is needed. Optional live weather and Annex C refreshes use public web requests only when triggered by the app flow and available in the browser.
-
-## ⚠️ Important Disclaimer
+## Disclaimer
 
 This is a probabilistic simulator, not an official FIFA product, live scoring authority, prediction guarantee, or betting tool. Current facts, match results, injuries, suspensions, lineups, rankings, and official regulations should be verified against trusted sources before relying on them.
 
-## 🤝 Community
+## Stability
 
-Use the simulator to explore scenarios, compare assumptions, test tournament paths, and discuss World Cup probabilities. If you improve the model, data, UI, accessibility, or audit coverage, consider contributing those changes back to the project.
-
-## 🏆 Stability Verified
-
-World Cup 2026 Simulator has been iteratively hardened through syntax checks, runtime smoke tests, ensemble-model checks, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, and responsive UI regression passes.
+The project is guarded by syntax checks, runtime smoke tests, ensemble-model checks, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, and responsive UI regression checks.

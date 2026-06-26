@@ -11,17 +11,17 @@ REQUIRED_UI = [
     'data-tab="bracket"',
     'data-tab="prob"',
     'data-tab="stats"',
-    'Transparency ledger',
-    'Integrity audit',
-    'Maintenance ledger',
+    'How predictions work',
+    'Technical checks',
+    'Data health',
     'const BASE_DATA = ',
-    'upcoming fixtures show consensus outcome',
+    'predicted upcoming scores',
     'formatGroupMCPrediction',
     'formatKnockoutMCPrediction',
     'recordMonteCarloPredictions',
     'chooseMonteCarloRepresentativeRun',
     'representative',
-    'Probability board, Run Result, Groups, and Bracket updated',
+    'Predictions complete. Favorites, sample path, Groups, and Bracket updated.',
     'const APP_VERSION',
     'MODEL_DEFAULTS',
     'hydrateModelDisclosure',
@@ -58,8 +58,9 @@ REQUIRED_INPUT_UI = [
     'activateSectionTarget',
 ]
 REQUIRED_BRACKET_UI = [
-    '.bracketScroller{overflow-x:auto',
-    'grid-template-columns:repeat(6,minmax(240px,1fr))',
+    '.bracketScroller{overflow:visible',
+    '@media (max-width:1480px) and (min-width:1001px)',
+    'grid-template-columns:repeat(3,minmax(0,1fr))',
     'grid-template-columns:auto minmax(0,1fr)',
     'grid-template-columns:minmax(0,1fr) auto',
     'position:static;top:auto;z-index:2',
@@ -92,7 +93,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
     'data/latest-simulation.json',
 ]
-README_VERSION_MARKER = "shown in the deployed app's Maintenance view from embedded `BASE_DATA`"
+README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
 REQUIRED_SCRIPT_MARKERS = {
     'scripts/automation_utils.py': [
         'def utc_stamp():',
@@ -156,7 +157,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'addEventListener',
         'localStorageStub',
         'Initial page load did not run Monte Carlo predictions into Groups and Bracket views.',
-        'Initial Monte Carlo representative did not inform Run Result, Groups, and Bracket views.',
+        'Initial Monte Carlo representative did not inform the sample path, Groups, and Bracket views.',
         'Last data update footer was not rendered.',
         'Footer metadata did not render app version, data version, copyright, and legal notice.',
         'Last data update footer did not use the latest embedded timestamp.',
@@ -164,7 +165,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'Monte Carlo loading state did not toggle accessibly.',
         'Monte Carlo controls were not locked during simulation.',
         'Monte Carlo summaries were not invalidated after data/control refresh.',
-        'Run Result, Groups, and Bracket were not informed by the Monte Carlo representative run.',
+        'Sample path, Groups, and Bracket were not informed by the Monte Carlo representative run.',
         'Displayed bracket Monte Carlo prediction did not match displayed teams.',
     ],
     'scripts/base-data.mjs': [

@@ -92,7 +92,7 @@ if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !ini
 }
 const initialRepresentativeOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
 if (!initialRepresentativeOk) {
-  throw new Error('Initial Monte Carlo representative did not inform Run Result, Groups, and Bracket views.');
+  throw new Error('Initial Monte Carlo representative did not inform the sample path, Groups, and Bracket views.');
 }
 const footerText = elements.get('#lastDataUpdate')?.textContent || '';
 if (!html.includes('id="lastDataUpdate"') || !footerText || /^Loading/.test(footerText)) {
@@ -134,8 +134,8 @@ const ensembleModelOk = vm.runInContext(`(() => {
     Math.abs(highTotal - 1) < 1e-6 &&
     tailBucket?.p > poissonPmf(maxA, 5.8) * poissonPmf(0, 5.8) &&
     Array.isArray(sampled) && sampled.length === 2 &&
-    disclosure.includes('ensemble') &&
-    disclosure.includes('low-score');
+    /ensemble/i.test(disclosure) &&
+    /low-score/i.test(disclosure);
 })()`, sandbox, { timeout: 1000 });
 if (!ensembleModelOk) {
   throw new Error('Ensemble model and low-score scoreline sampler were not active and disclosed.');
@@ -181,7 +181,7 @@ if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsHtml.includ
 }
 const representativeRunOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
 if (!representativeRunOk) {
-  throw new Error('Run Result, Groups, and Bracket were not informed by the Monte Carlo representative run.');
+  throw new Error('Sample path, Groups, and Bracket were not informed by the Monte Carlo representative run.');
 }
 const predictionConsistency = vm.runInContext(`(() => {
   const groupOk = Object.values(MC.predictions.groups).every(p => {
