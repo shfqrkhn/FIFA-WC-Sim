@@ -13,6 +13,17 @@ REQUIRED_UI = [
     'Maintenance ledger',
     'const BASE_DATA = ',
 ]
+REQUIRED_INPUT_UI = [
+    'class="skip"',
+    'role="tablist"',
+    'aria-label="Main sections"',
+    'role="status"',
+    'aria-live="polite"',
+    ':focus-visible',
+    'button,input,select{min-height:44px}',
+    'setupA11y();',
+    'activateSectionTarget',
+]
 REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/validate_base_data.py',
     'python3 scripts/apply_scoreboard.py',
@@ -45,6 +56,9 @@ html = open(HTML, encoding='utf-8').read()
 for marker in REQUIRED_UI:
     if marker not in html:
         fail('missing UI/data marker: %s' % marker)
+for marker in REQUIRED_INPUT_UI:
+    if marker not in html:
+        fail('missing single-input UI marker: %s' % marker)
 if '<title>World Cup 2026 Simulator</title>' in html and 'Whole Tournament Simulator' not in html[:1000]:
     fail('compact shell regression detected')
 if os.path.exists(WORKFLOW):
@@ -102,4 +116,4 @@ if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
 if errors:
     fail('; '.join(errors[:12]))
-print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True}, indent=2))
+print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True, 'singleInputGuarded': True}, indent=2))
