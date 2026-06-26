@@ -24,6 +24,18 @@ REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/test_idempotence.py',
     'data/update-health.json',
 ]
+REQUIRED_SCRIPT_MARKERS = {
+    'scripts/test_idempotence.py': ['scripts/test_deterministic.py'],
+    'scripts/test_deterministic.py': [
+        "scripts/apply_scoreboard.py','--no-fetch",
+        'scripts/enrich_predictions.py',
+        'scripts/enrich_rest_travel.py',
+        "scripts/enrich_weather.py','--no-fetch",
+        'scripts/enrich_data_quality.py',
+        'scripts/update_health.py',
+        'before!=after or after!=final',
+    ],
+}
 
 def fail(msg):
     print('VALIDATION FAILED:', msg)
@@ -42,6 +54,13 @@ if os.path.exists(WORKFLOW):
             fail('missing workflow automation marker: %s' % marker)
 else:
     fail('missing daily BASE_DATA workflow')
+for path, markers in REQUIRED_SCRIPT_MARKERS.items():
+    if not os.path.exists(path):
+        fail('missing automation guard script: %s' % path)
+    body = open(path, encoding='utf-8').read()
+    for marker in markers:
+        if marker not in body:
+            fail('missing automation guard marker in %s: %s' % (path, marker))
 start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
 end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
 data = json.loads(html[start:end])
