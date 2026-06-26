@@ -2,6 +2,7 @@ import datetime, json, os, sys, urllib.request
 
 HTML_PATH = 'docs/index.html'
 STOP_DATE = datetime.date(2026, 7, 20)
+NO_FETCH = '--no-fetch' in sys.argv
 TEAM = {
     'MEX':'Mexico','RSA':'South Africa','KOR':'South Korea','CZE':'Czechia','CAN':'Canada','BIH':'Bosnia and Herzegovina','QAT':'Qatar','SUI':'Switzerland',
     'BRA':'Brazil','MAR':'Morocco','HTI':'Haiti','SCO':'Scotland','USA':'United States','PAR':'Paraguay','AUS':'Australia','TUR':'Turkey',
@@ -27,7 +28,7 @@ def is_final(ev):
     return bool(typ.get('completed') or typ.get('name') in ('STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN'))
 def scoreboard_paths():
     args = [a for a in sys.argv[1:] if a != '--no-fetch']
-    if '--no-fetch' in sys.argv: return args
+    if NO_FETCH: return args
     if args: return args
     today = datetime.date.today()
     if today > STOP_DATE:
@@ -54,7 +55,8 @@ html, start, end, data = load_base_data()
 idx = {key(m['teamA'], m['teamB']): m for m in data['matches'] if m.get('stage') == 'group'}
 fetched = applied = 0
 changes = []
-for path in scoreboard_paths():
+paths = scoreboard_paths()
+for path in paths:
     with open(path, encoding='utf-8') as f: feed = json.load(f)
     for ev in feed.get('events', []):
         if not is_final(ev): continue
@@ -86,8 +88,9 @@ if applied:
     data['currentStats'] = current
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html[:start] + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + html[end:])
+if not NO_FETCH and paths:
     os.makedirs('data', exist_ok=True)
     with open('data/latest-update.json', 'w', encoding='utf-8') as f:
         json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, f, indent=2)
         f.write('\n')
-print(json.dumps({'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, indent=2))
+print(json.dumps({'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes, 'noFetch': NO_FETCH}, indent=2))
