@@ -5,13 +5,13 @@ def digest(p):
     return hashlib.sha256(open(p,'rb').read()).hexdigest() if os.path.exists(p) else None
 def snap():
     return {p:digest(p) for p in files}
-for c in cmds: subprocess.run(c,check=True)
-a=snap()
-for c in cmds: subprocess.run(c,check=True)
-b=snap()
-if a!=b:
+def run():
+    for c in cmds: subprocess.run(c,check=True)
+before=snap(); run(); after=snap(); run(); final=snap()
+if before!=after or after!=final:
     print('deterministic idempotence failed')
-    print(a)
-    print(b)
+    print('before=',before)
+    print('after=',after)
+    print('final=',final)
     raise SystemExit(1)
 print('deterministic idempotence passed')
