@@ -7,16 +7,14 @@ html=open(HTML_PATH,encoding='utf-8').read()
 s=html.index(MARKER)+len(MARKER); e=html.index(END,s); data=json.loads(html[s:e])
 ms=[m for m in data.get('matches',[]) if m.get('stage')=='group']
 todo=[m for m in ms if not m.get('played')]
+played=[m for m in ms if m.get('played')]
 w=data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'),dict) else {}
 failed_weather=[{'match':k,'error':v.get('error')} for k,v in w.items() if isinstance(v,dict) and v.get('error')]
-latest={}
-if os.path.exists('data/latest-update.json'):
-    try: latest=json.load(open('data/latest-update.json',encoding='utf-8'))
-    except Exception: latest={'error':'latest-update unreadable'}
+stats=data.get('currentStats') if isinstance(data.get('currentStats'),dict) else {}
 health={
     'generatedAt':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z',
-    'scoreboard':{'attempted':True,'appliedChanges':latest.get('appliedChanges',0),'fetchedFinals':latest.get('fetchedFinals',0),'changes':latest.get('changes',[])},
-    'weather':{'attempted':True,'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
+    'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats},
+    'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
 }
