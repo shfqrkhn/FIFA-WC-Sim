@@ -3,6 +3,10 @@ import datetime, json, os
 HTML_PATH='docs/index.html'
 MARKER='const BASE_DATA = '
 END=';\nconst BLOCKED_PATCH_KEYS'
+
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 html=open(HTML_PATH,encoding='utf-8').read()
 s=html.index(MARKER)+len(MARKER); e=html.index(END,s); data=json.loads(html[s:e])
 ms=[m for m in data.get('matches',[]) if m.get('stage')=='group']
@@ -16,7 +20,7 @@ if os.path.exists('data/latest-update.json'):
     try: latest=json.load(open('data/latest-update.json',encoding='utf-8'))
     except Exception: latest={'error':'latest-update unreadable'}
 health={
-    'generatedAt':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z',
+    'generatedAt':utc_stamp(),
     'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'dataQuality':data.get('dataQuality',{}),

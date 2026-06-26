@@ -5,6 +5,9 @@ MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 EARTH_KM = 6371.0
 
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 def load_data():
     html = open(HTML_PATH, encoding='utf-8').read()
     start = html.index(MARKER) + len(MARKER)
@@ -75,7 +78,7 @@ for m in matches:
         team_last[b] = {'day': day, 'venue': venue}
 if changed:
     data['restTravel'] = rest_travel
-    data['generatedAt'] = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    data['generatedAt'] = utc_stamp()
     data['sourceNote'] = 'Automated BASE_DATA update including scoreboard, form, rest/travel, and weather context. Companion UI shell is not rewritten.'
     save_data(html, start, end, data)
 print(json.dumps({'restTravelMatches': len(rest_travel), 'changed': changed}, indent=2))

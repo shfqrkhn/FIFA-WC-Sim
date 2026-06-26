@@ -4,6 +4,9 @@ HTML_PATH = 'docs/index.html'
 MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 def load_data():
     html = open(HTML_PATH, encoding='utf-8').read()
     start = html.index(MARKER) + len(MARKER)
@@ -38,7 +41,7 @@ quality_core = {
     'principle': 'Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.'
 }
 if stable(data.get('dataQuality')) != quality_core:
-    now = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    now = utc_stamp()
     data['dataQuality'] = dict(quality_core, updatedAt=now)
     data['generatedAt'] = now
     data['sourceNote'] = 'Automated BASE_DATA update with score, form, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'

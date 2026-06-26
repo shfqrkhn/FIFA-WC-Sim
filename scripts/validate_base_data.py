@@ -3,6 +3,7 @@ import json, os, re, sys
 HTML = 'docs/index.html'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 REQUIRED_UI = [
+    '<title>FIFA World Cup 2026 \u2014 Whole Tournament Simulator</title>',
     'Whole Tournament Simulator',
     'data-tab="groups"',
     'data-tab="bracket"',
@@ -23,6 +24,18 @@ REQUIRED_INPUT_UI = [
     'button,input,select{min-height:44px}',
     'setupA11y();',
     'activateSectionTarget',
+]
+REQUIRED_BRACKET_UI = [
+    '.bracketScroller{overflow-x:auto',
+    'grid-template-columns:repeat(6,minmax(240px,1fr))',
+    'grid-template-columns:auto minmax(0,1fr)',
+    'grid-template-columns:minmax(0,1fr) auto',
+    'position:static;top:auto;z-index:2',
+    'text-overflow:ellipsis',
+    'venueText',
+    'teamText',
+    'title="${venue}"',
+    'title="${teamA}"',
 ]
 REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/validate_base_data.py',
@@ -74,6 +87,9 @@ for marker in REQUIRED_UI:
 for marker in REQUIRED_INPUT_UI:
     if marker not in html:
         fail('missing single-input UI marker: %s' % marker)
+for marker in REQUIRED_BRACKET_UI:
+    if marker not in html:
+        fail('missing bracket no-overlap marker: %s' % marker)
 if '<title>World Cup 2026 Simulator</title>' in html and 'Whole Tournament Simulator' not in html[:1000]:
     fail('compact shell regression detected')
 if os.path.exists(WORKFLOW):
@@ -90,6 +106,15 @@ for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     for marker in markers:
         if marker not in body:
             fail('missing automation guard marker in %s: %s' % (path, marker))
+deprecated = 'utc' + 'now'
+for root, _, files in os.walk('scripts'):
+    for name in files:
+        if not name.endswith('.py'):
+            continue
+        path = os.path.join(root, name)
+        body = open(path, encoding='utf-8').read()
+        if 'datetime.datetime.' + deprecated in body or '.' + deprecated + '(' in body:
+            fail('deprecated naive UTC timestamp helper in %s' % path)
 start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
 end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
 data = json.loads(html[start:end])

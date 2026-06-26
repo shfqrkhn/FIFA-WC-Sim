@@ -4,6 +4,9 @@ HTML_PATH = 'docs/index.html'
 MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 def load_data():
     html = open(HTML_PATH, encoding='utf-8').read()
     start = html.index(MARKER) + len(MARKER)
@@ -86,7 +89,7 @@ for m in data.get('matches', []):
         changed = True
 
 if changed:
-    updated = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    updated = utc_stamp()
     data['modelInputs'] = {
         'updatedAt': updated,
         'method': 'Auto-derived tournament form, rank-expectation residual, upcoming-match context edge, and UI-preserving BASE_DATA-only update.',

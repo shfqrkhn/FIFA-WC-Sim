@@ -5,6 +5,9 @@ MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 NO_FETCH = '--no-fetch' in sys.argv
 
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 def load_data():
     html = open(HTML_PATH, encoding='utf-8').read()
     start = html.index(MARKER) + len(MARKER)
@@ -35,7 +38,7 @@ def fetch_weather(venue, day, existing=None):
     if not d.get('time'): return None
     high, low = d.get('temperature_2m_max', [None])[0], d.get('temperature_2m_min', [None])[0]
     if high is None or low is None: return None
-    return {'source': 'open-meteo', 'date': day.isoformat(), 'tempC': round((high + low) / 2, 1), 'highC': high, 'lowC': low, 'precipProb': d.get('precipitation_probability_max', [None])[0], 'windKph': d.get('wind_speed_10m_max', [None])[0], 'fetchedAt': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'}
+    return {'source': 'open-meteo', 'date': day.isoformat(), 'tempC': round((high + low) / 2, 1), 'highC': high, 'lowC': low, 'precipProb': d.get('precipitation_probability_max', [None])[0], 'windKph': d.get('wind_speed_10m_max', [None])[0], 'fetchedAt': utc_stamp()}
 
 def weather_edge(weather, team, venue):
     if not weather: return 0
@@ -61,7 +64,7 @@ for m in data.get('matches', []):
     try:
         weather = fetch_weather(venue, day, weather_by_match.get(no))
     except Exception as e:
-        weather = {'source': 'open-meteo', 'date': day.isoformat() if day else None, 'error': str(e), 'fetchedAt': datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'} if day else None
+        weather = {'source': 'open-meteo', 'date': day.isoformat() if day else None, 'error': str(e), 'fetchedAt': utc_stamp()} if day else None
     if not weather: continue
     if weather_signature(weather_by_match.get(no, {})) != weather_signature(weather):
         weather_by_match[no] = weather
@@ -80,7 +83,7 @@ for m in data.get('matches', []):
         changed = True
 if changed:
     data['weatherByMatch'] = weather_by_match
-    data['generatedAt'] = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+    data['generatedAt'] = utc_stamp()
     data['sourceNote'] = 'Automated BASE_DATA update including scoreboard, tournament-form enrichment, rest/travel, and weather context. Companion UI shell is not rewritten.'
     save_data(html, start, end, data)
 print(json.dumps({'weatherMatches': len(weather_by_match), 'changed': changed, 'noFetch': NO_FETCH}, indent=2))

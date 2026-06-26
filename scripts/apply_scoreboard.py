@@ -13,6 +13,9 @@ TEAM = {
     'POR':'Portugal','COD':'DR Congo','DRC':'DR Congo','UZB':'Uzbekistan','COL':'Colombia','ENG':'England','CRO':'Croatia','GHA':'Ghana','PAN':'Panama'
 }
 
+def utc_stamp():
+    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
 def key(a, b): return '|'.join(sorted([a, b]))
 def date_key(day): return day.strftime('%Y%m%d')
 def load_base_data():
@@ -94,7 +97,7 @@ for path in paths:
             match.pop('context', None)
             applied += 1
             changes.append('M%s %s %s-%s %s' % (match['no'], match['teamA'], next_a, next_b, match['teamB']))
-stamp = datetime.datetime.utcnow().replace(microsecond=0).isoformat() + 'Z'
+stamp = utc_stamp()
 if applied:
     played = [m for m in data['matches'] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
     goals = sum(m['scoreA'] + m['scoreB'] for m in played)
