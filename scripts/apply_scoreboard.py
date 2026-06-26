@@ -1,4 +1,5 @@
 import datetime, json, os, sys, urllib.request
+from automation_utils import utc_stamp
 
 HTML_PATH = 'docs/index.html'
 STOP_DATE = datetime.date(2026, 7, 20)
@@ -12,9 +13,6 @@ TEAM = {
     'FRA':'France','SEN':'Senegal','IRQ':'Iraq','NOR':'Norway','ARG':'Argentina','DZA':'Algeria','ALG':'Algeria','AUT':'Austria','JOR':'Jordan',
     'POR':'Portugal','COD':'DR Congo','DRC':'DR Congo','UZB':'Uzbekistan','COL':'Colombia','ENG':'England','CRO':'Croatia','GHA':'Ghana','PAN':'Panama'
 }
-
-def utc_stamp():
-    return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
 
 def key(a, b): return '|'.join(sorted([a, b]))
 def date_key(day): return day.strftime('%Y%m%d')

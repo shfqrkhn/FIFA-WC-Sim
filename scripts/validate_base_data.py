@@ -49,7 +49,13 @@ REQUIRED_WORKFLOW_STEPS = [
     'data/update-health.json',
 ]
 REQUIRED_SCRIPT_MARKERS = {
+    'scripts/automation_utils.py': [
+        'def utc_stamp():',
+        'datetime.timezone.utc',
+        ".replace('+00:00', 'Z')",
+    ],
     'scripts/apply_scoreboard.py': [
+        'from automation_utils import utc_stamp',
         "NO_FETCH = '--no-fetch' in sys.argv",
         'if not NO_FETCH and (paths or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
@@ -61,6 +67,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
+        'from automation_utils import utc_stamp',
         'data/latest-update.json',
         "'latestUpdate':latest",
     ],
@@ -115,6 +122,16 @@ for root, _, files in os.walk('scripts'):
         body = open(path, encoding='utf-8').read()
         if 'datetime.datetime.' + deprecated in body or '.' + deprecated + '(' in body:
             fail('deprecated naive UTC timestamp helper in %s' % path)
+utc_helpers = []
+for root, _, files in os.walk('scripts'):
+    for name in files:
+        if not name.endswith('.py'):
+            continue
+        path = os.path.join(root, name)
+        if re.search(r'^def\s+utc_stamp\s*\(', open(path, encoding='utf-8').read(), re.M):
+            utc_helpers.append(path.replace('\\', '/'))
+if utc_helpers != ['scripts/automation_utils.py']:
+    fail('utc_stamp helper must stay centralized in scripts/automation_utils.py')
 start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
 end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
 data = json.loads(html[start:end])
