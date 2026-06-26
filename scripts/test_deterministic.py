@@ -7,7 +7,8 @@ def snap():
     return {p:digest(p) for p in files}
 def run():
     for c in cmds: subprocess.run(c,check=True)
-run()
+if not os.path.exists('data/update-health.json'):
+    run()
 before=snap(); run(); after=snap(); run(); final=snap()
 if before!=after or after!=final:
     print('deterministic idempotence failed')
