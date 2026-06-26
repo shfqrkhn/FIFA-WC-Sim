@@ -81,6 +81,36 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/update_health.py',
         'before!=after or after!=final',
     ],
+    'scripts/node-python.mjs': [
+        'const PYTHON_CANDIDATES',
+        'export function runPythonScript',
+    ],
+    'scripts/build-html.mjs': [
+        "import { readArtifact } from './base-data.mjs'",
+        'groupMatches',
+        'knockoutMatches',
+    ],
+    'scripts/validate.mjs': [
+        "import { runPythonScript } from './node-python.mjs'",
+        'scripts/validate_base_data.py',
+    ],
+    'scripts/update-data.mjs': [
+        'scripts/apply_scoreboard.py',
+        'scripts/enrich_predictions.py',
+        'scripts/enrich_rest_travel.py',
+        'scripts/enrich_weather.py',
+        'scripts/enrich_data_quality.py',
+        'scripts/update_health.py',
+    ],
+    'scripts/run-sim.mjs': [
+        'documentStub',
+        'addEventListener',
+        'localStorageStub',
+    ],
+    'scripts/base-data.mjs': [
+        r'/;\r?\nconst BLOCKED_PATCH_KEYS/',
+        'JSON.parse(html.slice(from,end))',
+    ],
 }
 
 def fail(msg):
@@ -132,6 +162,14 @@ for root, _, files in os.walk('scripts'):
             utc_helpers.append(path.replace('\\', '/'))
 if utc_helpers != ['scripts/automation_utils.py']:
     fail('utc_stamp helper must stay centralized in scripts/automation_utils.py')
+for root, _, files in os.walk('scripts'):
+    for name in files:
+        if not name.endswith('.mjs'):
+            continue
+        path = os.path.join(root, name)
+        body = open(path, encoding='utf-8').read()
+        if 'const M=' in body or 'const T=' in body or 'const SRC' in body:
+            fail('legacy compact artifact marker in %s' % path)
 start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
 end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
 data = json.loads(html[start:end])

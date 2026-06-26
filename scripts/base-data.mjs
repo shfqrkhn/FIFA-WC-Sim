@@ -6,7 +6,8 @@ export function readArtifact(path='docs/index.html'){
   const start=html.indexOf(marker);
   if(start<0)throw new Error('BASE_DATA missing');
   const from=start+marker.length;
-  const end=html.indexOf(';\nconst BLOCKED_PATCH_KEYS',from);
+  const boundary=html.slice(from).match(/;\r?\nconst BLOCKED_PATCH_KEYS/);
+  const end=boundary?from+boundary.index:-1;
   if(end<from)throw new Error('BASE_DATA end missing');
   return {html,from,end,data:JSON.parse(html.slice(from,end))};
 }

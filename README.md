@@ -8,8 +8,6 @@ Welcome to World Cup 2026 Simulator, a single-file web app built for quick tourn
 
 [**Live Demo**](https://shfqrkhn.github.io/FIFA-WC-Sim/)
 
-![Screenshot](docs/images/screenshot.jpeg)
-
 ## 🌟 What is World Cup 2026 Simulator?
 
 World Cup 2026 Simulator is a **free, static, offline-capable** app for simulating the full 48-team, 104-match FIFA World Cup 2026 format. It combines embedded group results, FIFA ranking priors, team-strength assumptions, venue effects, weather context, home/co-host advantage, seeded randomness, knockout logic, and Monte Carlo runs into one portable HTML file.

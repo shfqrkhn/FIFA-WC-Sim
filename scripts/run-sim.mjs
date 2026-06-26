@@ -10,20 +10,71 @@ const script = scriptMatch[1]
   .replace(/document\.querySelector/g, 'document.querySelector')
   .replace(/document\.querySelectorAll/g, 'document.querySelectorAll');
 
+function createElementStub(selector = '') {
+  const listeners = {};
+  return {
+    value: selector === '#mode' ? 'balanced' : selector === '#seed' ? 'automation-smoke' : selector === '#runs' ? '200' : '',
+    innerHTML: '',
+    textContent: '',
+    onclick: null,
+    href: '',
+    download: '',
+    files: [],
+    style: {},
+    dataset: {},
+    classList: {
+      add() {},
+      remove() {},
+      toggle() {},
+      contains() { return false; }
+    },
+    addEventListener(type, handler) { listeners[type] = handler; },
+    removeEventListener(type) { delete listeners[type]; },
+    setAttribute() {},
+    removeAttribute() {},
+    getAttribute() { return ''; },
+    appendChild() {},
+    focus() {},
+    select() {},
+    click() {}
+  };
+}
+
+const elements = new Map();
+const documentStub = {
+  styleSheets: [],
+  querySelector(selector) {
+    if (!elements.has(selector)) elements.set(selector, createElementStub(selector));
+    return elements.get(selector);
+  },
+  querySelectorAll() { return []; },
+  getElementById(id) { return this.querySelector(`#${id}`); },
+  createElement(tag) { return createElementStub(tag); },
+  addEventListener() {},
+  removeEventListener() {}
+};
+const localStorageStub = {
+  data: new Map(),
+  getItem(key) { return this.data.has(key) ? this.data.get(key) : null; },
+  setItem(key, value) { this.data.set(key, String(value)); },
+  removeItem(key) { this.data.delete(key); }
+};
+
 const sandbox = {
   console,
-  document: {
-    querySelector(selector) {
-      const values = {
-        '#mode': { value: 'balanced' },
-        '#seed': { value: 'automation-smoke' },
-        '#runs': { value: '200' }
-      };
-      return values[selector] || { value: '', innerHTML: '', textContent: '', onclick: null };
-    },
-    querySelectorAll() { return []; }
-  }
+  setTimeout,
+  clearTimeout,
+  document: documentStub,
+  localStorage: localStorageStub,
+  location: { hash: '' },
+  history: { replaceState() {} },
+  navigator: { clipboard: { writeText: async () => {} } },
+  Blob: class Blob {},
+  URL: { createObjectURL() { return 'blob:smoke'; }, revokeObjectURL() {} },
+  fetch: async () => { throw new Error('network disabled during simulation smoke test'); }
 };
+sandbox.window = sandbox;
+sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 vm.runInContext(script, sandbox, { timeout: 5000 });
 const result = vm.runInContext("simulate('automation-smoke')", sandbox, { timeout: 5000 });
