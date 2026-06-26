@@ -38,7 +38,8 @@ REQUIRED_WORKFLOW_STEPS = [
 REQUIRED_SCRIPT_MARKERS = {
     'scripts/apply_scoreboard.py': [
         "NO_FETCH = '--no-fetch' in sys.argv",
-        'if not NO_FETCH and paths:',
+        'if not NO_FETCH and (paths or FETCH_FAILURES):',
+        "'fetchFailures': FETCH_FAILURES",
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
