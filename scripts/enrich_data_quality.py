@@ -38,11 +38,15 @@ quality_core = {
     'referees': {'status': 'missing', 'reason': 'no reliable automated source configured'},
     'principle': 'Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.'
 }
-if stable(data.get('dataQuality')) != quality_core:
+source_note = 'Automated BASE_DATA update with score, form, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'
+quality_changed = stable(data.get('dataQuality')) != quality_core
+source_note_changed = data.get('sourceNote') != source_note
+if quality_changed or source_note_changed:
     now = utc_stamp()
-    data['dataQuality'] = dict(quality_core, updatedAt=now)
+    if quality_changed:
+        data['dataQuality'] = dict(quality_core, updatedAt=now)
     data['generatedAt'] = now
-    data['sourceNote'] = 'Automated BASE_DATA update with score, form, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'
+    data['sourceNote'] = source_note
     save_data(html, start, end, data)
     changed = True
 else:

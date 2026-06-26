@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-06-26T02:21:56Z",
+  "generatedAt": "2026-06-26T10:58:12Z",
   "scoreboard": {
-    "playedGroupMatches": 58,
+    "playedGroupMatches": 60,
     "totalGroupMatches": 72,
     "currentStats": {
       "updatedTo": "2026-06-25",
       "source": "ESPN scoreboard updater refreshed completed group results, match count, and goals through 2026-06-25. Attendance, top-scorer, and conduct snapshots are not refreshed by this automated score pass.",
-      "matchesPlayed": 58,
-      "goalsScored": 172,
-      "goalsPerMatch": 2.97,
+      "matchesPlayed": 60,
+      "goalsScored": 177,
+      "goalsPerMatch": 2.95,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -25,39 +25,37 @@
           "note": "Known team conduct/fair-play score in current third-place table note."
         }
       ],
-      "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-26T02:21:56Z.",
+      "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-26T10:57:47Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater after score totals advanced."
     },
     "latestUpdate": {
-      "generatedAt": "2026-06-26T02:17:37Z",
-      "fetchedFinals": 55,
-      "appliedChanges": 4,
+      "generatedAt": "2026-06-26T10:57:47Z",
+      "fetchedFinals": 57,
+      "appliedChanges": 2,
       "changes": [
-        "M29 Cura\u00e7ao 0-2 Ivory Coast",
-        "M30 Ecuador 2-1 Germany",
-        "M35 Japan 1-1 Sweden",
-        "M36 Tunisia 1-3 Netherlands"
+        "M24 Paraguay 0-0 Australia",
+        "M23 Turkey 3-2 United States"
       ],
       "fetchFailures": []
     }
   },
   "weather": {
-    "coveredUnplayedMatches": 14,
-    "totalUnplayedMatches": 14,
+    "coveredUnplayedMatches": 12,
+    "totalUnplayedMatches": 12,
     "failedMatches": []
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedGroupMatches": 58,
+      "playedGroupMatches": 60,
       "totalGroupMatches": 72,
       "source": "scoreboard updater"
     },
     "weather": {
       "status": "current",
-      "coveredUnplayedMatches": 14,
-      "totalUnplayedMatches": 14,
+      "coveredUnplayedMatches": 12,
+      "totalUnplayedMatches": 12,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -95,7 +93,7 @@
       "reason": "no reliable automated source configured"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-26T02:17:56Z"
+    "updatedAt": "2026-06-26T10:58:12Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

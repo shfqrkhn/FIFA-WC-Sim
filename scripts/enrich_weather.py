@@ -53,7 +53,12 @@ def weather_edge(weather, team, venue):
 html, start, end, data = load_data()
 teams, venues = team_map(data), data.get('venues') or {}
 weather_by_match = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
+unplayed_match_nos = {str(m.get('no')) for m in data.get('matches', []) if m.get('stage') == 'group' and not m.get('played')}
 changed = False
+for no in list(weather_by_match):
+    if no not in unplayed_match_nos:
+        weather_by_match.pop(no, None)
+        changed = True
 for m in data.get('matches', []):
     if m.get('stage') != 'group' or m.get('played'): continue
     no = str(m.get('no'))

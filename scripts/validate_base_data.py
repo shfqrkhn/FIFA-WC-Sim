@@ -256,6 +256,14 @@ if current_stats:
             errors.append('scoreboard-refreshed currentStats must not retain stale attendance totals')
         if current_stats.get('topScorers'):
             errors.append('scoreboard-refreshed currentStats must not retain stale top-scorer rows')
+weather_by_match = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
+if weather_by_match:
+    played_weather = sorted(
+        str(m.get('no')) for m in played_matches
+        if str(m.get('no')) in weather_by_match
+    )
+    if played_weather:
+        errors.append('weatherByMatch retains completed match rows: %s' % ', '.join(played_weather[:12]))
 if errors:
     fail('; '.join(errors[:12]))
 print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True, 'singleInputGuarded': True}, indent=2))
