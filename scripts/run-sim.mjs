@@ -12,6 +12,8 @@ const script = scriptMatch[1]
 
 function createElementStub(selector = '') {
   const listeners = {};
+  const classes = new Set();
+  const attributes = {};
   return {
     value: selector === '#mode' ? 'balanced' : selector === '#seed' ? 'automation-smoke' : selector === '#runs' ? '200' : '',
     innerHTML: '',
@@ -23,16 +25,20 @@ function createElementStub(selector = '') {
     style: {},
     dataset: {},
     classList: {
-      add() {},
-      remove() {},
-      toggle() {},
-      contains() { return false; }
+      add(...names) { names.forEach(name => classes.add(name)); },
+      remove(...names) { names.forEach(name => classes.delete(name)); },
+      toggle(name, force) {
+        const on = force === undefined ? !classes.has(name) : !!force;
+        on ? classes.add(name) : classes.delete(name);
+        return on;
+      },
+      contains(name) { return classes.has(name); }
     },
     addEventListener(type, handler) { listeners[type] = handler; },
     removeEventListener(type) { delete listeners[type]; },
-    setAttribute() {},
-    removeAttribute() {},
-    getAttribute() { return ''; },
+    setAttribute(name, value) { attributes[name] = String(value); },
+    removeAttribute(name) { delete attributes[name]; },
+    getAttribute(name) { return attributes[name] || ''; },
     appendChild() {},
     focus() {},
     select() {},
@@ -77,6 +83,46 @@ sandbox.window = sandbox;
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);
 vm.runInContext(script, sandbox, { timeout: 5000 });
+await vm.runInContext('__bootstrapReady', sandbox, { timeout: 1000 });
+const initialMc = vm.runInContext('MC', sandbox, { timeout: 1000 });
+const initialGroupsHtml = elements.get('#groupsView')?.innerHTML || '';
+const initialBracketHtml = elements.get('#bracketView')?.innerHTML || '';
+if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsHtml.includes('MC:') || !initialBracketHtml.includes('MC:')) {
+  throw new Error('Initial page load did not run Monte Carlo predictions into Groups and Bracket views.');
+}
+const footerText = elements.get('#lastDataUpdate')?.textContent || '';
+if (!html.includes('id="lastDataUpdate"') || !footerText || footerText === 'Loading…') {
+  throw new Error('Last data update footer was not rendered.');
+}
+const busyOk = vm.runInContext(`(() => {
+  setBusy(true, 'Busy smoke');
+  const on = $('#appStatus').classList.contains('isBusy') && $('#appStatus').getAttribute('aria-busy') === 'true';
+  setBusy(false);
+  const off = !$('#appStatus').classList.contains('isBusy') && $('#appStatus').getAttribute('aria-busy') === 'false';
+  return on && off;
+})()`, sandbox, { timeout: 1000 });
+if (!busyOk) {
+  throw new Error('Monte Carlo loading state did not toggle accessibly.');
+}
+const controlsLockOk = vm.runInContext(`(() => {
+  const ids = ['seed','runs','mode','homeAdv','weather','mcBtn'];
+  setMonteCarloControlsDisabled(true);
+  const locked = ids.every(id => $('#'+id).disabled === true && $('#'+id).getAttribute('aria-disabled') === 'true');
+  setMonteCarloControlsDisabled(false);
+  const unlocked = ids.every(id => $('#'+id).disabled === false && $('#'+id).getAttribute('aria-disabled') === 'false');
+  return locked && unlocked;
+})()`, sandbox, { timeout: 1000 });
+if (!controlsLockOk) {
+  throw new Error('Monte Carlo controls were not locked during simulation.');
+}
+const invalidationOk = vm.runInContext(`(() => {
+  const hadMc = !!MC;
+  refresh('Invalidation smoke.');
+  return hadMc && MC === null && !($('#groupsView').innerHTML || '').includes('MC:') && !($('#bracketView').innerHTML || '').includes('MC:');
+})()`, sandbox, { timeout: 5000 });
+if (!invalidationOk) {
+  throw new Error('Monte Carlo summaries were not invalidated after data/control refresh.');
+}
 const result = vm.runInContext("simulate('automation-smoke')", sandbox, { timeout: 5000 });
 if (!result || !result.champion || result.ko.length < 5) {
   throw new Error('Simulation smoke test failed.');
@@ -104,6 +150,17 @@ const predictionConsistency = vm.runInContext(`(() => {
 })()`, sandbox, { timeout: 5000 });
 if (!predictionConsistency.groupOk || !predictionConsistency.bracketOk) {
   throw new Error('Monte Carlo prediction summaries are internally inconsistent.');
+}
+const displayedBracketPredictionOk = vm.runInContext(`(() => {
+  return LAST.ko.every(m => {
+    const text = formatKnockoutMCPrediction(m.no, m.teamA, m.teamB);
+    if (!text || text.includes('this matchup was not sampled')) return true;
+    const winner = text.match(/^MC: (.+?) wins /)?.[1];
+    return !winner || winner === m.teamA || winner === m.teamB;
+  });
+})()`, sandbox, { timeout: 5000 });
+if (!displayedBracketPredictionOk) {
+  throw new Error('Displayed bracket Monte Carlo prediction did not match displayed teams.');
 }
 fs.mkdirSync('data', { recursive: true });
 fs.writeFileSync('data/latest-simulation.json', JSON.stringify({
