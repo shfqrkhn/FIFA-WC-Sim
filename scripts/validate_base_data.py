@@ -62,7 +62,7 @@ REQUIRED_SCRIPT_MARKERS = {
     'scripts/apply_scoreboard.py': [
         'from automation_utils import utc_stamp',
         "NO_FETCH = '--no-fetch' in sys.argv",
-        'if not NO_FETCH and (paths or FETCH_FAILURES):',
+        'if not NO_FETCH and (applied or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
         "'path': path",
         'def latest_played_day(matches):',

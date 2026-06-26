@@ -153,7 +153,7 @@ if applied or stats_changed or source_note_changed:
     data['currentStats'] = refresh_current_stats(current, played, goals, updated_to, stamp)
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html[:start] + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + html[end:])
-if not NO_FETCH and (paths or FETCH_FAILURES):
+if not NO_FETCH and (applied or FETCH_FAILURES):
     os.makedirs('data', exist_ok=True)
     with open('data/latest-update.json', 'w', encoding='utf-8') as f:
         json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes, 'fetchFailures': FETCH_FAILURES}, f, indent=2)
