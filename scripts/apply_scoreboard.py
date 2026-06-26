@@ -3,6 +3,7 @@ import datetime, json, os, sys, urllib.request
 HTML_PATH = 'docs/index.html'
 STOP_DATE = datetime.date(2026, 7, 20)
 NO_FETCH = '--no-fetch' in sys.argv
+FETCH_FAILURES = []
 TEAM = {
     'MEX':'Mexico','RSA':'South Africa','KOR':'South Korea','CZE':'Czechia','CAN':'Canada','BIH':'Bosnia and Herzegovina','QAT':'Qatar','SUI':'Switzerland',
     'BRA':'Brazil','MAR':'Morocco','HTI':'Haiti','SCO':'Scotland','USA':'United States','PAR':'Paraguay','AUS':'Australia','TUR':'Turkey',
@@ -39,15 +40,16 @@ def scoreboard_paths():
     day = datetime.date(2026, 6, 11)
     paths = []
     while day <= end_day:
-        path = 'data/scoreboards/%s.json' % date_key(day)
-        url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=%s' % date_key(day)
+        day_id = date_key(day)
+        path = 'data/scoreboards/%s.json' % day_id
+        url = 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard?dates=%s' % day_id
         try:
             with urllib.request.urlopen(url, timeout=20) as response:
                 payload = response.read()
             with open(path, 'wb') as f: f.write(payload)
             paths.append(path)
-        except Exception:
-            pass
+        except Exception as e:
+            FETCH_FAILURES.append({'date': day_id, 'error': str(e)})
         day += datetime.timedelta(days=1)
     return paths
 
@@ -88,9 +90,9 @@ if applied:
     data['currentStats'] = current
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html[:start] + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + html[end:])
-if not NO_FETCH and paths:
+if not NO_FETCH and (paths or FETCH_FAILURES):
     os.makedirs('data', exist_ok=True)
     with open('data/latest-update.json', 'w', encoding='utf-8') as f:
-        json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes}, f, indent=2)
+        json.dump({'generatedAt': stamp, 'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes, 'fetchFailures': FETCH_FAILURES}, f, indent=2)
         f.write('\n')
-print(json.dumps({'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes, 'noFetch': NO_FETCH}, indent=2))
+print(json.dumps({'fetchedFinals': fetched, 'appliedChanges': applied, 'changes': changes, 'fetchFailures': FETCH_FAILURES, 'noFetch': NO_FETCH}, indent=2))
