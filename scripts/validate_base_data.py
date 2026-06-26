@@ -36,6 +36,11 @@ REQUIRED_WORKFLOW_STEPS = [
     'data/update-health.json',
 ]
 REQUIRED_SCRIPT_MARKERS = {
+    'scripts/apply_scoreboard.py': [
+        "NO_FETCH = '--no-fetch' in sys.argv",
+        'if not NO_FETCH and paths:',
+        'data/latest-update.json',
+    ],
     'scripts/test_idempotence.py': ['scripts/test_deterministic.py'],
     'scripts/test_deterministic.py': [
         "scripts/apply_scoreboard.py','--no-fetch",
