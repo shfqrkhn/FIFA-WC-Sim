@@ -93,7 +93,9 @@ The app runs in the browser and does not require an account, backend service, tr
 
 ## Disclaimer
 
-This is a probabilistic simulator, not an official FIFA product, live scoring authority, prediction guarantee, or betting tool. Current facts, match results, injuries, suspensions, lineups, rankings, and official regulations should be verified against trusted sources before relying on them.
+This simulator is for educational and informational use only. It is not official FIFA data, live scoring authority, betting advice, gambling advice, investment advice, financial advice, or prediction-market advice. Outputs are probabilistic simulations, not guarantees or recommendations. Do not use these predictions to place bets, trade contracts, or risk money. If you use them elsewhere, you are responsible for your own decisions and may lose money.
+
+Current facts, match results, injuries, suspensions, lineups, rankings, and official regulations should be verified against trusted sources before relying on them.
 
 ## Stability
 
