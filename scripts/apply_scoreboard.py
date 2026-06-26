@@ -59,7 +59,11 @@ fetched = applied = 0
 changes = []
 paths = scoreboard_paths()
 for path in paths:
-    with open(path, encoding='utf-8') as f: feed = json.load(f)
+    try:
+        with open(path, encoding='utf-8') as f: feed = json.load(f)
+    except Exception:
+        FETCH_FAILURES.append({'path': path, 'error': 'scoreboard file unreadable'})
+        continue
     for ev in feed.get('events', []):
         if not is_final(ev): continue
         comps = ev.get('competitions', [{}])[0].get('competitors', [])
