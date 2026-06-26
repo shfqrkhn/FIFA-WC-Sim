@@ -1,6 +1,7 @@
-import json, re, sys
+import json, os, re, sys
 
 HTML = 'docs/index.html'
+WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 REQUIRED_UI = [
     'Whole Tournament Simulator',
     'data-tab="groups"',
@@ -11,6 +12,17 @@ REQUIRED_UI = [
     'Integrity audit',
     'Maintenance ledger',
     'const BASE_DATA = ',
+]
+REQUIRED_WORKFLOW_STEPS = [
+    'python3 scripts/validate_base_data.py',
+    'python3 scripts/apply_scoreboard.py',
+    'python3 scripts/enrich_predictions.py',
+    'python3 scripts/enrich_rest_travel.py',
+    'python3 scripts/enrich_weather.py',
+    'python3 scripts/enrich_data_quality.py',
+    'python3 scripts/update_health.py',
+    'python3 scripts/test_idempotence.py',
+    'data/update-health.json',
 ]
 
 def fail(msg):
@@ -23,6 +35,13 @@ for marker in REQUIRED_UI:
         fail('missing UI/data marker: %s' % marker)
 if '<title>World Cup 2026 Simulator</title>' in html and 'Whole Tournament Simulator' not in html[:1000]:
     fail('compact shell regression detected')
+if os.path.exists(WORKFLOW):
+    workflow = open(WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing workflow automation marker: %s' % marker)
+else:
+    fail('missing daily BASE_DATA workflow')
 start = html.index('const BASE_DATA = ') + len('const BASE_DATA = ')
 end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
 data = json.loads(html[start:end])
@@ -64,4 +83,4 @@ if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
 if errors:
     fail('; '.join(errors[:12]))
-print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout)}, indent=2))
+print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True}, indent=2))
