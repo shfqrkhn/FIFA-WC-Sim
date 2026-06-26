@@ -72,10 +72,14 @@ for m in data.get('matches', []):
     if a not in state or b not in state:
         continue
     sa, sb = state[a], state[b]
-    adj_a = clamp(((sa['pts']/max(1, sa['played'])) - (sb['pts']/max(1, sb['played']))) * 0.018 + ((sa['gd']/max(1, sa['played'])) - (sb['gd']/max(1, sb['played']))) * 0.014, -0.08, 0.08)
+    adj_a = round(clamp(((sa['pts']/max(1, sa['played'])) - (sb['pts']/max(1, sb['played']))) * 0.018 + ((sa['gd']/max(1, sa['played'])) - (sb['gd']/max(1, sb['played']))) * 0.014, -0.08, 0.08), 3)
     ctx = m.get('context') if isinstance(m.get('context'), dict) else {}
-    a_ctx = dict(ctx.get('A', {}), goalAdj=round(adj_a, 3), note='Auto form/context adjustment from current tournament results.')
-    b_ctx = dict(ctx.get('B', {}), goalAdj=round(-adj_a, 3), note='Auto form/context adjustment from current tournament results.')
+    a_ctx = dict(ctx.get('A', {}))
+    b_ctx = dict(ctx.get('B', {}))
+    base_a = float(a_ctx.get('goalAdj') or 0) - float(a_ctx.get('formAdj') or 0)
+    base_b = float(b_ctx.get('goalAdj') or 0) - float(b_ctx.get('formAdj') or 0)
+    a_ctx.update({'goalAdj': round(clamp(base_a + adj_a, -0.18, 0.18), 3), 'formAdj': adj_a, 'note': 'Auto form/context adjustment from current tournament results.'})
+    b_ctx.update({'goalAdj': round(clamp(base_b - adj_a, -0.18, 0.18), 3), 'formAdj': -adj_a, 'note': 'Auto form/context adjustment from current tournament results.'})
     next_ctx = dict(ctx, A=a_ctx, B=b_ctx)
     if m.get('context') != next_ctx:
         m['context'] = next_ctx
