@@ -81,6 +81,12 @@ const result = vm.runInContext("simulate('automation-smoke')", sandbox, { timeou
 if (!result || !result.champion || result.ko.length < 5) {
   throw new Error('Simulation smoke test failed.');
 }
+const mc = vm.runInContext("renderResult(simulate('automation-smoke')); runMCCore()", sandbox, { timeout: 5000 });
+const groupsHtml = elements.get('#groupsView')?.innerHTML || '';
+const bracketHtml = elements.get('#bracketView')?.innerHTML || '';
+if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsHtml.includes('MC:') || !bracketHtml.includes('MC:')) {
+  throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
+}
 fs.mkdirSync('data', { recursive: true });
 fs.writeFileSync('data/latest-simulation.json', JSON.stringify({
   generatedAt: new Date().toISOString(),

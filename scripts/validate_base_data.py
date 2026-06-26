@@ -15,6 +15,11 @@ REQUIRED_UI = [
     'Integrity audit',
     'Maintenance ledger',
     'const BASE_DATA = ',
+    'upcoming fixtures show consensus outcome',
+    'formatGroupMCPrediction',
+    'formatKnockoutMCPrediction',
+    'recordMonteCarloPredictions',
+    'Probability board, Groups, and Bracket updated',
 ]
 REQUIRED_INPUT_UI = [
     'class="skip"',
