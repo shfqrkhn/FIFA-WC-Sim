@@ -40,6 +40,7 @@ REQUIRED_SCRIPT_MARKERS = {
         "NO_FETCH = '--no-fetch' in sys.argv",
         'if not NO_FETCH and (paths or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
+        "'path': path",
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
