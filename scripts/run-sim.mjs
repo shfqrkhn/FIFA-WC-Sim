@@ -115,6 +115,25 @@ const footerLatestOk = vm.runInContext(`(() => {
 if (!footerLatestOk) {
   throw new Error('Last data update footer did not use the latest embedded timestamp.');
 }
+const ensembleModelOk = vm.runInContext(`(() => {
+  const breakdown = ensembleBreakdown('Argentina', { matches: DATA.matches });
+  const weightTotal = Object.values(ensembleWeights()).reduce((sum, x) => sum + x, 0);
+  const dist = scorelineDistribution(1.15, 1.05, {});
+  const probTotal = dist.reduce((sum, x) => sum + x.p, 0);
+  const sampled = sampleScoreline(1.15, 1.05, rngFactory('ensemble-smoke'), {});
+  const disclosure = String(DATA.config?.modelNotes || '') + ' ' + (DATA.config?.assumptions || []).join(' ');
+  return Number.isFinite(breakdown.total) &&
+    breakdown.parts.some(p => p.label === 'Ranking prior') &&
+    breakdown.parts.some(p => p.label === 'Attack/defense profile') &&
+    Math.abs(weightTotal - 1) < 1e-9 &&
+    Math.abs(probTotal - 1) < 1e-6 &&
+    Array.isArray(sampled) && sampled.length === 2 &&
+    disclosure.includes('ensemble') &&
+    disclosure.includes('low-score');
+})()`, sandbox, { timeout: 1000 });
+if (!ensembleModelOk) {
+  throw new Error('Ensemble model and low-score scoreline sampler were not active and disclosed.');
+}
 const busyOk = vm.runInContext(`(() => {
   setBusy(true, 'Busy smoke');
   const on = $('#appStatus').classList.contains('isBusy') && $('#appStatus').getAttribute('aria-busy') === 'true';

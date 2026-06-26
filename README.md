@@ -14,7 +14,7 @@ Welcome to World Cup 2026 Simulator, a single-file web app built for quick tourn
 
 ## 🌟 What is World Cup 2026 Simulator?
 
-World Cup 2026 Simulator is a **free, static, offline-capable** app for simulating the full 48-team, 104-match FIFA World Cup 2026 format. It combines embedded group results, FIFA ranking priors, team-strength assumptions, venue effects, weather context, home/co-host advantage, seeded randomness, knockout logic, and Monte Carlo runs into one portable HTML file.
+World Cup 2026 Simulator is a **free, static, offline-capable** app for simulating the full 48-team, 104-match FIFA World Cup 2026 format. It combines embedded group results, an ensemble match-strength model, venue effects, weather context, home/co-host advantage, seeded randomness, knockout logic, and Monte Carlo runs into one portable HTML file.
 
 The app is designed to be transparent: model assumptions, coefficients, match explanations, data patches, source notes, and audit checks are visible inside the interface.
 
@@ -35,6 +35,7 @@ Using the simulator is simple.
 The main dashboard is optimized around the probability board and core controls:
 
 * **Monte Carlo runs:** Estimate title probabilities across repeated seeded tournament simulations.
+* **Ensemble match model:** Blend ranking prior, tournament pedigree, current form, and attack/defense profile before sampling scorelines.
 * **Compact controls:** Adjust seed, run count, mode, home advantage, and weather behavior.
 * **Auto-refresh flow:** Relevant optional data refreshes are triggered through the Monte Carlo workflow instead of extra manual buttons.
 * **Responsive UI:** Designed for desktop, tablet, mobile, touch, mouse, keyboard, and constrained input conditions.
@@ -73,6 +74,7 @@ The Monte Carlo section provides deeper probability output:
 The Transparency section explains how results are generated:
 
 * Power formulas.
+* Ensemble weights and scoreline-sampling settings.
 * Expected-goals calculations.
 * Venue, climate, altitude, and host/co-host adjustments.
 * Manual match-context modifiers.
@@ -106,4 +108,4 @@ Use the simulator to explore scenarios, compare assumptions, test tournament pat
 
 ## 🏆 Stability Verified
 
-World Cup 2026 Simulator has been iteratively hardened through syntax checks, runtime smoke tests, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, and responsive UI regression passes.
+World Cup 2026 Simulator has been iteratively hardened through syntax checks, runtime smoke tests, ensemble-model checks, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, and responsive UI regression passes.
