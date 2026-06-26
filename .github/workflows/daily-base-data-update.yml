@@ -20,6 +20,7 @@ jobs:
       - run: python3 scripts/enrich_rest_travel.py
       - run: python3 scripts/enrich_weather.py
       - run: python3 scripts/enrich_data_quality.py
+      - run: python3 scripts/update_health.py
       - run: python3 scripts/validate_base_data.py
       - run: python3 scripts/test_idempotence.py
       - run: |
@@ -28,5 +29,6 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
           git add docs/index.html
           if [ -f data/latest-update.json ]; then git add data/latest-update.json; fi
+          if [ -f data/update-health.json ]; then git add data/update-health.json; fi
           git commit -m 'Daily World Cup BASE_DATA update'
           git push
