@@ -143,6 +143,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'localStorageStub',
         'Initial page load did not run Monte Carlo predictions into Groups and Bracket views.',
         'Last data update footer was not rendered.',
+        'Last data update footer did not use the latest embedded timestamp.',
         'Monte Carlo loading state did not toggle accessibly.',
         'Monte Carlo controls were not locked during simulation.',
         'Monte Carlo summaries were not invalidated after data/control refresh.',
