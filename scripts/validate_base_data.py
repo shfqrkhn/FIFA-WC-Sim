@@ -41,6 +41,10 @@ REQUIRED_SCRIPT_MARKERS = {
         'if not NO_FETCH and paths:',
         'data/latest-update.json',
     ],
+    'scripts/update_health.py': [
+        'data/latest-update.json',
+        "'latestUpdate':latest",
+    ],
     'scripts/test_idempotence.py': ['scripts/test_deterministic.py'],
     'scripts/test_deterministic.py': [
         "scripts/apply_scoreboard.py','--no-fetch",
