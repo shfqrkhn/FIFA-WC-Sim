@@ -1,6 +1,6 @@
 import hashlib, os, subprocess
 files=['docs/index.html','data/latest-update.json']
-cmds=[['python3','scripts/apply_scoreboard.py','--no-fetch'],['python3','scripts/enrich_predictions.py'],['python3','scripts/enrich_rest_travel.py'],['python3','scripts/enrich_weather.py','--no-fetch']]
+cmds=[['python3','scripts/apply_scoreboard.py','--no-fetch'],['python3','scripts/enrich_predictions.py'],['python3','scripts/enrich_rest_travel.py'],['python3','scripts/enrich_weather.py','--no-fetch'],['python3','scripts/enrich_data_quality.py']]
 def digest(p):
     return hashlib.sha256(open(p,'rb').read()).hexdigest() if os.path.exists(p) else None
 def snap():
