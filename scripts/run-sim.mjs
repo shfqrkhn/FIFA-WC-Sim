@@ -95,7 +95,7 @@ if (!initialRepresentativeOk) {
   throw new Error('Initial Monte Carlo representative did not inform Run Result, Groups, and Bracket views.');
 }
 const footerText = elements.get('#lastDataUpdate')?.textContent || '';
-if (!html.includes('id="lastDataUpdate"') || !footerText || footerText === 'Loading…') {
+if (!html.includes('id="lastDataUpdate"') || !footerText || /^Loading/.test(footerText)) {
   throw new Error('Last data update footer was not rendered.');
 }
 const footerMetadataOk = vm.runInContext(`(() => {
