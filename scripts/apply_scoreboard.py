@@ -16,6 +16,17 @@ TEAM = {
 
 def key(a, b): return '|'.join(sorted([a, b]))
 def date_key(day): return day.strftime('%Y%m%d')
+def match_day(m):
+    for field in ('date', 'kickoff', 'kickoffLocal', 'utc', 'time'):
+        value = m.get(field) if isinstance(m, dict) else None
+        if not value: continue
+        try: return datetime.date.fromisoformat(str(value)[:10])
+        except Exception: continue
+    return None
+def latest_played_day(matches):
+    days = [match_day(m) for m in matches if m.get('stage') == 'group' and m.get('played')]
+    days = [d for d in days if d]
+    return max(days).isoformat() if days else None
 def load_base_data():
     with open(HTML_PATH, encoding='utf-8') as f: html = f.read()
     marker = 'const BASE_DATA = '
@@ -56,6 +67,32 @@ def scoreboard_paths():
             FETCH_FAILURES.append({'date': day_id, 'error': str(e)})
         day += datetime.timedelta(days=1)
     return paths
+def current_stats_needs_refresh(current, played, goals, updated_to):
+    return (
+        current.get('matchesPlayed') != len(played) or
+        current.get('goalsScored') != goals or
+        current.get('updatedTo') != updated_to or
+        'ESPN scoreboard updater refreshed' not in str(current.get('source', '')) or
+        current.get('attendance') is not None or
+        current.get('attendancePerMatch') is not None or
+        bool(current.get('topScorers'))
+    )
+def refresh_current_stats(current, played, goals, updated_to, stamp):
+    current.update({
+        'updatedTo': updated_to,
+        'source': 'ESPN scoreboard updater refreshed completed group results, match count, and goals through %s. Attendance, top-scorer, and conduct snapshots are not refreshed by this automated score pass.' % updated_to,
+        'matchesPlayed': len(played),
+        'goalsScored': goals,
+        'goalsPerMatch': round(goals / len(played), 2) if played else 0,
+        'scoreSource': 'ESPN scoreboard fifa.world; generated %s.' % stamp,
+        'attendance': None,
+        'attendancePerMatch': None,
+        'attendanceSource': 'Not refreshed by automated scoreboard updater after score totals advanced.',
+        'topScorers': [],
+        'topScorersSource': 'Not refreshed by automated scoreboard updater after score totals advanced.',
+        'thirdPlaceTableSource': 'Prior conduct/fair-play notes only; not refreshed by automated scoreboard updater after score totals advanced.'
+    })
+    return current
 
 html, start, end, data = load_base_data()
 idx = {key(m['teamA'], m['teamB']): m for m in data['matches'] if m.get('stage') == 'group'}
@@ -96,16 +133,24 @@ for path in paths:
             applied += 1
             changes.append('M%s %s %s-%s %s' % (match['no'], match['teamA'], next_a, next_b, match['teamB']))
 stamp = utc_stamp()
+played = [m for m in data['matches'] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+goals = sum(m['scoreA'] + m['scoreB'] for m in played)
+updated_to = latest_played_day(data['matches']) or stamp[:10]
+current = data.get('currentStats') if isinstance(data.get('currentStats'), dict) else {}
+stats_changed = current_stats_needs_refresh(current, played, goals, updated_to)
 if applied:
-    played = [m for m in data['matches'] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
-    goals = sum(m['scoreA'] + m['scoreB'] for m in played)
+    next_source_note = 'Automated daily scoreboard update; applied %s completed match result(s) and refreshed score-derived stats.' % applied
+elif 'applied 0 completed match result(s)' in str(data.get('sourceNote', '')):
+    next_source_note = 'Automated daily scoreboard metadata refresh from embedded completed match results; no additional score rows were applied in this repair pass.'
+else:
+    next_source_note = data.get('sourceNote') or 'Automated daily scoreboard metadata refresh from embedded completed match results.'
+source_note_changed = next_source_note != data.get('sourceNote')
+if applied or stats_changed or source_note_changed:
     data['schema'] = max(int(data.get('schema', 0)), 33)
-    data['version'] = stamp[:10] + '-auto-daily'
+    data['version'] = updated_to + '-auto-daily'
     data['generatedAt'] = stamp
-    data['sourceNote'] = 'Automated daily scoreboard update; applied %s completed match result(s).' % applied
-    current = data.get('currentStats', {})
-    current.update({'updatedTo': stamp[:10], 'matchesPlayed': len(played), 'goalsScored': goals, 'goalsPerMatch': round(goals / len(played), 2) if played else 0})
-    data['currentStats'] = current
+    data['sourceNote'] = next_source_note
+    data['currentStats'] = refresh_current_stats(current, played, goals, updated_to, stamp)
     with open(HTML_PATH, 'w', encoding='utf-8') as f:
         f.write(html[:start] + json.dumps(data, separators=(',', ':'), ensure_ascii=False) + html[end:])
 if not NO_FETCH and (paths or FETCH_FAILURES):

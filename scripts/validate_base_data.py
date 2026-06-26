@@ -65,6 +65,10 @@ REQUIRED_SCRIPT_MARKERS = {
         'if not NO_FETCH and (paths or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
         "'path': path",
+        'def latest_played_day(matches):',
+        'def refresh_current_stats(current, played, goals, updated_to, stamp):',
+        "'attendanceSource'",
+        "'topScorersSource'",
         'scoreboard file invalid shape',
         'isinstance(events, list)',
         "status = ev.get('status') if isinstance(ev.get('status'), dict) else {}",
@@ -214,6 +218,22 @@ if not isinstance(data.get('sources'), list):
     errors.append('missing sources')
 if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
+current_stats = data.get('currentStats') if isinstance(data.get('currentStats'), dict) else {}
+played_matches = [m for m in matches or [] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+played_goals = sum(m.get('scoreA', 0) + m.get('scoreB', 0) for m in played_matches)
+if current_stats:
+    if current_stats.get('matchesPlayed') != len(played_matches):
+        errors.append('currentStats matchesPlayed does not match embedded played matches')
+    if current_stats.get('goalsScored') != played_goals:
+        errors.append('currentStats goalsScored does not match embedded played scores')
+    source = str(current_stats.get('source', ''))
+    if 'all statistics correct as of June 24' in source and current_stats.get('updatedTo') != '2026-06-24':
+        errors.append('currentStats source overclaims an older complete snapshot')
+    if 'ESPN scoreboard updater refreshed' in source:
+        if current_stats.get('attendance') is not None or current_stats.get('attendancePerMatch') is not None:
+            errors.append('scoreboard-refreshed currentStats must not retain stale attendance totals')
+        if current_stats.get('topScorers'):
+            errors.append('scoreboard-refreshed currentStats must not retain stale top-scorer rows')
 if errors:
     fail('; '.join(errors[:12]))
 print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True, 'singleInputGuarded': True}, indent=2))
