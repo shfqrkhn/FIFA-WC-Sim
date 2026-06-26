@@ -11,9 +11,13 @@ played=[m for m in ms if m.get('played')]
 w=data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'),dict) else {}
 failed_weather=[{'match':k,'error':v.get('error')} for k,v in w.items() if isinstance(v,dict) and v.get('error')]
 stats=data.get('currentStats') if isinstance(data.get('currentStats'),dict) else {}
+latest={}
+if os.path.exists('data/latest-update.json'):
+    try: latest=json.load(open('data/latest-update.json',encoding='utf-8'))
+    except Exception: latest={'error':'latest-update unreadable'}
 health={
     'generatedAt':datetime.datetime.utcnow().replace(microsecond=0).isoformat()+'Z',
-    'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats},
+    'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
