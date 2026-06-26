@@ -65,8 +65,8 @@ REQUIRED_BRACKET_UI = [
 ]
 REQUIRED_WORKFLOW_STEPS = [
     "on:\n  workflow_dispatch:\n  schedule:",
-    "cron: '37 8 11-30 6 *'",
-    "cron: '37 8 1-20 7 *'",
+    "cron: '37 7,8,9 11-30 6 *'",
+    "cron: '37 7,8,9 1-20 7 *'",
     'python3 scripts/validate_base_data.py',
     'node --check "$f"',
     'node scripts/build-html.mjs',
