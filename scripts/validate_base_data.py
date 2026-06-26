@@ -39,13 +39,18 @@ REQUIRED_BRACKET_UI = [
 ]
 REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/validate_base_data.py',
+    'node --check "$f"',
+    'node scripts/build-html.mjs',
+    'node scripts/validate.mjs',
     'python3 scripts/apply_scoreboard.py',
     'python3 scripts/enrich_predictions.py',
     'python3 scripts/enrich_rest_travel.py',
     'python3 scripts/enrich_weather.py',
     'python3 scripts/enrich_data_quality.py',
     'python3 scripts/update_health.py',
+    'node scripts/update-data.mjs --no-fetch',
     'python3 scripts/test_idempotence.py',
+    'node scripts/run-sim.mjs',
     'data/update-health.json',
 ]
 REQUIRED_SCRIPT_MARKERS = {

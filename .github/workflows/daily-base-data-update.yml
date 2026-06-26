@@ -15,14 +15,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/validate_base_data.py
+      - run: for f in scripts/*.mjs; do node --check "$f"; done
+      - run: node scripts/build-html.mjs
+      - run: node scripts/validate.mjs
       - run: python3 scripts/apply_scoreboard.py
       - run: python3 scripts/enrich_predictions.py
       - run: python3 scripts/enrich_rest_travel.py
       - run: python3 scripts/enrich_weather.py
       - run: python3 scripts/enrich_data_quality.py
       - run: python3 scripts/update_health.py
+      - run: node scripts/update-data.mjs --no-fetch
       - run: python3 scripts/validate_base_data.py
       - run: python3 scripts/test_idempotence.py
+      - run: node scripts/run-sim.mjs
       - run: |
           if git diff --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
