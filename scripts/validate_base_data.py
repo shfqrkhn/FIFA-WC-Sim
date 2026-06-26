@@ -2,6 +2,7 @@ import json, os, re, sys
 
 HTML = 'docs/index.html'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
+GITIGNORE = '.gitignore'
 REQUIRED_UI = [
     '<title>FIFA World Cup 2026 \u2014 Whole Tournament Simulator</title>',
     'Whole Tournament Simulator',
@@ -52,6 +53,10 @@ REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/test_idempotence.py',
     'node scripts/run-sim.mjs',
     'data/update-health.json',
+]
+REQUIRED_GITIGNORE_ENTRIES = [
+    'data/scoreboards/',
+    'data/latest-simulation.json',
 ]
 REQUIRED_SCRIPT_MARKERS = {
     'scripts/automation_utils.py': [
@@ -145,6 +150,13 @@ if os.path.exists(WORKFLOW):
             fail('missing workflow automation marker: %s' % marker)
 else:
     fail('missing daily BASE_DATA workflow')
+if os.path.exists(GITIGNORE):
+    gitignore = open(GITIGNORE, encoding='utf-8').read().splitlines()
+    for entry in REQUIRED_GITIGNORE_ENTRIES:
+        if entry not in gitignore:
+            fail('missing generated-artifact ignore marker: %s' % entry)
+else:
+    fail('missing generated-artifact ignore file')
 for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     if not os.path.exists(path):
         fail('missing automation guard script: %s' % path)
