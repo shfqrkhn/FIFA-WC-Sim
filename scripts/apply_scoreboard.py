@@ -27,7 +27,8 @@ def competitor_name(c):
     code = c.get('abbreviation') or team.get('abbreviation')
     return TEAM.get(code, '')
 def is_final(ev):
-    typ = ev.get('status', {}).get('type', {})
+    status = ev.get('status') if isinstance(ev.get('status'), dict) else {}
+    typ = status.get('type') if isinstance(status.get('type'), dict) else {}
     return bool(typ.get('completed') or typ.get('name') in ('STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN'))
 def scoreboard_paths():
     args = [a for a in sys.argv[1:] if a != '--no-fetch']

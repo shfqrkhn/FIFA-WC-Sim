@@ -43,6 +43,8 @@ REQUIRED_SCRIPT_MARKERS = {
         "'path': path",
         'scoreboard file invalid shape',
         'isinstance(events, list)',
+        "status = ev.get('status') if isinstance(ev.get('status'), dict) else {}",
+        "typ = status.get('type') if isinstance(status.get('type'), dict) else {}",
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
