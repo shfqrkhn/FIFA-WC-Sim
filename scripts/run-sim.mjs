@@ -98,6 +98,15 @@ const footerText = elements.get('#lastDataUpdate')?.textContent || '';
 if (!html.includes('id="lastDataUpdate"') || !footerText || footerText === 'Loading…') {
   throw new Error('Last data update footer was not rendered.');
 }
+const footerMetadataOk = vm.runInContext(`(() => {
+  return $('#appVersion')?.textContent === APP_VERSION &&
+    $('#dataVersion')?.textContent === DATA.version &&
+    /^\\d{4}$/.test($('#copyrightYear')?.textContent || '') &&
+    ($('#legalNotice')?.textContent || '').includes('not affiliated with FIFA');
+})()`, sandbox, { timeout: 1000 });
+if (!footerMetadataOk) {
+  throw new Error('Footer metadata did not render app version, data version, copyright, and legal notice.');
+}
 const footerLatestOk = vm.runInContext(`(() => {
   const vals = [DATA.dataQuality?.updatedAt, DATA.generatedAt, DATA.currentStats?.updatedAt].filter(Boolean);
   const latest = vals.map(x => [String(x), new Date(x)]).filter(x => Number.isFinite(x[1].getTime())).sort((a,b) => b[1]-a[1])[0]?.[0];
