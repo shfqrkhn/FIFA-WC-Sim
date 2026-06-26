@@ -1,6 +1,6 @@
 # World Cup 2026 Simulator 🏆⚽
 
-**Current Version:** 2026.06.25-patch-32-nav-fit-polish
+**Current Data Version:** shown in the deployed app's Maintenance view from embedded `BASE_DATA`.
 
 **A fast, offline-first tournament simulator for exploring the 2026 FIFA World Cup.**
 

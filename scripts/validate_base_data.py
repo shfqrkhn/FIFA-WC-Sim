@@ -1,6 +1,7 @@
 import json, os, re, sys
 
 HTML = 'docs/index.html'
+README = 'README.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 GITIGNORE = '.gitignore'
 REQUIRED_UI = [
@@ -58,6 +59,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
     'data/latest-simulation.json',
 ]
+README_VERSION_MARKER = "shown in the deployed app's Maintenance view from embedded `BASE_DATA`"
 REQUIRED_SCRIPT_MARKERS = {
     'scripts/automation_utils.py': [
         'def utc_stamp():',
@@ -157,6 +159,14 @@ if os.path.exists(GITIGNORE):
             fail('missing generated-artifact ignore marker: %s' % entry)
 else:
     fail('missing generated-artifact ignore file')
+if os.path.exists(README):
+    readme = open(README, encoding='utf-8').read()
+    if README_VERSION_MARKER not in readme:
+        fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
+    if '2026.06.25-patch-32-nav-fit-polish' in readme:
+        fail('README contains stale hard-coded patch version')
+else:
+    fail('missing README')
 for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     if not os.path.exists(path):
         fail('missing automation guard script: %s' % path)
