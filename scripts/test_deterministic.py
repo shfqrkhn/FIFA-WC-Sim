@@ -7,6 +7,7 @@ def snap():
     return {p:digest(p) for p in files}
 def run():
     for c in cmds: subprocess.run(c,check=True)
+subprocess.run(['python3','scripts/update_health.py'],check=True)
 before=snap(); run(); after=snap(); run(); final=snap()
 if before!=after or after!=final:
     print('deterministic idempotence failed')
