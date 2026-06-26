@@ -22,7 +22,9 @@ def load_base_data():
     end = html.index(';\nconst BLOCKED_PATCH_KEYS', start)
     return html, start, end, json.loads(html[start:end])
 def competitor_name(c):
-    code = c.get('abbreviation') or c.get('team', {}).get('abbreviation')
+    if not isinstance(c, dict): return ''
+    team = c.get('team') if isinstance(c.get('team'), dict) else {}
+    code = c.get('abbreviation') or team.get('abbreviation')
     return TEAM.get(code, '')
 def is_final(ev):
     typ = ev.get('status', {}).get('type', {})
@@ -64,13 +66,23 @@ for path in paths:
     except Exception:
         FETCH_FAILURES.append({'path': path, 'error': 'scoreboard file unreadable'})
         continue
-    for ev in feed.get('events', []):
+    events = feed.get('events') if isinstance(feed, dict) else None
+    if not isinstance(events, list):
+        FETCH_FAILURES.append({'path': path, 'error': 'scoreboard file invalid shape'})
+        continue
+    for ev in events:
+        if not isinstance(ev, dict): continue
         if not is_final(ev): continue
-        comps = ev.get('competitions', [{}])[0].get('competitors', [])
-        if len(comps) != 2: continue
+        competitions = ev.get('competitions') or [{}]
+        if not isinstance(competitions, list) or not competitions or not isinstance(competitions[0], dict): continue
+        comps = competitions[0].get('competitors', [])
+        if not isinstance(comps, list) or len(comps) != 2 or any(not isinstance(c, dict) for c in comps): continue
         a, b = competitor_name(comps[0]), competitor_name(comps[1])
         if not a or not b: continue
-        score_a, score_b = int(comps[0].get('score', 0)), int(comps[1].get('score', 0))
+        try:
+            score_a, score_b = int(comps[0].get('score', 0)), int(comps[1].get('score', 0))
+        except Exception:
+            continue
         fetched += 1
         match = idx.get(key(a, b))
         if not match: continue
