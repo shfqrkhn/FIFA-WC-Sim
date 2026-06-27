@@ -115,6 +115,47 @@ const footerLatestOk = vm.runInContext(`(() => {
 if (!footerLatestOk) {
   throw new Error('Last data update footer did not use the latest embedded timestamp.');
 }
+const todayHighlightOk = vm.runInContext(`(() => {
+  const RealDate = Date;
+  const key = matchDateKey(DATA.matches.find(m => m.no === 65));
+  const parts = key.split('-').map(Number);
+  class MockDate extends RealDate {
+    constructor(...args) { super(...(args.length ? args : [parts[0], parts[1] - 1, parts[2], 12])); }
+    static now() { return new RealDate(parts[0], parts[1] - 1, parts[2], 12).getTime(); }
+    static parse(v) { return RealDate.parse(v); }
+    static UTC(...args) { return RealDate.UTC(...args); }
+  }
+  globalThis.Date = MockDate;
+  try {
+    const date = new Date();
+    renderTodayMatches();
+    renderGroups(DATA.matches);
+    const todayHtml = $('#todayView')?.innerHTML || '';
+    const sampleRun = simulate('today-highlight-smoke');
+    renderResult(sampleRun);
+    const runTodayHtml = $('#todayView')?.innerHTML || '';
+    const groupsHtml = $('#groupsView')?.innerHTML || '';
+    const runTodayRows = todayMatches(date, sampleRun);
+    const bracketHtml = matchCard({ no: 999, round: 'R32', date: key, venue: 'Smoke Venue', teamA: 'Argentina', teamB: 'Portugal' });
+    return localDateKey(date) === key &&
+      isTodayMatch({ date: key }, date) &&
+      !isTodayMatch({ date: '2099-01-01' }, date) &&
+      todayMatches(date).length >= 1 &&
+      runTodayRows.length >= 1 &&
+      $('#todayView').classList.contains('hasToday') &&
+      todayHtml.includes("Today's matches") &&
+      todayHtml.includes('Today') &&
+      runTodayRows.every(m => runTodayHtml.includes('M' + m.no) && runTodayHtml.includes(m.scoreA + '–' + m.scoreB)) &&
+      (groupsHtml.match(/todayMatch/g) || []).length >= runTodayRows.length &&
+      bracketHtml.includes('todayMatch') &&
+      bracketHtml.includes('Today');
+  } finally {
+    globalThis.Date = RealDate;
+  }
+})()`, sandbox, { timeout: 1000 });
+if (!todayHighlightOk) {
+  throw new Error('Today match highlighting did not classify and render schedule dates correctly.');
+}
 const ensembleModelOk = vm.runInContext(`(() => {
   const breakdown = ensembleBreakdown('Argentina', { matches: DATA.matches });
   const weightTotal = Object.values(ensembleWeights()).reduce((sum, x) => sum + x, 0);
