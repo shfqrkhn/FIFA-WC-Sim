@@ -156,6 +156,29 @@ const todayHighlightOk = vm.runInContext(`(() => {
 if (!todayHighlightOk) {
   throw new Error('Today match highlighting did not classify and render schedule dates correctly.');
 }
+const statsSnapshotOk = vm.runInContext(`(() => {
+  const key = matchDateKey(DATA.matches.find(m => m.no === 65));
+  const parts = key.split('-').map(Number);
+  const date = new Date(parts[0], parts[1] - 1, parts[2], 12);
+  const snap = scheduleSnapshot(date);
+  renderStats();
+  const html = $('#statsView')?.innerHTML || '';
+  return snap.total === 104 &&
+    snap.played === 66 &&
+    snap.remaining === 38 &&
+    snap.groupLeft === 6 &&
+    snap.koLeft === 32 &&
+    snap.todayCount >= 1 &&
+    Number.isFinite(snap.daysToFinal) &&
+    html.includes('Schedule progress') &&
+    html.includes('Matches left') &&
+    html.includes('Calendar days to final') &&
+    html.includes('Next scheduled match day') &&
+    html.includes('<div>Attendance</div><div>—</div>');
+})()`, sandbox, { timeout: 1000 });
+if (!statsSnapshotOk) {
+  throw new Error('Tournament snapshot schedule progress did not render expected remaining-match fields.');
+}
 const ensembleModelOk = vm.runInContext(`(() => {
   const breakdown = ensembleBreakdown('Argentina', { matches: DATA.matches });
   const weightTotal = Object.values(ensembleWeights()).reduce((sum, x) => sum + x, 0);
