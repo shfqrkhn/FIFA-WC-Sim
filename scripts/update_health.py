@@ -17,10 +17,21 @@ latest={}
 if os.path.exists('data/latest-update.json'):
     try: latest=json.load(open('data/latest-update.json',encoding='utf-8'))
     except Exception: latest={'error':'latest-update unreadable'}
+audit={'predictions':[]}
+if os.path.exists('data/prediction-audit.json'):
+    try: audit=json.load(open('data/prediction-audit.json',encoding='utf-8'))
+    except Exception: audit={'error':'prediction-audit unreadable','predictions':[]}
+calibration={}
+if os.path.exists('data/calibration-state.json'):
+    try: calibration=json.load(open('data/calibration-state.json',encoding='utf-8'))
+    except Exception: calibration={'error':'calibration-state unreadable'}
+predictions=audit.get('predictions',[]) if isinstance(audit,dict) else []
+settled=[p for p in predictions if isinstance(p,dict) and p.get('actual_result')]
 health={
     'generatedAt':utc_stamp(),
     'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
+    'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
 }

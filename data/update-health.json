@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T05:37:24Z",
+  "generatedAt": "2026-06-27T11:57:08Z",
   "scoreboard": {
     "playedGroupMatches": 66,
     "totalGroupMatches": 72,
@@ -48,6 +48,13 @@
     "coveredUnplayedMatches": 6,
     "totalUnplayedMatches": 6,
     "failedMatches": []
+  },
+  "predictionAudit": {
+    "frozenPredictions": 6,
+    "settledPredictions": 0,
+    "calibrationStatus": "insufficient_sample",
+    "resolvedPredictions": 0,
+    "minimumResolvedPredictions": 30
   },
   "dataQuality": {
     "scores": {

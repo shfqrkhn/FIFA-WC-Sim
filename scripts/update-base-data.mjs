@@ -11,7 +11,9 @@ const fetchArgs = noFetch ? ['--no-fetch'] : [];
 const COMMIT_CANDIDATES = [
   'docs/index.html',
   'data/latest-update.json',
-  'data/update-health.json'
+  'data/update-health.json',
+  'data/prediction-audit.json',
+  'data/calibration-state.json'
 ];
 
 function snapshot(paths) {
@@ -40,13 +42,17 @@ function runNode(script, scriptArgs = []) {
 
 const steps = [
   ['validate baseline', () => runPythonScript('scripts/validate_base_data.py')],
+  ['freeze pre-match predictions', () => runNode('scripts/freeze-predictions.mjs')],
   ['apply scoreboard', () => runPythonScript('scripts/apply_scoreboard.py', [...scoreboardArgs, ...fetchArgs])],
   ['enrich predictions', () => runPythonScript('scripts/enrich_predictions.py')],
   ['enrich rest/travel', () => runPythonScript('scripts/enrich_rest_travel.py')],
   ['enrich weather', () => runPythonScript('scripts/enrich_weather.py', fetchArgs)],
   ['enrich data quality', () => runPythonScript('scripts/enrich_data_quality.py')],
+  ['score frozen predictions', () => runNode('scripts/score-predictions.mjs')],
+  ['update calibration', () => runNode('scripts/update-calibration.mjs')],
   ['update health artifact', () => runPythonScript('scripts/update_health.py')],
   ['validate updated data', () => runPythonScript('scripts/validate_base_data.py')],
+  ['validate prediction audit calibration', () => runNode('scripts/validate-calibration.mjs')],
   ['validate extract/build shape', () => runNode('scripts/build-html.mjs')],
   ['validate wrapper', () => runNode('scripts/validate.mjs')]
 ];

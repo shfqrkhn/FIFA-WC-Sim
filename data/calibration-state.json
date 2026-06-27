@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "generated_at_utc": "2026-06-27T00:00:00Z",
+  "calibration_status": "insufficient_sample",
+  "active": false,
+  "resolved_predictions": 0,
+  "min_resolved_predictions": 30,
+  "use_calibrated_probabilities": false,
+  "method": "conservative_bucket_calibration",
+  "bucket_adjustments": [],
+  "raw_validation_metrics": null,
+  "validation_metrics": null,
+  "last_update_decision": "insufficient_sample",
+  "rollback_count": 0,
+  "notes": [
+    "Calibration is disabled until enough frozen predictions have resolved.",
+    "Base model output and calibrated output remain separate.",
+    "Unavailable lineups, injuries, suspensions, referees, and incomplete discipline ledgers remain neutral unless patched from reliable sources."
+  ]
+}

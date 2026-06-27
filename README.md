@@ -74,6 +74,14 @@ The app keeps Monte Carlo as the tournament-level simulator. Under each tourname
 
 The displayed sample path is selected from the Monte Carlo run that represents the top champion/finalist pairing, so the main result, Groups, Bracket, and favorites board stay aligned.
 
+### Prediction Audit and Calibration
+
+The maintenance scripts can freeze pre-match model predictions into `data/prediction-audit.json` before results are known. Once match results are embedded, `scripts/score-predictions.mjs` scores those frozen records with Brier score, log loss, scoreline error, calibration bucket, and failure class.
+
+`scripts/update-calibration.mjs` uses only already-settled frozen predictions. Calibration is conservative, remains separate from the base model, and stays disabled as `insufficient_sample` until at least 30 resolved predictions exist. If validation does not improve or tie raw Brier/log-loss performance, calibrated probabilities are rolled back and the app continues to show raw model probabilities.
+
+This audit loop is educational and informational only. It is used to detect overconfidence and calibration drift, not to provide betting advice.
+
 ## Data Sources and Updates
 
 The embedded data includes:
@@ -97,7 +105,7 @@ It runs on:
 
 GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance.
 
-The workflow runs `node scripts/update-base-data.mjs`, then idempotence and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, and `data/update-health.json`, and only after validation passes.
+The workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, and `data/calibration-state.json`, and only after validation passes.
 
 ### Automated Sources
 
@@ -130,6 +138,15 @@ Use `--no-fetch` for deterministic local repair/enrichment without network calls
 node scripts/update-base-data.mjs --no-fetch
 ```
 
+Audit/calibration maintenance can also be run one step at a time:
+
+```bash
+node scripts/freeze-predictions.mjs
+node scripts/score-predictions.mjs
+node scripts/update-calibration.mjs
+node scripts/validate-calibration.mjs
+```
+
 ### Local Validation
 
 ```bash
@@ -137,6 +154,8 @@ python scripts/validate_base_data.py
 for f in scripts/*.mjs; do node --check "$f"; done
 node scripts/build-html.mjs
 node scripts/validate.mjs
+node scripts/validate-calibration.mjs
+node tests/run-all.mjs
 python scripts/test_idempotence.py
 node scripts/run-sim.mjs
 ```

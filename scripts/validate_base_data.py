@@ -29,6 +29,9 @@ REQUIRED_UI = [
     'scorelineDistribution',
     'poissonBucketPmf',
     'dixonColesTau',
+    'calibrationStatusText',
+    'calibrationAdjustedGroupOutcome',
+    'frozen-prediction bucket adjustment',
     'id="appVersion"',
     'id="dataVersion"',
     'id="lastDataUpdate"',
@@ -89,12 +92,16 @@ REQUIRED_WORKFLOW_STEPS = [
     'node --check "$f"',
     'node scripts/update-base-data.mjs',
     'python3 scripts/test_idempotence.py',
+    'node scripts/validate-calibration.mjs',
+    'node tests/run-all.mjs',
     'node scripts/run-sim.mjs',
     'python3 scripts/validate_base_data.py',
-    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json',
+    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'concurrency:',
-    'git add -A -- docs/index.html data/latest-update.json data/update-health.json',
+    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'data/update-health.json',
+    'data/prediction-audit.json',
+    'data/calibration-state.json',
 ]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
@@ -126,6 +133,9 @@ REQUIRED_SCRIPT_MARKERS = {
     'scripts/update_health.py': [
         'from automation_utils import utc_stamp',
         'data/latest-update.json',
+        'data/prediction-audit.json',
+        'data/calibration-state.json',
+        "'predictionAudit'",
         "'latestUpdate':latest",
     ],
     'scripts/test_idempotence.py': ['scripts/test_deterministic.py'],
@@ -160,14 +170,57 @@ REQUIRED_SCRIPT_MARKERS = {
         'COMMIT_CANDIDATES',
         'function snapshot',
         'function restore',
+        'scripts/freeze-predictions.mjs',
         'scripts/apply_scoreboard.py',
         'scripts/enrich_predictions.py',
         'scripts/enrich_rest_travel.py',
         'scripts/enrich_weather.py',
         'scripts/enrich_data_quality.py',
+        'scripts/score-predictions.mjs',
+        'scripts/update-calibration.mjs',
         'scripts/update_health.py',
+        'scripts/validate-calibration.mjs',
         'scripts/build-html.mjs',
         'scripts/validate.mjs',
+    ],
+    'scripts/prediction-audit-lib.mjs': [
+        'REQUIRED_LEDGER_FIELDS',
+        'MIN_RESOLVED_PREDICTIONS',
+        'createPredictionRecord',
+        'scorePrediction',
+        'updateCalibrationState',
+        'applyCalibrationToWdl',
+        'calibrationEligiblePredictions',
+        'validateNoMarketFields',
+    ],
+    'scripts/freeze-predictions.mjs': [
+        'createPredictionRecord',
+        'scorelineDistribution',
+        'expectedGoals',
+        'appendFrozenPrediction',
+    ],
+    'scripts/score-predictions.mjs': [
+        'scoreLedger',
+        'data/prediction-audit.json',
+    ],
+    'scripts/update-calibration.mjs': [
+        'updateCalibrationState',
+        'publicCalibrationState',
+        'writeArtifact',
+        'data/calibration-state.json',
+    ],
+    'scripts/validate-calibration.mjs': [
+        'REQUIRED_LEDGER_FIELDS',
+        'MIN_RESOLVED_PREDICTIONS',
+        'calibration_status',
+        'Brier',
+        'log loss',
+    ],
+    'tests/run-all.mjs': [
+        'prediction-audit.test.mjs',
+        'scoring.test.mjs',
+        'calibration.test.mjs',
+        'no-leakage.test.mjs',
     ],
     'scripts/run-sim.mjs': [
         'documentStub',
@@ -181,6 +234,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'Today match highlighting did not classify and render schedule dates correctly.',
         'Tournament snapshot schedule progress did not render expected remaining-match fields.',
         'Ensemble model and low-score scoreline sampler were not active and disclosed.',
+        'Prediction-audit calibration status was not disclosed or failed closed.',
         'Rank-seeded Elo prior',
         'Monte Carlo loading state did not toggle accessibly.',
         'Monte Carlo controls were not locked during simulation.',
@@ -325,6 +379,14 @@ if not isinstance(data.get('sources'), list):
     errors.append('missing sources')
 if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
+calibration = data.get('calibration')
+if not isinstance(calibration, dict):
+    errors.append('missing embedded calibration state')
+else:
+    if calibration.get('calibration_status') not in ('insufficient_sample', 'active', 'validation_worsened_rollback'):
+        errors.append('invalid calibration status')
+    if calibration.get('resolved_predictions', 0) < 30 and calibration.get('calibration_status') != 'insufficient_sample':
+        errors.append('calibration must fail closed below minimum sample')
 if not isinstance(data.get('modelInputs'), dict) or 'rank-seeded Elo-style rating' not in data.get('modelInputs', {}).get('features', []):
     errors.append('missing rank-seeded Elo-style model input disclosure')
 for t in teams or []:
@@ -362,4 +424,13 @@ if weather_by_match:
         errors.append('weatherByMatch retains completed match rows: %s' % ', '.join(played_weather[:12]))
 if errors:
     fail('; '.join(errors[:12]))
+for path in ('data/prediction-audit.json', 'data/calibration-state.json'):
+    if not os.path.exists(path):
+        fail('missing prediction audit artifact: %s' % path)
+    try:
+        artifact = json.load(open(path, encoding='utf-8'))
+    except Exception as e:
+        fail('unreadable prediction audit artifact %s: %s' % (path, e))
+    if not isinstance(artifact, dict) or artifact.get('schema') != 1:
+        fail('invalid prediction audit artifact schema: %s' % path)
 print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True, 'singleInputGuarded': True}, indent=2))

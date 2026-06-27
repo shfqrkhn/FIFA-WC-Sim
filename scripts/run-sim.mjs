@@ -210,6 +210,27 @@ const ensembleModelOk = vm.runInContext(`(() => {
 if (!ensembleModelOk) {
   throw new Error('Ensemble model and low-score scoreline sampler were not active and disclosed.');
 }
+const calibrationDisclosureOk = vm.runInContext(`(() => {
+  const state = calibrationState();
+  const text = calibrationStatusText();
+  const sample = calibrationAdjustedGroupOutcome({runs:10,teamA:'Alpha',teamB:'Beta',outcomes:{Alpha:7,Draw:2,Beta:1}}, 'Alpha');
+  const original = DATA.calibration;
+  DATA.calibration = {calibration_status:'active',active:true,resolved_predictions:1,min_resolved_predictions:30,bucket_adjustments:[{bucket:'0.7-0.8',outcome:'home_win',calibrated_confidence:.2}]};
+  const failClosed = calibrationAdjustedGroupOutcome({runs:10,teamA:'Alpha',teamB:'Beta',outcomes:{Alpha:7,Draw:2,Beta:1}}, 'Alpha');
+  DATA.calibration = original;
+  renderTransparency(LAST);
+  const html = $('#assumptionsView')?.innerHTML || '';
+  return state.calibration_status &&
+    text.includes(state.calibration_status) &&
+    sample.status === state.calibration_status &&
+    failClosed.status === 'insufficient_sample' &&
+    Math.abs(failClosed.prob - failClosed.raw) < 1e-12 &&
+    html.includes('Calibration') &&
+    html.includes('raw model probabilities');
+})()`, sandbox, { timeout: 1000 });
+if (!calibrationDisclosureOk) {
+  throw new Error('Prediction-audit calibration status was not disclosed or failed closed.');
+}
 const busyOk = vm.runInContext(`(() => {
   setBusy(true, 'Busy smoke');
   const on = $('#appStatus').classList.contains('isBusy') && $('#appStatus').getAttribute('aria-busy') === 'true';
