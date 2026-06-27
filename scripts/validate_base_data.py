@@ -45,6 +45,8 @@ REQUIRED_UI = [
     'function todayMatches',
     'function renderTodayMatches',
     'function matchTimeLabel',
+    'function matchKickoffSortValue',
+    'function todayMatchSort',
     'timeZoneName',
     'todayMatch',
     'function scheduleSnapshot',

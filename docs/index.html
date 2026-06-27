@@ -205,7 +205,9 @@ function matchDateValue(m){return m&&(m.kickoffUtc||m.kickoff||m.kickoffLocal||m
 function matchDateKey(m){const raw=matchDateValue(m); if(!raw)return ''; const s=String(raw); if(!s.includes('T'))return s.slice(0,10); const d=new Date(s); return Number.isFinite(d.getTime())?localDateKey(d):s.slice(0,10);}
 function matchTimeLabel(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw||!s.includes('T'))return ''; const d=new Date(s); return Number.isFinite(d.getTime())?d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'';}
 function isTodayMatch(m,date=new Date()){return matchDateKey(m)===localDateKey(date);}
-function todayMatches(date=new Date(),run=null){const key=localDateKey(date), all=[...(run?.matches||DATA.matches||[]),...(run?.ko||DATA.knockout||[])]; return all.filter(m=>matchDateKey(m)===key).sort((a,b)=>(a.no||0)-(b.no||0));}
+function matchKickoffSortValue(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw||!s.includes('T'))return Number.POSITIVE_INFINITY; const d=new Date(s); return Number.isFinite(d.getTime())?d.getTime():Number.POSITIVE_INFINITY;}
+function todayMatchSort(a,b){const ta=matchKickoffSortValue(a), tb=matchKickoffSortValue(b); return ta-tb||((a.no||0)-(b.no||0));}
+function todayMatches(date=new Date(),run=null){const key=localDateKey(date), all=[...(run?.matches||DATA.matches||[]),...(run?.ko||DATA.knockout||[])]; return all.filter(m=>matchDateKey(m)===key).sort(todayMatchSort);}
 function slotLabel(ref){if(!ref)return 'TBD'; if(ref.type==='rank')return (Number(ref.pos)===1?'1st':'2nd')+' Group '+ref.group; if(ref.type==='third')return '3rd '+(ref.groups||[]).join('/'); if(ref.type==='winner')return 'Winner M'+ref.match; if(ref.type==='loser')return 'Loser M'+ref.match; return 'TBD';}
 function matchSideName(m,side){return m?.[side==='A'?'teamA':'teamB']||slotLabel(m?.[side==='A'?'a':'b']);}
 function matchSideLabel(name){const t=DATA.teams.find(x=>x.name===name); return (t?.flag?esc(t.flag)+' ':'')+esc(name||'TBD');}

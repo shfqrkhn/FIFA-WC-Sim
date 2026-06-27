@@ -137,11 +137,21 @@ const todayHighlightOk = vm.runInContext(`(() => {
     const runTodayHtml = $('#todayView')?.innerHTML || '';
     const groupsHtml = $('#groupsView')?.innerHTML || '';
     const runTodayRows = todayMatches(date, sampleRun);
+    const syntheticOrder = todayMatches(date, {
+      matches: [
+        { no: 30, date: key + 'T20:00:00Z' },
+        { no: 20, date: key + 'T16:00:00Z' },
+        { no: 10, date: key + 'T16:00:00Z' },
+        { no: 40, date: key }
+      ],
+      ko: []
+    }).map(m => m.no).join(',');
     const bracketHtml = matchCard({ no: 999, round: 'R32', date: key, venue: 'Smoke Venue', teamA: 'Argentina', teamB: 'Portugal' });
     return localDateKey(date) === key &&
       isTodayMatch({ date: key }, date) &&
       !isTodayMatch({ date: '2099-01-01' }, date) &&
       todayMatches(date).length >= 1 &&
+      syntheticOrder === '10,20,30,40' &&
       runTodayRows.length >= 1 &&
       $('#todayView').classList.contains('hasToday') &&
       todayHtml.includes("Today's matches") &&
