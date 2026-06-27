@@ -2,3 +2,4 @@ __pycache__/
 *.py[cod]
 data/scoreboards/
 data/latest-simulation.json
+linkedin-post-package/
