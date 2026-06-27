@@ -259,6 +259,17 @@ const controlsLockOk = vm.runInContext(`(() => {
 if (!controlsLockOk) {
   throw new Error('Monte Carlo controls were not locked during simulation.');
 }
+const collapsedControlsOk =
+  /<div class="toolbar primaryControls">\s*<button class="btn gold" id="mcBtn"/.test(html) &&
+  html.includes('<details class="advancedControls" id="predictionSettings">') &&
+  html.includes('.advancedControls:not([open]) .settingsControls{display:none}') &&
+  html.includes('<div class="toolbar settingsControls" aria-label="Prediction settings">') &&
+  !html.includes('<details class="advancedControls" id="predictionSettings" open>') &&
+  html.indexOf('id="mcBtn"') < html.indexOf('id="predictionSettings"') &&
+  html.indexOf('id="seed"') > html.indexOf('id="predictionSettings"');
+if (!collapsedControlsOk) {
+  throw new Error('Prediction settings were not collapsed behind the visible run button.');
+}
 const invalidationOk = vm.runInContext(`(() => {
   const hadMc = !!MC;
   refresh('Invalidation smoke.');

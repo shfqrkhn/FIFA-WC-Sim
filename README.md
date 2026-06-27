@@ -13,8 +13,8 @@ World Cup 2026 Simulator is a static, offline-capable web app for exploring the 
 ## Quick Start
 
 1. Open the live app.
-2. On the **Sim** tab, keep the defaults or adjust the scenario name, number of prediction runs, match style, host boost, and weather setting.
-3. Press **Run predictions**.
+2. On the **Sim** tab, press **Run predictions**.
+3. Optionally expand **Prediction settings** to adjust the scenario name, number of prediction runs, match style, host boost, and weather setting.
 4. Read **Most likely champions** first. This is the quickest summary of the tournament outlook.
 5. Review **Sample tournament path** to see one representative bracket path that matches the top Monte Carlo outcome.
 6. Use **Groups**, **Bracket**, and **Odds** for more detail.
@@ -26,7 +26,7 @@ World Cup 2026 Simulator is a static, offline-capable web app for exploring the 
 
 The main screen is designed to answer the most common question first: who is most likely to win?
 
-Controls:
+Prediction settings:
 
 * **Scenario name:** a seed for repeatable results. The same seed and settings produce the same sample tournament path.
 * **Prediction runs:** how many Monte Carlo tournament runs to perform. More runs produce smoother probabilities and take longer.
