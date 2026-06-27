@@ -131,6 +131,7 @@ const todayHighlightOk = vm.runInContext(`(() => {
     renderTodayMatches();
     renderGroups(DATA.matches);
     const todayHtml = $('#todayView')?.innerHTML || '';
+    const localTime = matchTimeLabel(DATA.matches.find(m => m.no === 65));
     const sampleRun = simulate('today-highlight-smoke');
     renderResult(sampleRun);
     const runTodayHtml = $('#todayView')?.innerHTML || '';
@@ -145,6 +146,9 @@ const todayHighlightOk = vm.runInContext(`(() => {
       $('#todayView').classList.contains('hasToday') &&
       todayHtml.includes("Today's matches") &&
       todayHtml.includes('Today') &&
+      localTime &&
+      todayHtml.includes(localTime) &&
+      !matchTimeLabel({ date: key }) &&
       runTodayRows.every(m => runTodayHtml.includes('M' + m.no) && runTodayHtml.includes(m.scoreA + '–' + m.scoreB)) &&
       (groupsHtml.match(/todayMatch/g) || []).length >= runTodayRows.length &&
       bracketHtml.includes('todayMatch') &&

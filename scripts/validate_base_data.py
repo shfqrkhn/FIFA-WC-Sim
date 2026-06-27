@@ -37,6 +37,8 @@ REQUIRED_UI = [
     'id="todayView"',
     'function todayMatches',
     'function renderTodayMatches',
+    'function matchTimeLabel',
+    'timeZoneName',
     'todayMatch',
     'function scheduleSnapshot',
     'Schedule progress',
