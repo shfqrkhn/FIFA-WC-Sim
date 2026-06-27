@@ -3,37 +3,41 @@ name: Daily BASE_DATA update
 on:
   workflow_dispatch:
   schedule:
-    - cron: '37 7,8,9 11-30 6 *'
-    - cron: '37 7,8,9 1-20 7 *'
+    # Morning run: 11:37 UTC is 07:37 America/Montreal during EDT.
+    # GitHub cron is UTC only; the same time is 06:37 during EST.
+    - cron: '37 11 * * *'
+    # Safety run: catches delayed score feeds or a missed/delayed morning run.
+    # 17:37 UTC is 13:37 America/Montreal during EDT, 12:37 during EST.
+    - cron: '37 17 * * *'
 
 permissions:
   contents: write
+
+concurrency:
+  group: daily-base-data-update-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python3 scripts/validate_base_data.py
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: python3 -m py_compile scripts/*.py
       - run: for f in scripts/*.mjs; do node --check "$f"; done
-      - run: node scripts/build-html.mjs
-      - run: node scripts/validate.mjs
-      - run: python3 scripts/apply_scoreboard.py
-      - run: python3 scripts/enrich_predictions.py
-      - run: python3 scripts/enrich_rest_travel.py
-      - run: python3 scripts/enrich_weather.py
-      - run: python3 scripts/enrich_data_quality.py
-      - run: python3 scripts/update_health.py
-      - run: node scripts/update-data.mjs --no-fetch
-      - run: python3 scripts/validate_base_data.py
+      - run: node scripts/update-base-data.mjs
       - run: python3 scripts/test_idempotence.py
       - run: node scripts/run-sim.mjs
+      - run: python3 scripts/validate_base_data.py
       - run: |
-          if git diff --quiet; then exit 0; fi
+          if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json; then
+            echo "No validated BASE_DATA changes to commit."
+            exit 0
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add docs/index.html
-          if [ -f data/latest-update.json ]; then git add data/latest-update.json; fi
-          if [ -f data/update-health.json ]; then git add data/update-health.json; fi
+          git add -A -- docs/index.html data/latest-update.json data/update-health.json
           git commit -m 'Daily World Cup BASE_DATA update'
           git push

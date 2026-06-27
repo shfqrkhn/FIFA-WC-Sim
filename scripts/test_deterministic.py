@@ -1,6 +1,6 @@
-import hashlib, os, subprocess
+import hashlib, os, subprocess, sys
 files=['docs/index.html','data/latest-update.json','data/update-health.json']
-cmds=[['python3','scripts/apply_scoreboard.py','--no-fetch'],['python3','scripts/enrich_predictions.py'],['python3','scripts/enrich_rest_travel.py'],['python3','scripts/enrich_weather.py','--no-fetch'],['python3','scripts/enrich_data_quality.py'],['python3','scripts/update_health.py']]
+cmds=[[sys.executable,'scripts/apply_scoreboard.py','--no-fetch'],[sys.executable,'scripts/enrich_predictions.py'],[sys.executable,'scripts/enrich_rest_travel.py'],[sys.executable,'scripts/enrich_weather.py','--no-fetch'],[sys.executable,'scripts/enrich_data_quality.py'],[sys.executable,'scripts/update_health.py']]
 def digest(p):
     return hashlib.sha256(open(p,'rb').read()).hexdigest() if os.path.exists(p) else None
 def snap():

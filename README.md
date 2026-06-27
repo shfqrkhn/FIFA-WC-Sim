@@ -80,12 +80,76 @@ The embedded data includes:
 
 * Teams, groups, venues, and knockout slots.
 * Played group-stage results.
-* FIFA ranking priors and team-strength assumptions.
+* FIFA ranking priors, rank-seeded Elo-style ratings, and team-strength assumptions.
 * Venue, climate, rest/travel, and weather context.
 * Fair-play/team-conduct inputs where available.
 * Source notes, validation history, and known data-quality gaps.
 
-Scheduled update workflows refresh available BASE_DATA inputs and run validation. Missing factors such as lineups, injuries, suspensions, and referee assignments remain neutral unless reliable data is added.
+### Automated Update Status
+
+Daily auto-update exists at `.github/workflows/daily-base-data-update.yml`.
+
+It runs on:
+
+* `37 11 * * *` UTC: 07:37 America/Montreal during EDT, 06:37 during EST.
+* `37 17 * * *` UTC: safety run for delayed feeds or a missed morning run.
+* `workflow_dispatch`: manual fallback from GitHub Actions.
+
+GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance.
+
+The workflow runs `node scripts/update-base-data.mjs`, then idempotence and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, and `data/update-health.json`, and only after validation passes.
+
+### Automated Sources
+
+The updater currently uses:
+
+* ESPN public soccer scoreboard API for machine-readable completed match scores.
+* Open-Meteo for upcoming-match venue weather where available.
+* Embedded schedule and venue coordinates for rest/travel context.
+* Embedded FIFA ranking fields for the rank-seeded Elo-style model input.
+* Official FIFA pages remain the preferred manual authority for fixtures, reports, rankings, regulations, discipline, and disputed data.
+
+### Not Automatically Updated
+
+The updater does not invent unavailable data. These remain neutral unless reliable data is manually patched:
+
+* Lineups, injuries, suspensions, and referee assignments.
+* Full disciplinary/fair-play card ledger beyond embedded known conduct notes.
+* Official fixture/venue/kickoff rewrites when no stable unauthenticated source adapter is configured.
+* Betting odds or gambling-market data, which are not used.
+
+### Manual Update
+
+```bash
+node scripts/update-base-data.mjs
+```
+
+Use `--no-fetch` for deterministic local repair/enrichment without network calls:
+
+```bash
+node scripts/update-base-data.mjs --no-fetch
+```
+
+### Local Validation
+
+```bash
+python scripts/validate_base_data.py
+for f in scripts/*.mjs; do node --check "$f"; done
+node scripts/build-html.mjs
+node scripts/validate.mjs
+python scripts/test_idempotence.py
+node scripts/run-sim.mjs
+```
+
+On PowerShell, use `foreach` loops for wildcard script checks.
+
+## Deployment
+
+The app entrypoint is `docs/index.html`. GitHub Pages serves the static `docs/` artifact for the live demo. There is no build service or backend required for normal app use.
+
+## Maintenance Note
+
+Data updates must preserve the static/offline app shell. Failed source fetches degrade to neutral or cached inputs and must not be committed as partial updates. Current facts, fixture changes, fair-play/cards, lineups, injuries, suspensions, and regulations should be cross-checked against official FIFA or other reliable sources before changing model inputs.
 
 ## Privacy and Offline Use
 

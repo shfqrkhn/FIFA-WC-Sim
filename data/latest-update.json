@@ -1,10 +1,14 @@
 {
-  "generatedAt": "2026-06-26T10:57:47Z",
-  "fetchedFinals": 57,
-  "appliedChanges": 2,
+  "generatedAt": "2026-06-27T05:37:21Z",
+  "fetchedFinals": 63,
+  "appliedChanges": 6,
   "changes": [
-    "M24 Paraguay 0-0 Australia",
-    "M23 Turkey 3-2 United States"
+    "M53 Norway 1-4 France",
+    "M54 Senegal 5-0 Iraq",
+    "M47 Cape Verde 0-0 Saudi Arabia",
+    "M48 Uruguay 0-1 Spain",
+    "M41 Egypt 1-1 Iran",
+    "M42 New Zealand 1-5 Belgium"
   ],
   "fetchFailures": []
 }

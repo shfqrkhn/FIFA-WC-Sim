@@ -72,21 +72,18 @@ REQUIRED_BRACKET_UI = [
 ]
 REQUIRED_WORKFLOW_STEPS = [
     "on:\n  workflow_dispatch:\n  schedule:",
-    "cron: '37 7,8,9 11-30 6 *'",
-    "cron: '37 7,8,9 1-20 7 *'",
-    'python3 scripts/validate_base_data.py',
+    "cron: '37 11 * * *'",
+    "cron: '37 17 * * *'",
+    'actions/setup-node@v4',
+    'python3 -m py_compile scripts/*.py',
     'node --check "$f"',
-    'node scripts/build-html.mjs',
-    'node scripts/validate.mjs',
-    'python3 scripts/apply_scoreboard.py',
-    'python3 scripts/enrich_predictions.py',
-    'python3 scripts/enrich_rest_travel.py',
-    'python3 scripts/enrich_weather.py',
-    'python3 scripts/enrich_data_quality.py',
-    'python3 scripts/update_health.py',
-    'node scripts/update-data.mjs --no-fetch',
+    'node scripts/update-base-data.mjs',
     'python3 scripts/test_idempotence.py',
     'node scripts/run-sim.mjs',
+    'python3 scripts/validate_base_data.py',
+    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json',
+    'concurrency:',
+    'git add -A -- docs/index.html data/latest-update.json data/update-health.json',
     'data/update-health.json',
 ]
 REQUIRED_GITIGNORE_ENTRIES = [
@@ -145,12 +142,22 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/validate_base_data.py',
     ],
     'scripts/update-data.mjs': [
+        'scripts/update-base-data.mjs',
+        'Compatibility wrapper',
+        'spawnSync',
+    ],
+    'scripts/update-base-data.mjs': [
+        'COMMIT_CANDIDATES',
+        'function snapshot',
+        'function restore',
         'scripts/apply_scoreboard.py',
         'scripts/enrich_predictions.py',
         'scripts/enrich_rest_travel.py',
         'scripts/enrich_weather.py',
         'scripts/enrich_data_quality.py',
         'scripts/update_health.py',
+        'scripts/build-html.mjs',
+        'scripts/validate.mjs',
     ],
     'scripts/run-sim.mjs': [
         'documentStub',
@@ -162,6 +169,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'Footer metadata did not render app version, data version, copyright, and legal notice.',
         'Last data update footer did not use the latest embedded timestamp.',
         'Ensemble model and low-score scoreline sampler were not active and disclosed.',
+        'Rank-seeded Elo prior',
         'Monte Carlo loading state did not toggle accessibly.',
         'Monte Carlo controls were not locked during simulation.',
         'Monte Carlo summaries were not invalidated after data/control refresh.',
@@ -259,6 +267,8 @@ if not isinstance(teams, list) or len(teams) != 48:
 else:
     names = [t.get('name') for t in teams]
     if len(set(names)) != 48 or any(not n for n in names): errors.append('team names not unique/complete')
+    ids = [t.get('id') for t in teams]
+    if len(set(ids)) != 48 or any(not i for i in ids): errors.append('team ids not unique/complete')
     groups = {g:0 for g in 'ABCDEFGHIJKL'}
     for t in teams:
         groups[t.get('group')] = groups.get(t.get('group'), 0) + 1
@@ -276,15 +286,44 @@ else:
         seen.add(no)
         if m.get('teamA') not in team_names or m.get('teamB') not in team_names: errors.append('bad team reference on match %s' % no)
         if m.get('teamA') == m.get('teamB'): errors.append('same-team match %s' % no)
-        if m.get('played') and not (isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)): errors.append('played match without integer score %s' % no)
+        score_a, score_b = m.get('scoreA'), m.get('scoreB')
+        if m.get('played') and not (isinstance(score_a, int) and isinstance(score_b, int)): errors.append('played match without integer score %s' % no)
+        if m.get('played') and isinstance(score_a, int) and isinstance(score_b, int):
+            if score_a < 0 or score_b < 0 or score_a > 15 or score_b > 15:
+                errors.append('played match has out-of-range score %s' % no)
+        if not m.get('played') and (score_a is not None or score_b is not None):
+            errors.append('unplayed match carries fake score %s' % no)
 if not isinstance(knockout, list) or len(knockout) != 32:
     errors.append('expected 32 knockout matches')
+else:
+    knockout_seen = set()
+    for m in knockout:
+        no = m.get('no') if isinstance(m, dict) else None
+        if no in knockout_seen: errors.append('duplicate knockout match no %s' % no)
+        knockout_seen.add(no)
+if isinstance(matches, list) and isinstance(knockout, list) and len(matches) + len(knockout) != 104:
+    errors.append('expected 104 total matches')
+if isinstance(matches, list) and isinstance(knockout, list):
+    all_nos = [m.get('no') for m in matches + knockout if isinstance(m, dict)]
+    if len(all_nos) != len(set(all_nos)):
+        errors.append('duplicate match number across group/knockout matches')
 if not isinstance(venues, dict) or not venues:
     errors.append('missing venues')
 if not isinstance(data.get('sources'), list):
     errors.append('missing sources')
 if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
+if not isinstance(data.get('modelInputs'), dict) or 'rank-seeded Elo-style rating' not in data.get('modelInputs', {}).get('features', []):
+    errors.append('missing rank-seeded Elo-style model input disclosure')
+for t in teams or []:
+    if 'eloRating' in t:
+        try:
+            rating = float(t.get('eloRating'))
+        except Exception:
+            errors.append('non-finite eloRating for %s' % t.get('name'))
+            continue
+        if not (800 <= rating <= 2400):
+            errors.append('out-of-range eloRating for %s' % t.get('name'))
 current_stats = data.get('currentStats') if isinstance(data.get('currentStats'), dict) else {}
 played_matches = [m for m in matches or [] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
 played_goals = sum(m.get('scoreA', 0) + m.get('scoreB', 0) for m in played_matches)

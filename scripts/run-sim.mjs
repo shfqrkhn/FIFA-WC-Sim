@@ -128,6 +128,7 @@ const ensembleModelOk = vm.runInContext(`(() => {
   const disclosure = String(DATA.config?.modelNotes || '') + ' ' + (DATA.config?.assumptions || []).join(' ');
   return Number.isFinite(breakdown.total) &&
     breakdown.parts.some(p => p.label === 'Ranking prior') &&
+    breakdown.parts.some(p => p.label === 'Rank-seeded Elo prior') &&
     breakdown.parts.some(p => p.label === 'Attack/defense profile') &&
     Math.abs(weightTotal - 1) < 1e-9 &&
     Math.abs(probTotal - 1) < 1e-6 &&
@@ -135,6 +136,7 @@ const ensembleModelOk = vm.runInContext(`(() => {
     tailBucket?.p > poissonPmf(maxA, 5.8) * poissonPmf(0, 5.8) &&
     Array.isArray(sampled) && sampled.length === 2 &&
     /ensemble/i.test(disclosure) &&
+    /Elo-style prior/i.test(disclosure) &&
     /low-score/i.test(disclosure);
 })()`, sandbox, { timeout: 1000 });
 if (!ensembleModelOk) {

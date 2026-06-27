@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-06-26T10:58:12Z",
+  "generatedAt": "2026-06-27T05:37:24Z",
   "scoreboard": {
-    "playedGroupMatches": 60,
+    "playedGroupMatches": 66,
     "totalGroupMatches": 72,
     "currentStats": {
-      "updatedTo": "2026-06-25",
-      "source": "ESPN scoreboard updater refreshed completed group results, match count, and goals through 2026-06-25. Attendance, top-scorer, and conduct snapshots are not refreshed by this automated score pass.",
-      "matchesPlayed": 60,
-      "goalsScored": 177,
-      "goalsPerMatch": 2.95,
+      "updatedTo": "2026-06-26",
+      "source": "ESPN scoreboard updater refreshed completed group results, match count, and goals through 2026-06-26. Attendance, top-scorer, and conduct snapshots are not refreshed by this automated score pass.",
+      "matchesPlayed": 66,
+      "goalsScored": 196,
+      "goalsPerMatch": 2.97,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -25,37 +25,47 @@
           "note": "Known team conduct/fair-play score in current third-place table note."
         }
       ],
-      "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-26T10:57:47Z.",
+      "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-27T05:37:21Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater after score totals advanced."
     },
     "latestUpdate": {
-      "generatedAt": "2026-06-26T10:57:47Z",
-      "fetchedFinals": 57,
-      "appliedChanges": 2,
+      "generatedAt": "2026-06-27T05:37:21Z",
+      "fetchedFinals": 63,
+      "appliedChanges": 6,
       "changes": [
-        "M24 Paraguay 0-0 Australia",
-        "M23 Turkey 3-2 United States"
+        "M53 Norway 1-4 France",
+        "M54 Senegal 5-0 Iraq",
+        "M47 Cape Verde 0-0 Saudi Arabia",
+        "M48 Uruguay 0-1 Spain",
+        "M41 Egypt 1-1 Iran",
+        "M42 New Zealand 1-5 Belgium"
       ],
       "fetchFailures": []
     }
   },
   "weather": {
-    "coveredUnplayedMatches": 12,
-    "totalUnplayedMatches": 12,
+    "coveredUnplayedMatches": 6,
+    "totalUnplayedMatches": 6,
     "failedMatches": []
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedGroupMatches": 60,
+      "playedGroupMatches": 66,
       "totalGroupMatches": 72,
       "source": "scoreboard updater"
     },
+    "fixtures": {
+      "status": "partial",
+      "coveredGroupMatches": 72,
+      "totalGroupMatches": 72,
+      "source": "embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter"
+    },
     "weather": {
       "status": "current",
-      "coveredUnplayedMatches": 12,
-      "totalUnplayedMatches": 12,
+      "coveredUnplayedMatches": 6,
+      "totalUnplayedMatches": 6,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -68,6 +78,7 @@
       "status": "current",
       "features": [
         "rank",
+        "rank-seeded Elo-style rating",
         "played results",
         "points per game",
         "goal difference per game",
@@ -75,6 +86,10 @@
         "last-match momentum",
         "upcoming-match context goalAdj"
       ]
+    },
+    "automation": {
+      "status": "current",
+      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC."
     },
     "lineups": {
       "status": "missing",
@@ -93,7 +108,7 @@
       "reason": "no reliable automated source configured"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-26T10:58:12Z"
+    "updatedAt": "2026-06-27T05:37:24Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
