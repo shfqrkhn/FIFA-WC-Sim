@@ -107,6 +107,14 @@ const footerMetadataOk = vm.runInContext(`(() => {
 if (!footerMetadataOk) {
   throw new Error('Footer metadata did not render app version, data version, copyright, and legal notice.');
 }
+const sponsorButtonOk =
+  html.includes('src="https://github.com/sponsors/shfqrkhn/button"') &&
+  html.includes('title="Sponsor shfqrkhn"') &&
+  html.includes('loading="lazy"') &&
+  html.includes('class="sponsorFrame"');
+if (!sponsorButtonOk) {
+  throw new Error('GitHub sponsor button was not embedded as a lazy nonessential footer control.');
+}
 const footerLatestOk = vm.runInContext(`(() => {
   const vals = [DATA.dataQuality?.updatedAt, DATA.generatedAt, DATA.currentStats?.updatedAt].filter(Boolean);
   const latest = vals.map(x => [String(x), new Date(x)]).filter(x => Number.isFinite(x[1].getTime())).sort((a,b) => b[1]-a[1])[0]?.[0];
