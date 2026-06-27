@@ -175,6 +175,13 @@ const statsSnapshotOk = vm.runInContext(`(() => {
     snap.todayCount >= 1 &&
     Number.isFinite(snap.daysToFinal) &&
     html.includes('Schedule progress') &&
+    html.includes('Award projections') &&
+    html.includes('Golden Boot') &&
+    html.includes('Silver Ball') &&
+    html.includes('Bronze Boot') &&
+    html.includes('Goal of the Tournament') &&
+    html.includes('FIFA Peace Prize - Football Unites the World') &&
+    html.includes('Not refreshed by automated scoreboard updater') &&
     html.includes('Matches left') &&
     html.includes('Calendar days to final') &&
     html.includes('Next scheduled match day') &&

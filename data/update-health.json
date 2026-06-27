@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-27T11:57:08Z",
+  "generatedAt": "2026-06-27T12:30:07Z",
   "scoreboard": {
     "playedGroupMatches": 66,
     "totalGroupMatches": 72,
@@ -94,9 +94,13 @@
         "upcoming-match context goalAdj"
       ]
     },
+    "awardProjections": {
+      "status": "partial",
+      "source": "simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured"
+    },
     "automation": {
       "status": "current",
-      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC."
+      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs."
     },
     "lineups": {
       "status": "missing",
@@ -115,7 +119,7 @@
       "reason": "no reliable automated source configured"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-27T05:37:24Z"
+    "updatedAt": "2026-06-27T12:30:07Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

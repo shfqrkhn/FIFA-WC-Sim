@@ -53,6 +53,21 @@ assert.equal(duplicate.changed, false);
 assert.equal(duplicate.ledger.predictions.length, 1);
 assert.deepEqual(duplicate.ledger.predictions[0].predicted_wdl_probs, prediction.predicted_wdl_probs);
 
+const equivalentNewSnapshot = createPredictionRecord({
+  match,
+  createdAtUtc: '2026-07-01T12:30:00Z',
+  modelVersion: 'audit-test-model',
+  dataVersion: 'audit-test-data',
+  sourceSnapshotHash: 'metadata-only-change',
+  predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
+  predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
+  predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
+});
+const equivalent = appendFrozenPrediction(appended.ledger, equivalentNewSnapshot);
+assert.equal(equivalent.changed, false);
+assert.equal(equivalent.skipped, 'equivalent_prediction_already_frozen');
+assert.equal(equivalent.ledger.predictions.length, 1);
+
 assert.throws(() => createPredictionRecord({
   match,
   createdAtUtc: '2026-07-01T19:00:01Z',

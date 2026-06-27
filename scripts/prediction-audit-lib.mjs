@@ -271,11 +271,37 @@ export function createPredictionRecord(input) {
   return record;
 }
 
+function comparableFrozenPrediction(record) {
+  return {
+    match_id: record?.match_id,
+    stage: record?.stage,
+    home_team: record?.home_team,
+    away_team: record?.away_team,
+    model_version: record?.model_version,
+    data_version: record?.data_version,
+    predicted_wdl_probs: record?.predicted_wdl_probs || null,
+    predicted_scoreline_distribution: record?.predicted_scoreline_distribution || [],
+    predicted_advancement_probs: record?.predicted_advancement_probs || {},
+    kickoff_utc: record?.kickoff_utc || null,
+    venue: record?.venue || null,
+    group: record?.group || null,
+    feature_flags: record?.feature_flags || {}
+  };
+}
+
+export function hasEquivalentFrozenPrediction(predictions, prediction) {
+  const target = stableJson(comparableFrozenPrediction(prediction));
+  return (predictions || []).some(row => stableJson(comparableFrozenPrediction(row)) === target);
+}
+
 export function appendFrozenPrediction(ledger, prediction) {
   const next = structuredClone(ledger || emptyAuditLedger());
   if (!Array.isArray(next.predictions)) next.predictions = [];
   const exists = next.predictions.some(row => row.prediction_id === prediction.prediction_id);
   if (exists) return { ledger: next, changed: false, skipped: 'already_frozen' };
+  if (hasEquivalentFrozenPrediction(next.predictions, prediction)) {
+    return { ledger: next, changed: false, skipped: 'equivalent_prediction_already_frozen' };
+  }
   next.predictions.push(structuredClone(prediction));
   next.generated_at_utc = prediction.created_at_utc;
   return { ledger: next, changed: true };

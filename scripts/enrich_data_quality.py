@@ -63,7 +63,8 @@ quality_core = {
     'weather': {'status': status(len(weather) >= len(unplayed), bool(weather)), 'coveredUnplayedMatches': len([m for m in unplayed if str(m.get('no')) in weather]), 'totalUnplayedMatches': len(unplayed), 'source': 'open-meteo'},
     'restTravel': {'status': status(len(rest) >= len(matches), bool(rest)), 'coveredGroupMatches': len(rest), 'totalGroupMatches': len(matches), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
-    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC.'},
+    'awardProjections': {'status': 'partial', 'source': 'simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured'},
+    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
     'lineups': {'status': 'missing', 'reason': 'no reliable automated source configured'},
     'injuries': {'status': 'missing', 'reason': 'no reliable automated source configured'},
     'suspensions': {'status': 'missing', 'reason': 'no reliable automated source configured'},
@@ -91,16 +92,37 @@ upsert_source(data, {
     'confidence': 'high',
     'maintenanceNote': 'Runs morning plus safety pass in UTC; commits only after validation and only when tracked artifacts change.'
 })
+upsert_source(data, {
+    'name': 'Local rescue update trigger',
+    'url': 'scripts/manual-update-trigger.mjs',
+    'use': 'Operator-triggered fallback when scheduled and manual GitHub Actions updates are unavailable',
+    'tier': 'internal automation',
+    'confidence': 'high',
+    'maintenanceNote': 'Requires exact trigger WC_DATA_RESCUE, refuses dirty candidate artifacts, restores candidate files on validation failure, and commits only when explicitly requested.'
+})
+upsert_source(data, {
+    'name': 'FIFA Peace Prize - Football Unites the World',
+    'url': 'https://inside.fifa.com/campaigns/football-unites-the-world/news/president-trump-peace-prize-football-unites-the-world',
+    'use': 'Source for the non-model FIFA Peace Prize note in award projections',
+    'tier': 'official FIFA page',
+    'confidence': 'high',
+    'maintenanceNote': 'FIFA says Donald J. Trump received the inaugural FIFA Peace Prize - Football Unites the World on 5 Dec 2025; this is displayed as an already-awarded note, not a tournament prediction.'
+})
 maintenance = data.get('maintenance') if isinstance(data.get('maintenance'), dict) else {}
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'risk': 'Scheduled data updates can be delayed, skipped, or blocked by source/network failures.',
-    'mitigation': 'Workflow has a morning run, a later safety run, manual workflow_dispatch, rollback-capable updater script, and commit-after-validation guard.'
+    'mitigation': 'Workflow has a morning run, a later safety run, manual workflow_dispatch, rollback-capable updater script, local WC_DATA_RESCUE trigger, and commit-after-validation guard.'
 }, 'risk')
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'risk': 'Automated score updates use ESPN scoreboard data, while official FIFA remains the preferred manual authority.',
     'mitigation': 'Source ledger labels ESPN as the machine-readable automation feed; official FIFA fixtures/reports should be checked for disputed results, cards, lineups, injuries, and regulations.'
 }, 'risk')
+maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
+    'risk': 'Official tournament award and player leader feeds are incomplete or not configured.',
+    'mitigation': 'Stats displays separate actual top-scorer snapshots from model-side award projections; player-age, goalkeeper, and discipline gaps are marked neutral instead of invented.'
+}, 'risk')
 maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If the morning scheduled run fails or GitHub delays it, trigger Daily BASE_DATA update manually from Actions or run node scripts/update-base-data.mjs locally, then validate before committing.')
+maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If GitHub Actions itself is unavailable, provide trigger WC_DATA_RESCUE and run node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE locally; add --commit or --push only after validation is intended.')
 maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
     'gate': 'Daily automation safety',
     'method': 'GitHub Actions runs rollback-capable updater, validation, idempotence test, and simulation smoke before committing changed artifacts.',
@@ -112,6 +134,18 @@ maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'reason': 'Add rollback-capable BASE_DATA updater, redundant daily schedule, rank-seeded Elo-style input, and stricter validation.',
     'validation': 'scripts/update-base-data.mjs, validate_base_data, idempotence, and run-sim smoke',
     'risk': 'Official lineup/injury/suspension/referee feeds remain neutral unless reliable data is manually patched.'
+}, 'version')
+maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
+    'version': '2026.06.27-manual-rescue-trigger',
+    'reason': 'Add an exact-word local rescue updater for cases where scheduled and manual GitHub Actions updates are unavailable.',
+    'validation': 'scripts/manual-update-trigger.mjs, tests/manual-update-trigger.test.mjs, validate_base_data, idempotence, and run-sim smoke',
+    'risk': 'Rescue mode still depends on public source availability for fresh score/weather fetches; unavailable sources remain neutral or cached.'
+}, 'version')
+maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
+    'version': '2026.06.27-award-projections',
+    'reason': 'Explain empty official top-scorer snapshots and add transparent simulator-side award projections.',
+    'validation': 'renderStats award projection smoke, validate_base_data, idempotence, and run-sim smoke',
+    'risk': 'Golden Ball/Boot/Glove/coach projections use team progression and embedded star assumptions only; official player award feeds remain unavailable.'
 }, 'version')
 data['maintenance'] = maintenance
 sources_changed = json.dumps(data.get('sources'), sort_keys=True) != sources_before

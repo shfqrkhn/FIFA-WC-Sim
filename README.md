@@ -59,6 +59,8 @@ These are advanced sections. They keep transparency and maintenance information 
 * **Health:** data version, validation history, patch history, known risks, and update checklist.
 * **Sources:** source list and update protocol.
 
+The **Stats** tab keeps actual leaderboards separate from projections. Top scorers can be empty because the automated scoreboard feed updates match scores, not official player scorer tables; stale scorer rows are cleared instead of reused. Award projections are simulator-side estimates from embedded team/star assumptions and Monte Carlo progression, with missing player-age, goalkeeper, and full discipline ledgers marked as unavailable rather than invented.
+
 ## How the Prediction Engine Works
 
 The app keeps Monte Carlo as the tournament-level simulator. Under each tournament run, individual matches are predicted by an ensemble match model:
@@ -91,6 +93,7 @@ The embedded data includes:
 * FIFA ranking priors, rank-seeded Elo-style ratings, and team-strength assumptions.
 * Venue, climate, rest/travel, and weather context.
 * Fair-play/team-conduct inputs where available.
+* Simulator-side award projections, separated from official award/leaderboard data.
 * Source notes, validation history, and known data-quality gaps.
 
 ### Automated Update Status
@@ -137,6 +140,18 @@ Use `--no-fetch` for deterministic local repair/enrichment without network calls
 ```bash
 node scripts/update-base-data.mjs --no-fetch
 ```
+
+### Emergency Manual Trigger
+
+If scheduled GitHub Actions and `workflow_dispatch` both fail, use the trigger word `WC_DATA_RESCUE`.
+
+For a local guarded rescue run:
+
+```bash
+node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE
+```
+
+That command runs the same prediction-supporting update path as automation: freeze pre-match predictions, ingest completed scores, refresh form/Elo-style inputs, rest/travel, weather, data health, audit scoring, calibration, and validation. It refuses to run without the exact trigger word, refuses to overwrite already-dirty candidate data artifacts, restores candidate files on validation failure, and does not commit unless `--commit` is supplied. Use `--push` only after a validated local commit is intended.
 
 Audit/calibration maintenance can also be run one step at a time:
 

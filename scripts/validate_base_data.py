@@ -45,6 +45,20 @@ REQUIRED_UI = [
     'todayMatch',
     'function scheduleSnapshot',
     'Schedule progress',
+    'Award projections',
+    'Golden Boot',
+    'Silver Boot',
+    'Bronze Boot',
+    'Golden Ball',
+    'Silver Ball',
+    'Bronze Ball',
+    'Golden Glove',
+    'Best Young Player',
+    'Goal of the Tournament',
+    'FIFA Fair Play Trophy',
+    'FIFA Peace Prize - Football Unites the World',
+    'function awardProjectionRows',
+    'function renderAwardProjectionTable',
     'Matches left',
     'Calendar days to final',
     'Last data update:',
@@ -108,6 +122,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'data/latest-simulation.json',
 ]
 README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
+README_MANUAL_TRIGGER_MARKER = 'WC_DATA_RESCUE'
 REQUIRED_SCRIPT_MARKERS = {
     'scripts/automation_utils.py': [
         'def utc_stamp():',
@@ -183,6 +198,18 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/build-html.mjs',
         'scripts/validate.mjs',
     ],
+    'scripts/manual-update-trigger.mjs': [
+        'MANUAL_UPDATE_TRIGGER',
+        'WC_DATA_RESCUE',
+        'COMMIT_CANDIDATES',
+        'assertCandidateFilesClean',
+        'scripts/update-base-data.mjs',
+        'scripts/test_idempotence.py',
+        'scripts/validate-calibration.mjs',
+        'tests/run-all.mjs',
+        'scripts/run-sim.mjs',
+        'Manual World Cup BASE_DATA update',
+    ],
     'scripts/prediction-audit-lib.mjs': [
         'REQUIRED_LEDGER_FIELDS',
         'MIN_RESOLVED_PREDICTIONS',
@@ -221,6 +248,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'scoring.test.mjs',
         'calibration.test.mjs',
         'no-leakage.test.mjs',
+        'manual-update-trigger.test.mjs',
     ],
     'scripts/run-sim.mjs': [
         'documentStub',
@@ -282,6 +310,8 @@ if os.path.exists(README):
     readme = open(README, encoding='utf-8').read()
     if README_VERSION_MARKER not in readme:
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
+    if README_MANUAL_TRIGGER_MARKER not in readme:
+        fail('README must document the emergency manual update trigger')
     if '2026.06.25-patch-32-nav-fit-polish' in readme:
         fail('README contains stale hard-coded patch version')
 else:
