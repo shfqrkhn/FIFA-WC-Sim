@@ -37,6 +37,8 @@ REQUIRED_UI = [
     'id="lastDataUpdate"',
     'id="copyrightNotice"',
     'id="legalNotice"',
+    'footerMeta',
+    'footerSupport',
     'https://github.com/sponsors/shfqrkhn/button',
     'Sponsor shfqrkhn',
     'loading="lazy"',

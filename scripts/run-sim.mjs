@@ -111,6 +111,7 @@ const sponsorButtonOk =
   html.includes('src="https://github.com/sponsors/shfqrkhn/button"') &&
   html.includes('title="Sponsor shfqrkhn"') &&
   html.includes('loading="lazy"') &&
+  html.includes('class="footerSupport"') &&
   html.includes('class="sponsorFrame"');
 if (!sponsorButtonOk) {
   throw new Error('GitHub sponsor button was not embedded as a lazy nonessential footer control.');
