@@ -2,7 +2,8 @@
 import fs from 'node:fs';
 import vm from 'node:vm';
 
-const html = fs.readFileSync('docs/index.html', 'utf8');
+const htmlPath = process.env.SIM_HTML || 'docs/index.html';
+const html = fs.readFileSync(htmlPath, 'utf8');
 const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
 if (!scriptMatch) throw new Error('No inline simulator script found.');
 const script = scriptMatch[1]
@@ -87,7 +88,9 @@ await vm.runInContext('__bootstrapReady', sandbox, { timeout: 1000 });
 const initialMc = vm.runInContext('MC', sandbox, { timeout: 1000 });
 const initialGroupsHtml = elements.get('#groupsView')?.innerHTML || '';
 const initialBracketHtml = elements.get('#bracketView')?.innerHTML || '';
-if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsHtml.includes('MC:') || !initialBracketHtml.includes('MC:')) {
+const initialUnplayedGroupMatches = vm.runInContext('DATA.matches.filter(m => !m.played).length', sandbox, { timeout: 1000 });
+const initialGroupsMcOk = initialUnplayedGroupMatches === 0 || initialGroupsHtml.includes('MC:');
+if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsMcOk || !initialBracketHtml.includes('MC:')) {
   throw new Error('Initial page load did not run Monte Carlo predictions into Groups and Bracket views.');
 }
 const initialRepresentativeOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
@@ -319,7 +322,9 @@ if (!result || !result.champion || result.ko.length < 5) {
 const mc = vm.runInContext("renderResult(simulate('automation-smoke')); runMCCore()", sandbox, { timeout: 5000 });
 const groupsHtml = elements.get('#groupsView')?.innerHTML || '';
 const bracketHtml = elements.get('#bracketView')?.innerHTML || '';
-if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsHtml.includes('MC:') || !bracketHtml.includes('MC:')) {
+const unplayedGroupMatches = vm.runInContext('DATA.matches.filter(m => !m.played).length', sandbox, { timeout: 1000 });
+const groupsMcOk = unplayedGroupMatches === 0 || groupsHtml.includes('MC:');
+if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsMcOk || !bracketHtml.includes('MC:')) {
   throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
 }
 const representativeRunOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
