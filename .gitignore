@@ -3,3 +3,4 @@ __pycache__/
 data/scoreboards/
 data/latest-simulation.json
 linkedin-post-package/
+.codex-remote-attachments/

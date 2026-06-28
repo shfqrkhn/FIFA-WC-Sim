@@ -129,6 +129,7 @@ REQUIRED_WORKFLOW_STEPS = [
     'python3 scripts/validate_base_data.py',
     'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'concurrency:',
+    'group: base-data-update-${{ github.ref }}',
     'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'data/update-health.json',
     'data/prediction-audit.json',
@@ -147,11 +148,14 @@ REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     'node scripts/run-sim.mjs',
     'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'concurrency:',
+    'group: base-data-update-${{ github.ref }}',
     'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
 ]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
     'data/latest-simulation.json',
+    'linkedin-post-package/',
+    '.codex-remote-attachments/',
 ]
 README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
 README_MANUAL_TRIGGER_MARKER = 'WC_DATA_RESCUE'
@@ -264,6 +268,11 @@ REQUIRED_SCRIPT_MARKERS = {
         'applyCalibrationToWdl',
         'calibrationEligiblePredictions',
         'validateNoMarketFields',
+        'kept_previous_validated_bucket_calibration',
+        'raw_model_only_previous_validation_worsened',
+        'settled < created',
+        'kickoff <= asOf',
+        'sane integer scores',
     ],
     'scripts/freeze-predictions.mjs': [
         'createPredictionRecord',
@@ -287,6 +296,9 @@ REQUIRED_SCRIPT_MARKERS = {
         'calibration_status',
         'Brier',
         'log loss',
+        'invalid audit timestamps',
+        'time-inconsistent audit timestamps',
+        'sane integer score',
     ],
     'tests/run-all.mjs': [
         'prediction-audit.test.mjs',

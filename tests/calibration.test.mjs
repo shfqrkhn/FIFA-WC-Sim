@@ -27,7 +27,8 @@ function settled(id, createdDay, probs, actual) {
     log_loss: 0,
     scoreline_error: 0,
     calibration_bucket: '0.8-0.9',
-    failure_type: 'pure_variance'
+    failure_type: 'pure_variance',
+    kickoff_utc: `2026-06-${String(createdDay).padStart(2, '0')}T18:00:00Z`
   };
 }
 
@@ -64,7 +65,19 @@ const badLedger = {
   predictions: Array.from({ length: 40 }, (_, i) => settled(i + 1, Math.min(28, i + 1), { home_win: 0.45, draw: 0.35, away_win: 0.2 }, i % 2 ? 'home_win' : 'draw'))
 };
 const rolled = updateCalibrationState(badLedger, activeState, { asOfUtc: '2026-07-01T00:00:00Z' });
-assert.equal(rolled.last_update_decision, 'kept_previous_validation_worsened');
+assert.equal(rolled.last_update_decision, 'kept_previous_validated_bucket_calibration');
 assert.equal(rolled.calibration_status, 'active');
+assert.ok(rolled.validation_metrics.brier_score <= rolled.raw_validation_metrics.brier_score + 1e-12);
+
+const staleBadState = {
+  ...activeState,
+  bucket_adjustments: [{ bucket: '0.4-0.5', outcome: 'home_win', count: 30, raw_confidence: 0.45, observed_frequency: 1, calibrated_confidence: 0.98 }],
+  validation_metrics: { brier_score: 0.1, log_loss: 0.1 },
+  raw_validation_metrics: { brier_score: 0.2, log_loss: 0.2 }
+};
+const staleRolledBack = updateCalibrationState(badLedger, staleBadState, { asOfUtc: '2026-07-01T00:00:00Z' });
+assert.equal(staleRolledBack.calibration_status, 'validation_worsened_rollback');
+assert.equal(staleRolledBack.active, false);
+assert.equal(staleRolledBack.last_update_decision, 'raw_model_only_previous_validation_worsened');
 
 console.log('calibration tests passed');

@@ -130,13 +130,16 @@ export function matchDateValue(match) {
   return match && (match.kickoffUtc || match.kickoff || match.kickoffLocal || match.date || match.utc || match.time);
 }
 
-export function matchKickoffMs(match) {
-  const raw = matchDateValue(match);
+function utcTimestampMs(raw) {
   if (!raw) return null;
   const text = String(raw);
   if (!text.includes('T')) return null;
   const ms = Date.parse(text);
   return Number.isFinite(ms) ? ms : null;
+}
+
+export function matchKickoffMs(match) {
+  return utcTimestampMs(matchDateValue(match));
 }
 
 export function isBeforeKickoff(createdAtUtc, match) {
@@ -313,8 +316,8 @@ export function scorePrediction(prediction, match, settledAtUtc = utcNow()) {
   if (!isBeforeKickoff(prediction.created_at_utc, match)) return { scored: false, reason: 'prediction created after kickoff' };
   const scoreA = match.scoreA;
   const scoreB = match.scoreB;
-  if (!match.played || !Number.isFinite(scoreA) || !Number.isFinite(scoreB)) {
-    return { scored: false, reason: 'match is not completed with finite scores' };
+  if (!match.played || !isSaneScore(scoreA) || !isSaneScore(scoreB)) {
+    return { scored: false, reason: 'match is not completed with sane integer scores' };
   }
   const result = actualResult(scoreA, scoreB);
   const err = scorelineError(prediction.predicted_scoreline_distribution, scoreA, scoreB);
@@ -353,21 +356,34 @@ export function scoreLedger(ledger, matchMap, settledAtUtc = utcNow()) {
 
 function hasResolvedMetrics(prediction) {
   return WDL_KEYS.includes(prediction.actual_result) &&
+    isSaneScore(prediction.actual_home_score) &&
+    isSaneScore(prediction.actual_away_score) &&
     prediction.settled_at_utc &&
     Number.isFinite(Number(prediction.brier_score)) &&
     Number.isFinite(Number(prediction.log_loss));
 }
 
+function isSaneScore(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 15;
+}
+
+function isFiniteNumberLike(value) {
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+}
+
 export function calibrationEligiblePredictions(predictions, matchMap = new Map(), opts = {}) {
-  const asOf = Date.parse(opts.asOfUtc || utcNow());
+  const asOf = utcTimestampMs(opts.asOfUtc || utcNow());
+  if (!Number.isFinite(asOf)) return [];
   return (predictions || [])
     .filter(hasResolvedMetrics)
-    .filter(prediction => Date.parse(prediction.settled_at_utc) <= asOf)
     .filter(prediction => {
+      const created = utcTimestampMs(prediction.created_at_utc);
+      const settled = utcTimestampMs(prediction.settled_at_utc);
+      if (!Number.isFinite(created) || !Number.isFinite(settled)) return false;
+      if (created > asOf || settled > asOf || settled < created) return false;
       const match = matchMap.get(Number(prediction.match_id)) || matchMap.get(String(prediction.match_id));
-      if (match) return isBeforeKickoff(prediction.created_at_utc, match);
-      if (prediction.kickoff_utc) return Date.parse(prediction.created_at_utc) < Date.parse(prediction.kickoff_utc);
-      return true;
+      const kickoff = match ? matchKickoffMs(match) : utcTimestampMs(prediction.kickoff_utc);
+      return Number.isFinite(kickoff) && created < kickoff && kickoff <= asOf && settled >= kickoff;
     })
     .sort((a, b) => Date.parse(a.created_at_utc) - Date.parse(b.created_at_utc) || String(a.prediction_id).localeCompare(String(b.prediction_id)));
 }
@@ -454,7 +470,7 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
   const eligible = calibrationEligiblePredictions(ledger?.predictions || [], matchMap, { asOfUtc });
   if (eligible.length < MIN_RESOLVED_PREDICTIONS) {
     return {
-      ...emptyCalibrationState(previousState?.generated_at_utc || asOfUtc),
+      ...emptyCalibrationState(asOfUtc),
       resolved_predictions: eligible.length,
       last_update_decision: 'insufficient_sample'
     };
@@ -483,12 +499,28 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
     return { ...candidate, last_update_decision: 'promoted_validated_bucket_calibration' };
   }
 
-  if (previousState?.active && previousState.calibration_status === 'active') {
+  if (previousState?.active && previousState.calibration_status === 'active' && Array.isArray(previousState.bucket_adjustments)) {
+    const previousMetrics = averageMetrics(validate, previousState);
+    const previousStillValid = previousMetrics.brier_score <= rawMetrics.brier_score + 1e-12 &&
+      previousMetrics.log_loss <= rawMetrics.log_loss + 1e-12;
+    if (!previousStillValid) {
+      return {
+        ...emptyCalibrationState(asOfUtc),
+        calibration_status: 'validation_worsened_rollback',
+        resolved_predictions: eligible.length,
+        raw_validation_metrics: rawMetrics,
+        validation_metrics: previousMetrics,
+        last_update_decision: 'raw_model_only_previous_validation_worsened',
+        rollback_count: Number(previousState.rollback_count || 0) + 1
+      };
+    }
     return {
       ...previousState,
+      generated_at_utc: asOfUtc,
       resolved_predictions: eligible.length,
       raw_validation_metrics: rawMetrics,
-      last_update_decision: 'kept_previous_validation_worsened',
+      validation_metrics: previousMetrics,
+      last_update_decision: 'kept_previous_validated_bucket_calibration',
       rollback_count: Number(previousState.rollback_count || 0) + 1
     };
   }

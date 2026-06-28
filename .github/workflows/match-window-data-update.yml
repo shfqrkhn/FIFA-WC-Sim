@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: match-window-base-data-update-${{ github.ref }}
+  group: base-data-update-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:

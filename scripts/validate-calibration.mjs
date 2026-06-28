@@ -19,6 +19,20 @@ function fail(message) {
   errors.push(message);
 }
 
+function utcMs(value) {
+  if (!value || !String(value).includes('T')) return null;
+  const ms = Date.parse(value);
+  return Number.isFinite(ms) ? ms : null;
+}
+
+function saneScore(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 15;
+}
+
+function finiteNumberLike(value) {
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value));
+}
+
 const marketAudit = validateNoMarketFields(audit);
 const marketState = validateNoMarketFields(state);
 if (!marketAudit.ok) fail(`market-like audit field(s): ${marketAudit.fields.join(', ')}`);
@@ -30,11 +44,22 @@ for (const [index, row] of (audit.predictions || []).entries()) {
   for (const field of REQUIRED_LEDGER_FIELDS) if (!Object.hasOwn(row, field)) fail(`prediction ${index} missing ${field}`);
   if (ids.has(row.prediction_id)) fail(`duplicate prediction_id ${row.prediction_id}`);
   ids.add(row.prediction_id);
+  for (const key of WDL_KEYS) {
+    const value = row.predicted_wdl_probs?.[key];
+    if (!finiteNumberLike(value) || Number(value) < 0 || Number(value) > 1) fail(`prediction ${row.prediction_id} has invalid ${key} probability`);
+  }
   const total = WDL_KEYS.reduce((sum, key) => sum + Number(row.predicted_wdl_probs?.[key] || 0), 0);
   if (Math.abs(total - 1) > 1e-6) fail(`prediction ${row.prediction_id} WDL probabilities do not sum to 1`);
   if (row.actual_result && !WDL_KEYS.includes(row.actual_result)) fail(`prediction ${row.prediction_id} has invalid actual_result`);
-  if (row.actual_result && !(Number.isFinite(row.actual_home_score) && Number.isFinite(row.actual_away_score))) fail(`prediction ${row.prediction_id} has result without finite score`);
-  if (row.actual_result && Date.parse(row.created_at_utc) >= Date.parse(row.kickoff_utc || 'invalid')) fail(`prediction ${row.prediction_id} was scored after kickoff-created timestamp`);
+  if (row.actual_result) {
+    if (!(saneScore(row.actual_home_score) && saneScore(row.actual_away_score))) fail(`prediction ${row.prediction_id} has result without sane integer score`);
+    if (!finiteNumberLike(row.brier_score) || !finiteNumberLike(row.log_loss)) fail(`prediction ${row.prediction_id} has result without finite scoring metrics`);
+    const created = utcMs(row.created_at_utc);
+    const kickoff = utcMs(row.kickoff_utc);
+    const settled = utcMs(row.settled_at_utc);
+    if (!Number.isFinite(created) || !Number.isFinite(kickoff) || !Number.isFinite(settled)) fail(`prediction ${row.prediction_id} has invalid audit timestamps`);
+    else if (!(created < kickoff && kickoff <= settled)) fail(`prediction ${row.prediction_id} has time-inconsistent audit timestamps`);
+  }
 }
 
 if (state.resolved_predictions < MIN_RESOLVED_PREDICTIONS && state.calibration_status !== 'insufficient_sample') {

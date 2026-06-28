@@ -58,6 +58,10 @@ const late = scorePrediction({ ...frozen, created_at_utc: '2026-06-20T18:00:01Z'
 assert.equal(late.scored, false);
 assert.match(late.reason, /after kickoff/);
 
+const malformedScore = scorePrediction(frozen, { ...completed, scoreA: 1.5 }, '2026-06-20T20:00:00Z');
+assert.equal(malformedScore.scored, false);
+assert.match(malformedScore.reason, /sane integer/);
+
 assert.equal(classifyFailure({
   ...frozen,
   predicted_wdl_probs: { home_win: 0.8, draw: 0.12, away_win: 0.08 }

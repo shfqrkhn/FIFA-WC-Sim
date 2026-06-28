@@ -30,6 +30,10 @@ const eligible = calibrationEligiblePredictions([
   base,
   { ...base, prediction_id: 'future-settled', settled_at_utc: '2026-07-02T00:00:00Z' },
   { ...base, prediction_id: 'late-created', created_at_utc: '2026-06-20T21:00:00Z' },
+  { ...base, prediction_id: 'future-created', created_at_utc: '2026-07-02T01:00:00Z' },
+  { ...base, prediction_id: 'no-kickoff', match_id: 2 },
+  { ...base, prediction_id: 'settled-before-kickoff', match_id: 3, kickoff_utc: '2026-06-21T18:00:00Z' },
+  { ...base, prediction_id: 'missing-score', actual_home_score: null },
   { ...base, prediction_id: 'unsettled', actual_result: null, settled_at_utc: null }
 ], new Map([
   [1, { no: 1, date: '2026-06-20T18:00:00Z' }]
