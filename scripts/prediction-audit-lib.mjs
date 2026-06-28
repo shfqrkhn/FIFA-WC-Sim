@@ -469,10 +469,15 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
   const matchMap = opts.matchMap || new Map();
   const eligible = calibrationEligiblePredictions(ledger?.predictions || [], matchMap, { asOfUtc });
   if (eligible.length < MIN_RESOLVED_PREDICTIONS) {
+    const stableInsufficientSample = previousState?.calibration_status === 'insufficient_sample' &&
+      !previousState.active &&
+      !previousState.use_calibrated_probabilities &&
+      Number(previousState.resolved_predictions) === eligible.length;
     return {
-      ...emptyCalibrationState(asOfUtc),
+      ...emptyCalibrationState(stableInsufficientSample && previousState.generated_at_utc ? previousState.generated_at_utc : asOfUtc),
       resolved_predictions: eligible.length,
-      last_update_decision: 'insufficient_sample'
+      last_update_decision: 'insufficient_sample',
+      rollback_count: Number(previousState?.rollback_count || 0)
     };
   }
 

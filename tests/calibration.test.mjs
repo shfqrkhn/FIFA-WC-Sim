@@ -36,6 +36,12 @@ const smallLedger = { predictions: Array.from({ length: 12 }, (_, i) => settled(
 const smallState = updateCalibrationState(smallLedger, emptyCalibrationState(), { asOfUtc: '2026-07-01T00:00:00Z' });
 assert.equal(smallState.calibration_status, 'insufficient_sample');
 assert.deepEqual(applyCalibrationToWdl({ home_win: 0.8, draw: 0.1, away_win: 0.1 }, smallState).probabilities, { home_win: 0.8, draw: 0.1, away_win: 0.1 });
+const repeatedSmallState = updateCalibrationState(smallLedger, {
+  ...smallState,
+  generated_at_utc: '2026-06-01T00:00:00Z'
+}, { asOfUtc: '2026-07-02T00:00:00Z' });
+assert.equal(repeatedSmallState.generated_at_utc, '2026-06-01T00:00:00Z');
+assert.equal(repeatedSmallState.last_update_decision, 'insufficient_sample');
 assert.equal(applyCalibrationToWdl({ home_win: 0.8, draw: 0.1, away_win: 0.1 }, {
   calibration_status: 'active',
   active: true,
