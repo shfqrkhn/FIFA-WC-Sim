@@ -2,15 +2,19 @@
 import fs from 'node:fs';
 import { readArtifact } from './base-data.mjs';
 import {
+  brierScore,
+  calibrationBucket,
   emptyAuditLedger,
   emptyCalibrationState,
   calibrationEligiblePredictions,
   FAILURE_TYPES,
+  logLoss,
   MIN_RESOLVED_PREDICTIONS,
   matchKickoffMs,
   publicCalibrationState,
   readJson,
   REQUIRED_LEDGER_FIELDS,
+  scorelineError,
   stableJson,
   validateNoMarketFields,
   WDL_KEYS
@@ -53,6 +57,15 @@ function utcMs(value) {
 
 function saneScore(value) {
   return Number.isInteger(value) && value >= 0 && value <= 15;
+}
+
+function parseScoreline(row) {
+  if (typeof row?.score === 'string') {
+    const match = row.score.match(/^(\d+)-(\d+)$/);
+    if (!match) return [NaN, NaN];
+    return [Number(match[1]), Number(match[2])];
+  }
+  return [Number(row?.a), Number(row?.b)];
 }
 
 function finiteNumberLike(value) {
@@ -119,7 +132,7 @@ function validateScorelineDistribution(rows, predictionId) {
   let total = 0;
   for (const [index, row] of rows.entries()) {
     const probability = Number(row?.probability ?? row?.p);
-    const [home, away] = String(row?.score ?? `${row?.a}-${row?.b}`).split('-').map(Number);
+    const [home, away] = parseScoreline(row);
     if (!Number.isFinite(probability) || probability < 0 || probability > 1 || !saneScore(home) || !saneScore(away)) {
       fail(`prediction ${predictionId} has invalid predicted_scoreline_distribution row ${index}`);
     }
@@ -178,14 +191,22 @@ for (const [index, row] of (audit.predictions || []).entries()) {
   if (Math.abs(total - 1) > 1e-6) fail(`prediction ${row.prediction_id} WDL probabilities do not sum to 1`);
   validateScorelineDistribution(row.predicted_scoreline_distribution, row.prediction_id);
   validateProbabilityObject(row.predicted_advancement_probs, 'predicted_advancement_probs', row.prediction_id);
-  if (row.actual_result && !WDL_KEYS.includes(row.actual_result)) fail(`prediction ${row.prediction_id} has invalid actual_result`);
-  if (row.actual_result) {
+  if (row.actual_result !== null && !WDL_KEYS.includes(row.actual_result)) fail(`prediction ${row.prediction_id} has invalid actual_result`);
+  if (WDL_KEYS.includes(row.actual_result)) {
     if (!(saneScore(row.actual_home_score) && saneScore(row.actual_away_score))) fail(`prediction ${row.prediction_id} has result without sane integer score`);
     if (resultFromScore(row.actual_home_score, row.actual_away_score) !== row.actual_result) fail(`prediction ${row.prediction_id} actual_result does not match score`);
     if (!finiteNumberLike(row.brier_score) || Number(row.brier_score) < 0 || Number(row.brier_score) > 2 ||
         !finiteNumberLike(row.log_loss) || Number(row.log_loss) < 0 ||
         !finiteNumberLike(row.scoreline_error) || Number(row.scoreline_error) < 0 ||
         !validBucket(row.calibration_bucket)) fail(`prediction ${row.prediction_id} has invalid scoring metrics`);
+    const expectedBrier = brierScore(row.predicted_wdl_probs, row.actual_result);
+    const expectedLoss = logLoss(row.predicted_wdl_probs, row.actual_result);
+    const expectedScorelineError = scorelineError(row.predicted_scoreline_distribution, row.actual_home_score, row.actual_away_score);
+    const expectedBucket = calibrationBucket(row.predicted_wdl_probs);
+    if (Math.abs(Number(row.brier_score) - expectedBrier) > 1e-9 ||
+        Math.abs(Number(row.log_loss) - expectedLoss) > 1e-9 ||
+        Math.abs(Number(row.scoreline_error) - Number(expectedScorelineError)) > 1e-6 ||
+        row.calibration_bucket !== expectedBucket) fail(`prediction ${row.prediction_id} scoring metrics do not match frozen probabilities`);
     const settled = utcMs(row.settled_at_utc);
     if (!Number.isFinite(created) || !Number.isFinite(kickoff) || !Number.isFinite(settled)) fail(`prediction ${row.prediction_id} has invalid audit timestamps`);
     else if (!(created < kickoff && kickoff <= settled)) fail(`prediction ${row.prediction_id} has time-inconsistent audit timestamps`);

@@ -315,8 +315,10 @@ REQUIRED_SCRIPT_MARKERS = {
         'duplicate predicted_scoreline_distribution',
         'probabilities exceed 1',
         'missing prediction audit file',
+        'invalid actual_result',
         'actual_result does not match score',
         'invalid scoring metrics',
+        'scoring metrics do not match frozen probabilities',
         'active calibration has invalid bucket adjustment',
         'must not remain insufficient_sample',
         'matchKickoffMs',
@@ -349,6 +351,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'invalid predicted_advancement_probs keys',
         'invalid predicted_wdl_probs keys',
         'invalid source_snapshot_hash format',
+        'invalid actual_result',
         'missing prediction audit file',
     ],
     'tests/match-window-update.test.mjs': [

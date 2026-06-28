@@ -88,6 +88,14 @@ assert.notEqual(invalidDistribution.status, 0);
 assert.match(invalidDistribution.stderr, /invalid predicted_scoreline_distribution/);
 
 fs.copyFileSync('data/prediction-audit.json', auditPath);
+const malformedScoreline = readJson(auditPath);
+malformedScoreline.predictions[0].predicted_scoreline_distribution[0].score = '-1-0';
+writeJson(auditPath, malformedScoreline);
+const invalidScoreline = runValidator();
+assert.notEqual(invalidScoreline.status, 0);
+assert.match(invalidScoreline.stderr, /invalid predicted_scoreline_distribution/);
+
+fs.copyFileSync('data/prediction-audit.json', auditPath);
 const badAdvancement = readJson(auditPath);
 delete badAdvancement.predictions[0].predicted_advancement_probs.draw;
 writeJson(auditPath, badAdvancement);
@@ -110,6 +118,14 @@ writeJson(auditPath, badHash);
 const invalidHash = runValidator();
 assert.notEqual(invalidHash.status, 0);
 assert.match(invalidHash.stderr, /invalid source_snapshot_hash format/);
+
+fs.copyFileSync('data/prediction-audit.json', auditPath);
+const emptyResult = readJson(auditPath);
+emptyResult.predictions[0].actual_result = '';
+writeJson(auditPath, emptyResult);
+const invalidResult = runValidator();
+assert.notEqual(invalidResult.status, 0);
+assert.match(invalidResult.stderr, /invalid actual_result/);
 
 fs.rmSync(auditPath);
 const missingAudit = runValidator();
