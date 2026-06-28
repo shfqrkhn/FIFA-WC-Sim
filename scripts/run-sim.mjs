@@ -187,13 +187,17 @@ const statsSnapshotOk = vm.runInContext(`(() => {
   const parts = key.split('-').map(Number);
   const date = new Date(parts[0], parts[1] - 1, parts[2], 12);
   const snap = scheduleSnapshot(date);
+  const playedGroup = DATA.matches.filter(m => m.played && Number.isFinite(m.scoreA) && Number.isFinite(m.scoreB)).length;
+  const playedKo = DATA.knockout.filter(m => m.played && Number.isFinite(m.scoreA) && Number.isFinite(m.scoreB)).length;
+  const played = playedGroup + playedKo;
+  const total = DATA.matches.length + DATA.knockout.length;
   renderStats();
   const html = $('#statsView')?.innerHTML || '';
-  return snap.total === 104 &&
-    snap.played === 66 &&
-    snap.remaining === 38 &&
-    snap.groupLeft === 6 &&
-    snap.koLeft === 32 &&
+  return snap.total === total &&
+    snap.played === played &&
+    snap.remaining === total - played &&
+    snap.groupLeft === DATA.matches.length - playedGroup &&
+    snap.koLeft === DATA.knockout.length - playedKo &&
     snap.todayCount >= 1 &&
     Number.isFinite(snap.daysToFinal) &&
     html.includes('Schedule progress') &&
