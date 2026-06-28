@@ -342,8 +342,13 @@ export function hasEquivalentFrozenPrediction(predictions, prediction) {
 export function appendFrozenPrediction(ledger, prediction) {
   const next = structuredClone(ledger || emptyAuditLedger());
   if (!Array.isArray(next.predictions)) next.predictions = [];
-  const exists = next.predictions.some(row => row.prediction_id === prediction.prediction_id);
-  if (exists) return { ledger: next, changed: false, skipped: 'already_frozen' };
+  const existing = next.predictions.find(row => row.prediction_id === prediction.prediction_id);
+  if (existing) {
+    const sameFrozenInputs = stableJson(comparableFrozenPrediction(existing)) === stableJson(comparableFrozenPrediction(prediction)) &&
+      existing.source_snapshot_hash === prediction.source_snapshot_hash;
+    if (!sameFrozenInputs) throw new Error(`conflicting frozen prediction_id ${prediction.prediction_id}`);
+    return { ledger: next, changed: false, skipped: 'already_frozen' };
+  }
   if (hasEquivalentFrozenPrediction(next.predictions, prediction)) {
     return { ledger: next, changed: false, skipped: 'equivalent_prediction_already_frozen' };
   }

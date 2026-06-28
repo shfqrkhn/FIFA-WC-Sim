@@ -46,15 +46,18 @@ assert.ok(validateNoMarketFields(prediction).ok);
 
 const ledger = emptyAuditLedger('2026-07-01T12:00:00Z');
 const appended = appendFrozenPrediction(ledger, prediction);
-const duplicate = appendFrozenPrediction(appended.ledger, {
-  ...prediction,
-  predicted_wdl_probs: { home_win: 0.99, draw: 0.005, away_win: 0.005 }
-});
+const duplicate = appendFrozenPrediction(appended.ledger, prediction);
 
 assert.equal(appended.changed, true);
 assert.equal(duplicate.changed, false);
+assert.equal(duplicate.skipped, 'already_frozen');
 assert.equal(duplicate.ledger.predictions.length, 1);
 assert.deepEqual(duplicate.ledger.predictions[0].predicted_wdl_probs, prediction.predicted_wdl_probs);
+
+assert.throws(() => appendFrozenPrediction(appended.ledger, {
+  ...prediction,
+  predicted_wdl_probs: { home_win: 0.99, draw: 0.005, away_win: 0.005 }
+}), /conflicting frozen prediction_id/);
 
 const equivalentNewSnapshot = createPredictionRecord({
   match,
