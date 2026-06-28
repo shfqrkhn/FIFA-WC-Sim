@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-28T02:18:24Z",
+  "generatedAt": "2026-06-28T11:54:46Z",
   "scoreboard": {
     "playedGroupMatches": 66,
     "totalGroupMatches": 72,
@@ -101,11 +101,11 @@
     },
     "automation": {
       "status": "current",
-      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC match hours and late North American post-match buffers. The match-window script no-ops unless near a kickoff/result slot, refuses full updates during active-match windows, and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs."
+      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs."
     },
     "matchWindowAutomation": {
       "status": "current",
-      "source": "scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, and pre/post kickoff slots"
+      "source": "scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, pre/post kickoff slots, and bounded stale-result recovery"
     },
     "lineups": {
       "status": "neutral_unless_verified",
@@ -128,7 +128,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-28T02:18:23Z"
+    "updatedAt": "2026-06-28T11:54:36Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

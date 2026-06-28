@@ -138,6 +138,7 @@ REQUIRED_WORKFLOW_STEPS = [
 REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     "on:\n  workflow_dispatch:\n  schedule:",
     "cron: '*/30 11-23 * 6,7 *'",
+    "cron: '*/30 8-10 * 6,7 *'",
     "cron: '*/30 0-7 * 6,7 *'",
     'actions/setup-node@v4',
     'node --check scripts/match-window-update.mjs',
@@ -168,6 +169,7 @@ REQUIRED_SCRIPT_MARKERS = {
     'scripts/apply_scoreboard.py': [
         'from automation_utils import utc_stamp',
         "NO_FETCH = '--no-fetch' in sys.argv",
+        'datetime.datetime.now(datetime.timezone.utc).date()',
         'if not NO_FETCH and (applied or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
         "'path': path",
@@ -234,6 +236,9 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/validate-calibration.mjs',
         'scripts/build-html.mjs',
         'scripts/validate.mjs',
+    ],
+    'scripts/enrich_predictions.py': [
+        'datetime.datetime.now(datetime.timezone.utc).date().isoformat()',
     ],
     'scripts/match-window-update.mjs': [
         'PRE_KICKOFF_SLOTS_MIN',
@@ -359,6 +364,8 @@ REQUIRED_SCRIPT_MARKERS = {
         'pre_kickoff_freeze_only_active_lock',
         'active_match_lock',
         'post_match',
+        'stale_result_recovery',
+        'STALE_RESULT_RECOVERY_END_MIN',
         'outside_match_window',
     ],
     'scripts/run-sim.mjs': [

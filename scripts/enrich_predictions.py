@@ -207,7 +207,7 @@ if changed:
         'maintenanceNote': 'Not an external Elo feed; coefficient and source limits are disclosed in How, Health, and Sources.'
     })
     data['schema'] = max(int(data.get('schema', 0)), 34)
-    data['version'] = datetime.date.today().isoformat() + '-accuracy-enriched'
+    data['version'] = datetime.datetime.now(datetime.timezone.utc).date().isoformat() + '-accuracy-enriched'
     data['generatedAt'] = updated
     data['sourceNote'] = 'Automated BASE_DATA score update plus prediction-enrichment pass with rank-seeded Elo-style prior. Companion UI shell is not rewritten.'
     save_data(html, start, end, data)

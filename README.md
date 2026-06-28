@@ -105,14 +105,14 @@ It runs on:
 
 * `37 11 * * *` UTC: 07:37 America/Montreal during EDT, 06:37 during EST.
 * `37 17 * * *` UTC: safety run for delayed feeds or a missed morning run.
-* `*/30 11-23 * 6,7 *` and `*/30 0-7 * 6,7 *` UTC in `.github/workflows/match-window-data-update.yml`: match-window checks during June/July UTC match hours and late North American post-match buffers.
+* `*/30 0-23 * 6,7 *` UTC, represented as three UTC-hour blocks in `.github/workflows/match-window-data-update.yml`: match-window checks every 30 minutes during June/July while no-oping outside guarded update windows.
 * `workflow_dispatch`: manual fallback from GitHub Actions.
 
 GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run, match-window checks, and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance. America/Montreal local time shifts with DST because the cron schedule remains UTC.
 
 The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, and `data/calibration-state.json`, and only after validation passes.
 
-The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff or post-match slot. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
+The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
 
 ### Automated Sources
 

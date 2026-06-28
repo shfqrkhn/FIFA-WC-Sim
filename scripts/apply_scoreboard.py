@@ -46,7 +46,7 @@ def scoreboard_paths():
     args = [a for a in sys.argv[1:] if a != '--no-fetch']
     if NO_FETCH: return args
     if args: return args
-    today = datetime.date.today()
+    today = datetime.datetime.now(datetime.timezone.utc).date()
     if today > STOP_DATE:
         print('World Cup update window ended.')
         return []

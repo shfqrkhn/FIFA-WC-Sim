@@ -5,10 +5,11 @@ import { readArtifact } from './base-data.mjs';
 import { runPythonScript } from './node-python.mjs';
 
 export const PRE_KICKOFF_SLOTS_MIN = Object.freeze([120, 60, 15]);
-export const POST_KICKOFF_SLOTS_MIN = Object.freeze([135, 240]);
+export const POST_KICKOFF_SLOTS_MIN = Object.freeze([135, 240, 300, 450, 600, 720]);
 export const SLOT_TOLERANCE_MIN = 18;
 export const ACTIVE_LOCK_START_MIN = -10;
 export const ACTIVE_LOCK_END_MIN = 135;
+export const STALE_RESULT_RECOVERY_END_MIN = 18 * 60;
 
 function getArg(argv, name) {
   const index = argv.indexOf(name);
@@ -72,8 +73,9 @@ export function evaluateMatchWindow(data, nowUtc, options = {}) {
       pre.push(summarizeMatch(match, deltaMin, 'pre_kickoff'));
       continue;
     }
-    if (deltaMin >= ACTIVE_LOCK_END_MIN && nearSlot(deltaMin, POST_KICKOFF_SLOTS_MIN)) {
-      post.push(summarizeMatch(match, deltaMin, 'post_match'));
+    if (!match.played && deltaMin >= ACTIVE_LOCK_END_MIN && deltaMin <= STALE_RESULT_RECOVERY_END_MIN) {
+      const phase = nearSlot(deltaMin, POST_KICKOFF_SLOTS_MIN) ? 'post_match' : 'stale_result_recovery';
+      post.push(summarizeMatch(match, deltaMin, phase));
     }
   }
   if (active.length && !options.ignoreActiveLock) {
@@ -83,10 +85,18 @@ export function evaluateMatchWindow(data, nowUtc, options = {}) {
     return { shouldRun: false, mode: 'none', reason: 'active_match_lock', nowUtc, pre, post, active };
   }
   const shouldRun = !!(options.force || pre.length || post.length);
+  const postReasons = [
+    post.some(match => match.phase === 'post_match') && 'post_match',
+    post.some(match => match.phase === 'stale_result_recovery') && 'stale_result_recovery'
+  ].filter(Boolean);
+  const reasons = [
+    pre.length && 'pre_kickoff',
+    ...postReasons
+  ].filter(Boolean);
   return {
     shouldRun,
     mode: shouldRun ? 'full_update' : 'none',
-    reason: options.force ? 'forced' : shouldRun ? [pre.length && 'pre_kickoff', post.length && 'post_match'].filter(Boolean).join('+') : 'outside_match_window',
+    reason: options.force ? 'forced' : shouldRun ? reasons.join('+') : 'outside_match_window',
     nowUtc,
     pre,
     post,
@@ -128,6 +138,7 @@ export function runMatchWindowUpdate(options = parseMatchWindowArgs()) {
   return runUpdate(options);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (invokedDirectly) {
   process.exit(runMatchWindowUpdate(parseMatchWindowArgs(process.argv.slice(2))));
 }

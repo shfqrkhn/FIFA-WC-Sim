@@ -5,8 +5,9 @@ on:
   schedule:
     # North American World Cup match windows can span Montreal morning through late night.
     # GitHub cron is UTC only; local America/Montreal time shifts with DST.
-    # The script no-ops unless a match is near a pre-kickoff or post-match update slot.
+    # The script no-ops unless a match is near a pre-kickoff/post-match slot or inside the delayed-result recovery window.
     - cron: '*/30 11-23 * 6,7 *'
+    - cron: '*/30 8-10 * 6,7 *'
     - cron: '*/30 0-7 * 6,7 *'
 
 permissions:

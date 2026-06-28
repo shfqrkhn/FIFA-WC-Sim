@@ -64,8 +64,8 @@ quality_core = {
     'restTravel': {'status': status(len(rest) >= len(matches), bool(rest)), 'coveredGroupMatches': len(rest), 'totalGroupMatches': len(matches), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
     'awardProjections': {'status': 'partial', 'source': 'simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured'},
-    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC match hours and late North American post-match buffers. The match-window script no-ops unless near a kickoff/result slot, refuses full updates during active-match windows, and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
-    'matchWindowAutomation': {'status': 'current', 'source': 'scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, and pre/post kickoff slots'},
+    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
+    'matchWindowAutomation': {'status': 'current', 'source': 'scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, pre/post kickoff slots, and bounded stale-result recovery'},
     'lineups': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official lineup adapter configured; source-backed availability fields are applied only when verified data is patched'},
     'injuries': {'status': 'missing', 'reason': 'no reliable automated source configured'},
     'suspensions': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official discipline adapter configured; confirmed suspensions can be applied from source-backed availability fields'},
@@ -92,7 +92,7 @@ upsert_source(data, {
     'use': 'Pre-kickoff freeze/refresh and post-match score/calibration checks near scheduled match windows',
     'tier': 'internal automation',
     'confidence': 'high',
-    'maintenanceNote': 'Runs every 30 minutes during June/July UTC match hours and late North American post-match buffers; scripts/match-window-update.mjs no-ops outside slots, refuses full active-match updates, and can freeze later pre-kickoff predictions during overlap.'
+    'maintenanceNote': 'Runs every 30 minutes during June/July UTC days; scripts/match-window-update.mjs no-ops outside slots/recovery windows, refuses full active-match updates, retries stale unplayed results for a bounded window, and can freeze later pre-kickoff predictions during overlap.'
 })
 upsert_source(data, {
     'name': 'Source-backed availability hooks',
@@ -158,7 +158,7 @@ maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatri
 }, 'gate')
 maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
     'gate': 'Match-window automation safety',
-    'method': 'tests/match-window-update.test.mjs verifies pre-kickoff slots, post-match slots, outside-window no-op, and active-match lock behavior.',
+    'method': 'tests/match-window-update.test.mjs verifies pre-kickoff slots, post-match slots, delayed stale-result recovery, outside-window no-op, and active-match lock behavior.',
     'status': 'passed',
     'lastRun': 'node tests/run-all.mjs'
 }, 'gate')
