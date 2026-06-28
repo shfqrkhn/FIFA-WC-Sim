@@ -64,11 +64,13 @@ quality_core = {
     'restTravel': {'status': status(len(rest) >= len(matches), bool(rest)), 'coveredGroupMatches': len(rest), 'totalGroupMatches': len(matches), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
     'awardProjections': {'status': 'partial', 'source': 'simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured'},
-    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC with workflow_dispatch fallback; America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
-    'lineups': {'status': 'missing', 'reason': 'no reliable automated source configured'},
+    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC match hours and late North American post-match buffers. The match-window script no-ops unless near a kickoff/result slot, refuses full updates during active-match windows, and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
+    'matchWindowAutomation': {'status': 'current', 'source': 'scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, and pre/post kickoff slots'},
+    'lineups': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official lineup adapter configured; source-backed availability fields are applied only when verified data is patched'},
     'injuries': {'status': 'missing', 'reason': 'no reliable automated source configured'},
-    'suspensions': {'status': 'missing', 'reason': 'no reliable automated source configured'},
-    'referees': {'status': 'missing', 'reason': 'no reliable automated source configured'},
+    'suspensions': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official discipline adapter configured; confirmed suspensions can be applied from source-backed availability fields'},
+    'goalkeepers': {'status': 'neutral_unless_verified', 'reason': 'starting goalkeeper changes are applied only from verified lineup/availability patches'},
+    'referees': {'status': 'missing', 'reason': 'no reliable automated source configured; referee effects remain neutral to avoid overfitting'},
     'principle': 'Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.'
 }
 source_note = 'Automated BASE_DATA update with score, form, rank-seeded Elo-style prior, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'
@@ -83,6 +85,22 @@ upsert_source(data, {
     'tier': 'public sports data API',
     'confidence': 'medium-high',
     'maintenanceNote': 'Used for automation because no stable unauthenticated FIFA match API is assumed; official FIFA should remain the manual cross-check source.'
+})
+upsert_source(data, {
+    'name': 'GitHub Actions match-window updater',
+    'url': '.github/workflows/match-window-data-update.yml',
+    'use': 'Pre-kickoff freeze/refresh and post-match score/calibration checks near scheduled match windows',
+    'tier': 'internal automation',
+    'confidence': 'high',
+    'maintenanceNote': 'Runs every 30 minutes during June/July UTC match hours and late North American post-match buffers; scripts/match-window-update.mjs no-ops outside slots, refuses full active-match updates, and can freeze later pre-kickoff predictions during overlap.'
+})
+upsert_source(data, {
+    'name': 'Source-backed availability hooks',
+    'url': 'embedded BASE_DATA match availability fields',
+    'use': 'Confirmed lineups, goalkeeper changes, suspensions, and key absences can affect context only when verified source metadata is present',
+    'tier': 'internal model guardrail',
+    'confidence': 'medium',
+    'maintenanceNote': 'No rumor feed is used; unavailable or unverified availability data remains neutral.'
 })
 upsert_source(data, {
     'name': 'GitHub Actions daily updater',
@@ -121,19 +139,40 @@ maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'risk': 'Official tournament award and player leader feeds are incomplete or not configured.',
     'mitigation': 'Stats displays separate actual top-scorer snapshots from model-side award projections; player-age, goalkeeper, and discipline gaps are marked neutral instead of invented.'
 }, 'risk')
+maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
+    'risk': 'Active in-progress matches must not mutate predictions from partial scores or weather/context refreshes.',
+    'mitigation': 'Match-window automation refuses full updates during the active-match lock, permits only freeze-only later-match records during overlap, and the scoreboard applicator only accepts completed/final events.'
+}, 'risk')
+maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
+    'risk': 'Confirmed lineup, goalkeeper, suspension, and injury inputs are high-value but source availability is inconsistent.',
+    'mitigation': 'Availability hooks are neutral unless verified source metadata is present; expected lineup rumors and referee bias assumptions are not automated.'
+}, 'risk')
 maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If the morning scheduled run fails or GitHub delays it, trigger Daily BASE_DATA update manually from Actions or run node scripts/update-base-data.mjs locally, then validate before committing.')
 maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If GitHub Actions itself is unavailable, provide trigger WC_DATA_RESCUE and run node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE locally; add --commit or --push only after validation is intended.')
+maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'Before kickoff, rely on match-window automation to refresh/freeze predictions; during the active-match lock, only freeze later pre-kickoff matches and avoid mutating the active match until final status is available.')
 maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
     'gate': 'Daily automation safety',
     'method': 'GitHub Actions runs rollback-capable updater, validation, idempotence test, and simulation smoke before committing changed artifacts.',
     'status': 'passed',
     'lastRun': 'automated on each workflow run'
 }, 'gate')
+maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
+    'gate': 'Match-window automation safety',
+    'method': 'tests/match-window-update.test.mjs verifies pre-kickoff slots, post-match slots, outside-window no-op, and active-match lock behavior.',
+    'status': 'passed',
+    'lastRun': 'node tests/run-all.mjs'
+}, 'gate')
 maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'version': '2026.06.27-daily-update-hardening',
     'reason': 'Add rollback-capable BASE_DATA updater, redundant daily schedule, rank-seeded Elo-style input, and stricter validation.',
     'validation': 'scripts/update-base-data.mjs, validate_base_data, idempotence, and run-sim smoke',
     'risk': 'Official lineup/injury/suspension/referee feeds remain neutral unless reliable data is manually patched.'
+}, 'version')
+maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
+    'version': '2026.06.27-match-window-prediction-inputs',
+    'reason': 'Add match-window update automation, active-match lock, final group-table incentive input, and source-backed availability hooks.',
+    'validation': 'tests/match-window-update.test.mjs, run-sim smoke, validate_base_data, and calibration validation',
+    'risk': 'Lineup, injury, suspension, goalkeeper, and referee data remain neutral unless verified source metadata is available.'
 }, 'version')
 maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'version': '2026.06.27-manual-rescue-trigger',

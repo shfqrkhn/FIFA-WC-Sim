@@ -17,7 +17,7 @@ World Cup 2026 Simulator is a static, offline-capable web app for exploring the 
 3. Optionally expand **Prediction settings** to adjust the scenario name, number of prediction runs, match style, host boost, and weather setting.
 4. Read **Most likely champions** first. This is the quickest summary of the tournament outlook.
 5. Review **Sample tournament path** to see one representative bracket path that matches the top Monte Carlo outcome.
-6. Use **Groups**, **Bracket**, and **Odds** for more detail.
+6. Use **Groups**, **Bracket**, and **Chances** for more detail.
 7. Use **How**, **Data**, **Checks**, **Health**, and **Sources** only when you want deeper transparency or maintenance detail.
 
 ## Main Tabs
@@ -42,7 +42,7 @@ Shows current group standings, played results, projected upcoming scores, and th
 
 Shows the projected knockout bracket from the Round of 32 through the final. The bracket wraps across smaller desktop and mobile screens to avoid horizontal scrolling.
 
-### Odds
+### Chances
 
 Shows each team's Monte Carlo probability of winning the cup and reaching later rounds.
 
@@ -69,10 +69,11 @@ The app keeps Monte Carlo as the tournament-level simulator. Under each tourname
 2. **Tournament pedigree proxy:** titles, deep runs, and listed star depth add historical and squad-strength context.
 3. **Current form:** embedded tournament points, goal difference, goals for, and goals against adjust teams as results arrive.
 4. **Attack/defense profile:** played-match scoring and defending patterns influence expected goals.
-5. **Context terms:** venue, climate, weather, rest/travel, host/co-host advantage, and editable match context adjust expected goals.
-6. **Scoreline sampler:** expected goals are converted into scorelines with a bounded low-score correlation adjustment, then knockout draws go to extra time and penalties.
-7. **Tournament simulation:** group standings, best third-place teams, legal knockout slots, and each knockout round are resolved.
-8. **Monte Carlo aggregation:** thousands of runs are counted into champion, finalist, semifinal, quarterfinal, and round-of-16 probabilities.
+5. **Context terms:** venue, climate, weather, rest/travel, host/co-host advantage, final group-table incentive state, and editable match context adjust expected goals.
+6. **Source-backed availability hooks:** confirmed lineup, goalkeeper, suspension, and key-absence modifiers can apply only when verified source metadata is embedded; otherwise they remain neutral.
+7. **Scoreline sampler:** expected goals are converted into scorelines with a bounded low-score correlation adjustment, then knockout draws go to extra time and penalties.
+8. **Tournament simulation:** group standings, best third-place teams, legal knockout slots, and each knockout round are resolved.
+9. **Monte Carlo aggregation:** thousands of runs are counted into champion, finalist, semifinal, quarterfinal, and round-of-16 probabilities.
 
 The displayed sample path is selected from the Monte Carlo run that represents the top champion/finalist pairing, so the main result, Groups, Bracket, and favorites board stay aligned.
 
@@ -104,11 +105,14 @@ It runs on:
 
 * `37 11 * * *` UTC: 07:37 America/Montreal during EDT, 06:37 during EST.
 * `37 17 * * *` UTC: safety run for delayed feeds or a missed morning run.
+* `*/30 11-23 * 6,7 *` and `*/30 0-7 * 6,7 *` UTC in `.github/workflows/match-window-data-update.yml`: match-window checks during June/July UTC match hours and late North American post-match buffers.
 * `workflow_dispatch`: manual fallback from GitHub Actions.
 
-GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance.
+GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run, match-window checks, and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance. America/Montreal local time shifts with DST because the cron schedule remains UTC.
 
-The workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, and `data/calibration-state.json`, and only after validation passes.
+The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, and `data/calibration-state.json`, and only after validation passes.
+
+The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff or post-match slot. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
 
 ### Automated Sources
 
@@ -118,6 +122,7 @@ The updater currently uses:
 * Open-Meteo for upcoming-match venue weather where available.
 * Embedded schedule and venue coordinates for rest/travel context.
 * Embedded FIFA ranking fields for the rank-seeded Elo-style model input.
+* Embedded standings for conservative final group-table incentive adjustments.
 * Official FIFA pages remain the preferred manual authority for fixtures, reports, rankings, regulations, discipline, and disputed data.
 
 ### Not Automatically Updated
@@ -125,6 +130,7 @@ The updater currently uses:
 The updater does not invent unavailable data. These remain neutral unless reliable data is manually patched:
 
 * Lineups, injuries, suspensions, and referee assignments.
+* Confirmed lineup, goalkeeper, suspension, and key-absence modifiers unless verified source metadata is patched into embedded availability fields.
 * Full disciplinary/fair-play card ledger beyond embedded known conduct notes.
 * Official fixture/venue/kickoff rewrites when no stable unauthenticated source adapter is configured.
 * Betting odds or gambling-market data, which are not used.

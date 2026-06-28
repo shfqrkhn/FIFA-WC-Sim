@@ -220,10 +220,24 @@ const ensembleModelOk = vm.runInContext(`(() => {
   const highTotal = high.reduce((sum, x) => sum + x.p, 0);
   const sampled = sampleScoreline(1.15, 1.05, rngFactory('ensemble-smoke'), {});
   const disclosure = String(DATA.config?.modelNotes || '') + ' ' + (DATA.config?.assumptions || []).join(' ');
+  const availabilitySample = { teamA:'Alpha', teamB:'Beta', availability:{ A:{ status:'official', keyAbsences:1 } }, context:{ A:{ goalAdj:0 }, B:{ goalAdj:0 } } };
+  const unverifiedSample = { teamA:'Alpha', teamB:'Beta', availability:{ A:{ status:'unverified', keyAbsences:3 } }, context:{ A:{ goalAdj:0 }, B:{ goalAdj:0 } } };
+  const priorKeyAbsencePenalty = DATA.config.confirmedKeyAbsenceGoalPenalty;
+  DATA.config.confirmedKeyAbsenceGoalPenalty = 0;
+  const zeroPenaltyOk = availabilityFactor('Alpha', availabilitySample) === 0;
+  DATA.config.confirmedKeyAbsenceGoalPenalty = priorKeyAbsencePenalty;
   return Number.isFinite(breakdown.total) &&
     breakdown.parts.some(p => p.label === 'Ranking prior') &&
     breakdown.parts.some(p => p.label === 'Rank-seeded Elo prior') &&
     breakdown.parts.some(p => p.label === 'Attack/defense profile') &&
+    typeof availabilityFactor === 'function' &&
+    availabilityFactor('Alpha', availabilitySample) < 0 &&
+    contextFactor('Alpha', availabilitySample) < 0 &&
+    zeroPenaltyOk &&
+    availabilityFactor('Alpha', unverifiedSample) === 0 &&
+    contextFactor('Alpha', unverifiedSample) === 0 &&
+    DATA.modelInputs?.features?.includes('group-table incentive') &&
+    DATA.matches.some(m => m.incentiveProfile?.status) &&
     Math.abs(weightTotal - 1) < 1e-9 &&
     Math.abs(probTotal - 1) < 1e-6 &&
     Math.abs(highTotal - 1) < 1e-6 &&
@@ -231,7 +245,8 @@ const ensembleModelOk = vm.runInContext(`(() => {
     Array.isArray(sampled) && sampled.length === 2 &&
     /ensemble/i.test(disclosure) &&
     /Elo-style prior/i.test(disclosure) &&
-    /low-score/i.test(disclosure);
+    /low-score/i.test(disclosure) &&
+    /availability|lineup|suspension/i.test(disclosure);
 })()`, sandbox, { timeout: 1000 });
 if (!ensembleModelOk) {
   throw new Error('Ensemble model and low-score scoreline sampler were not active and disclosed.');

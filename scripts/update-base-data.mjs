@@ -5,8 +5,18 @@ import { spawnSync } from 'node:child_process';
 import { runPythonScript } from './node-python.mjs';
 
 const args = process.argv.slice(2);
+const getArg = name => {
+  const index = args.indexOf(name);
+  return index >= 0 ? args[index + 1] : null;
+};
 const noFetch = args.includes('--no-fetch');
-const scoreboardArgs = args.filter(arg => arg !== '--no-fetch');
+const nowUtc = getArg('--now');
+const nowArgs = nowUtc ? ['--now', nowUtc] : [];
+const scoreboardArgs = args.filter((arg, index) => {
+  if (arg === '--no-fetch' || arg === '--now') return false;
+  if (args[index - 1] === '--now') return false;
+  return true;
+});
 const fetchArgs = noFetch ? ['--no-fetch'] : [];
 const COMMIT_CANDIDATES = [
   'docs/index.html',
@@ -42,14 +52,14 @@ function runNode(script, scriptArgs = []) {
 
 const steps = [
   ['validate baseline', () => runPythonScript('scripts/validate_base_data.py')],
-  ['freeze pre-match predictions', () => runNode('scripts/freeze-predictions.mjs')],
+  ['freeze pre-match predictions', () => runNode('scripts/freeze-predictions.mjs', nowArgs)],
   ['apply scoreboard', () => runPythonScript('scripts/apply_scoreboard.py', [...scoreboardArgs, ...fetchArgs])],
   ['enrich predictions', () => runPythonScript('scripts/enrich_predictions.py')],
   ['enrich rest/travel', () => runPythonScript('scripts/enrich_rest_travel.py')],
   ['enrich weather', () => runPythonScript('scripts/enrich_weather.py', fetchArgs)],
   ['enrich data quality', () => runPythonScript('scripts/enrich_data_quality.py')],
-  ['score frozen predictions', () => runNode('scripts/score-predictions.mjs')],
-  ['update calibration', () => runNode('scripts/update-calibration.mjs')],
+  ['score frozen predictions', () => runNode('scripts/score-predictions.mjs', nowArgs)],
+  ['update calibration', () => runNode('scripts/update-calibration.mjs', nowArgs)],
   ['update health artifact', () => runPythonScript('scripts/update_health.py')],
   ['validate updated data', () => runPythonScript('scripts/validate_base_data.py')],
   ['validate prediction audit calibration', () => runNode('scripts/validate-calibration.mjs')],

@@ -3,6 +3,7 @@ import json, os, re, sys
 HTML = 'docs/index.html'
 README = 'README.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
+MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
 GITIGNORE = '.gitignore'
 REQUIRED_UI = [
     '<title>FIFA World Cup 2026 \u2014 Whole Tournament Simulator</title>',
@@ -10,6 +11,7 @@ REQUIRED_UI = [
     'data-tab="groups"',
     'data-tab="bracket"',
     'data-tab="prob"',
+    'Chances table',
     'data-tab="stats"',
     'How predictions work',
     'Technical checks',
@@ -32,6 +34,9 @@ REQUIRED_UI = [
     'calibrationStatusText',
     'calibrationAdjustedGroupOutcome',
     'frozen-prediction bucket adjustment',
+    'Source-backed availability and incentive inputs',
+    'function availabilityFactor',
+    'function trustedModelSource',
     'id="appVersion"',
     'id="dataVersion"',
     'id="lastDataUpdate"',
@@ -129,6 +134,21 @@ REQUIRED_WORKFLOW_STEPS = [
     'data/prediction-audit.json',
     'data/calibration-state.json',
 ]
+REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
+    "on:\n  workflow_dispatch:\n  schedule:",
+    "cron: '*/30 11-23 * 6,7 *'",
+    "cron: '*/30 0-7 * 6,7 *'",
+    'actions/setup-node@v4',
+    'node --check scripts/match-window-update.mjs',
+    'node scripts/match-window-update.mjs',
+    'python3 scripts/validate_base_data.py',
+    'node scripts/validate-calibration.mjs',
+    'node tests/run-all.mjs',
+    'node scripts/run-sim.mjs',
+    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+    'concurrency:',
+    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
     'data/latest-simulation.json',
@@ -195,6 +215,7 @@ REQUIRED_SCRIPT_MARKERS = {
     ],
     'scripts/update-base-data.mjs': [
         'COMMIT_CANDIDATES',
+        'nowArgs',
         'function snapshot',
         'function restore',
         'scripts/freeze-predictions.mjs',
@@ -209,6 +230,18 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/validate-calibration.mjs',
         'scripts/build-html.mjs',
         'scripts/validate.mjs',
+    ],
+    'scripts/match-window-update.mjs': [
+        'PRE_KICKOFF_SLOTS_MIN',
+        'POST_KICKOFF_SLOTS_MIN',
+        'ACTIVE_LOCK_END_MIN',
+        'evaluateMatchWindow',
+        'active_match_lock',
+        'freeze_only',
+        'scripts/update-base-data.mjs',
+        'scripts/update_health.py',
+        'scripts/validate_base_data.py',
+        '--now',
     ],
     'scripts/manual-update-trigger.mjs': [
         'MANUAL_UPDATE_TRIGGER',
@@ -261,6 +294,14 @@ REQUIRED_SCRIPT_MARKERS = {
         'calibration.test.mjs',
         'no-leakage.test.mjs',
         'manual-update-trigger.test.mjs',
+        'match-window-update.test.mjs',
+    ],
+    'tests/match-window-update.test.mjs': [
+        'pre_kickoff',
+        'pre_kickoff_freeze_only_active_lock',
+        'active_match_lock',
+        'post_match',
+        'outside_match_window',
     ],
     'scripts/run-sim.mjs': [
         'documentStub',
@@ -275,6 +316,8 @@ REQUIRED_SCRIPT_MARKERS = {
         'Today match highlighting did not classify and render schedule dates correctly.',
         'Tournament snapshot schedule progress did not render expected remaining-match fields.',
         'Ensemble model and low-score scoreline sampler were not active and disclosed.',
+        'availabilityFactor',
+        'group-table incentive',
         'Prediction-audit calibration status was not disclosed or failed closed.',
         'Rank-seeded Elo prior',
         'Monte Carlo loading state did not toggle accessibly.',
@@ -306,6 +349,8 @@ for marker in REQUIRED_BRACKET_UI:
         fail('missing bracket no-overlap marker: %s' % marker)
 if '<title>World Cup 2026 Simulator</title>' in html and 'Whole Tournament Simulator' not in html[:1000]:
     fail('compact shell regression detected')
+if 'Odds table' in html or re.search(r'>\s*Odds\s*<', html):
+    fail('visible probability UI must use Chances terminology, not Odds')
 if os.path.exists(WORKFLOW):
     workflow = open(WORKFLOW, encoding='utf-8').read()
     for marker in REQUIRED_WORKFLOW_STEPS:
@@ -313,6 +358,13 @@ if os.path.exists(WORKFLOW):
             fail('missing workflow automation marker: %s' % marker)
 else:
     fail('missing daily BASE_DATA workflow')
+if os.path.exists(MATCH_WINDOW_WORKFLOW):
+    workflow = open(MATCH_WINDOW_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing match-window workflow marker: %s' % marker)
+else:
+    fail('missing match-window BASE_DATA workflow')
 if os.path.exists(GITIGNORE):
     gitignore = open(GITIGNORE, encoding='utf-8').read().splitlines()
     for entry in REQUIRED_GITIGNORE_ENTRIES:
@@ -326,6 +378,10 @@ if os.path.exists(README):
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
     if README_MANUAL_TRIGGER_MARKER not in readme:
         fail('README must document the emergency manual update trigger')
+    if 'match-window' not in readme or 'active-match lock' not in readme:
+        fail('README must document match-window automation and active-match lock')
+    if '### Chances' not in readme or '### Odds' in readme or '**Odds**' in readme:
+        fail('README probability section must use Chances terminology')
     if '2026.06.25-patch-32-nav-fit-polish' in readme:
         fail('README contains stale hard-coded patch version')
 else:

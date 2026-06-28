@@ -1,0 +1,42 @@
+name: Match-window BASE_DATA update
+
+on:
+  workflow_dispatch:
+  schedule:
+    # North American World Cup match windows can span Montreal morning through late night.
+    # GitHub cron is UTC only; local America/Montreal time shifts with DST.
+    # The script no-ops unless a match is near a pre-kickoff or post-match update slot.
+    - cron: '*/30 11-23 * 6,7 *'
+    - cron: '*/30 0-7 * 6,7 *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: match-window-base-data-update-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node --check scripts/match-window-update.mjs
+      - run: node scripts/match-window-update.mjs
+      - run: python3 scripts/validate_base_data.py
+      - run: node scripts/validate-calibration.mjs
+      - run: node tests/run-all.mjs
+      - run: node scripts/run-sim.mjs
+      - run: |
+          if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json; then
+            echo "No validated match-window BASE_DATA changes to commit."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json
+          git commit -m 'Match-window World Cup BASE_DATA update'
+          git push

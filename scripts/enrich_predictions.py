@@ -35,6 +35,31 @@ def match_result(gf, ga):
 def goal_margin_multiplier(gf, ga):
     return 1 + min(3, abs(gf - ga)) * 0.12
 
+def team_group(name, teams):
+    for team in teams:
+        if team.get('name') == name:
+            return team.get('group')
+    return None
+
+def group_unplayed(group, matches):
+    return [m for m in matches if m.get('stage') == 'group' and m.get('group') == group and not m.get('played')]
+
+def group_incentive(name, group, state, matches):
+    row = state.get(name, {})
+    if row.get('played', 0) < 2 or len(group_unplayed(group, matches)) > 2:
+        return 0.0, 'neutral until final group-match incentive state is reached'
+    pts = row.get('pts', 0)
+    gd = row.get('gd', 0)
+    if pts >= 6:
+        return -0.02, 'already on six or more points; small rotation/control discount'
+    if pts <= 1:
+        return 0.025, 'needs a result from final group match; small chase incentive'
+    if pts == 3:
+        return 0.018 if gd < 1 else 0.012, 'three-point final-match qualification pressure'
+    if pts == 4:
+        return 0.006 if gd < 2 else -0.004, 'four-point final-match consolidation state'
+    return 0.0, 'neutral group-table incentive'
+
 def upsert_source(data, item):
     sources = data.get('sources')
     if not isinstance(sources, list):
@@ -115,10 +140,34 @@ for m in data.get('matches', []):
     ctx = m.get('context') if isinstance(m.get('context'), dict) else {}
     a_ctx = dict(ctx.get('A', {}))
     b_ctx = dict(ctx.get('B', {}))
-    base_a = float(a_ctx.get('goalAdj') or 0) - float(a_ctx.get('formAdj') or 0)
-    base_b = float(b_ctx.get('goalAdj') or 0) - float(b_ctx.get('formAdj') or 0)
-    a_ctx.update({'goalAdj': round(clamp(base_a + adj_a, -0.18, 0.18), 3), 'formAdj': adj_a, 'note': 'Auto form/context adjustment from current tournament results.'})
-    b_ctx.update({'goalAdj': round(clamp(base_b - adj_a, -0.18, 0.18), 3), 'formAdj': -adj_a, 'note': 'Auto form/context adjustment from current tournament results.'})
+    group = m.get('group') or team_group(a, teams)
+    incentive_a, incentive_note_a = group_incentive(a, group, state, data.get('matches', []))
+    incentive_b, incentive_note_b = group_incentive(b, group, state, data.get('matches', []))
+    base_a = float(a_ctx.get('goalAdj') or 0) - float(a_ctx.get('formAdj') or 0) - float(a_ctx.get('incentiveAdj') or 0)
+    base_b = float(b_ctx.get('goalAdj') or 0) - float(b_ctx.get('formAdj') or 0) - float(b_ctx.get('incentiveAdj') or 0)
+    a_ctx.update({
+        'goalAdj': round(clamp(base_a + adj_a + incentive_a, -0.18, 0.18), 3),
+        'formAdj': adj_a,
+        'incentiveAdj': round(incentive_a, 3),
+        'incentiveNote': incentive_note_a,
+        'note': 'Auto form/context adjustment from current tournament results and final-group incentive state.'
+    })
+    b_ctx.update({
+        'goalAdj': round(clamp(base_b - adj_a + incentive_b, -0.18, 0.18), 3),
+        'formAdj': -adj_a,
+        'incentiveAdj': round(incentive_b, 3),
+        'incentiveNote': incentive_note_b,
+        'note': 'Auto form/context adjustment from current tournament results and final-group incentive state.'
+    })
+    incentive_profile = {
+        'status': 'derived_from_embedded_standings' if incentive_a or incentive_b else 'neutral',
+        'source': 'embedded standings before final group match',
+        'teamA': {'team': a, 'goalAdj': round(incentive_a, 3), 'note': incentive_note_a},
+        'teamB': {'team': b, 'goalAdj': round(incentive_b, 3), 'note': incentive_note_b}
+    }
+    if m.get('incentiveProfile') != incentive_profile:
+        m['incentiveProfile'] = incentive_profile
+        changed = True
     next_ctx = dict(ctx, A=a_ctx, B=b_ctx)
     if m.get('context') != next_ctx:
         m['context'] = next_ctx
@@ -130,11 +179,17 @@ if changed:
         t['eloRatingUpdatedAt'] = updated
     data['modelInputs'] = {
         'updatedAt': updated,
-        'method': 'Auto-derived tournament form, rank-expectation residual, rank-seeded Elo-style rating, upcoming-match context edge, and UI-preserving BASE_DATA-only update.',
-        'features': ['rank', 'rank-seeded Elo-style rating', 'played results', 'points per game', 'goal difference per game', 'rank-adjusted result residual', 'last-match momentum', 'upcoming-match context goalAdj'],
-        'coefficients': {'eloK': 18, 'eloGoalMarginStep': 0.12, 'eloGoalMarginCap': 3},
-        'guardrail': 'Derived fields only tune existing morale/manualPowerAdj/context factors and the transparent Elo-style prior; missing external injury, lineup, xG, referee, and market data remain neutral unless patched explicitly.'
+        'method': 'Auto-derived tournament form, rank-expectation residual, rank-seeded Elo-style rating, final group-table incentive, upcoming-match context edge, and UI-preserving BASE_DATA-only update.',
+        'features': ['rank', 'rank-seeded Elo-style rating', 'played results', 'points per game', 'goal difference per game', 'rank-adjusted result residual', 'last-match momentum', 'group-table incentive', 'upcoming-match context goalAdj'],
+        'coefficients': {'eloK': 18, 'eloGoalMarginStep': 0.12, 'eloGoalMarginCap': 3, 'groupIncentiveGoalCap': 0.025},
+        'guardrail': 'Derived fields only tune existing morale/manualPowerAdj/context factors and the transparent Elo-style prior; missing external injury, lineup, suspension, goalkeeper, xG, referee, and market data remain neutral unless patched explicitly.'
     }
+    cfg = data.get('config') if isinstance(data.get('config'), dict) else {}
+    cfg.setdefault('confirmedKeyAbsenceGoalPenalty', 0.055)
+    cfg.setdefault('confirmedSuspensionGoalPenalty', 0.045)
+    cfg.setdefault('confirmedKeeperDowngradeGoalPenalty', 0.035)
+    cfg.setdefault('confirmedRotationGoalPenalty', 0.03)
+    data['config'] = cfg
     upsert_source(data, {
         'name': 'FIFA/Coca-Cola Men\'s World Ranking',
         'url': 'https://inside.fifa.com/fifa-world-ranking/men',
