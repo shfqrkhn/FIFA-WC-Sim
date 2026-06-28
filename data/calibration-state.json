@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-06-27T00:00:00Z",
+  "generated_at_utc": "2026-06-28T12:57:05Z",
   "calibration_status": "insufficient_sample",
   "active": false,
-  "resolved_predictions": 0,
+  "resolved_predictions": 6,
   "min_resolved_predictions": 30,
   "use_calibrated_probabilities": false,
   "method": "conservative_bucket_calibration",
