@@ -17,13 +17,16 @@ const match = {
   teamB: 'Beta',
   played: false
 };
+const HASH_A = 'a'.repeat(64);
+const HASH_B = 'b'.repeat(64);
+const HASH_C = 'c'.repeat(64);
 
 const prediction = createPredictionRecord({
   match,
   createdAtUtc: '2026-07-01T12:00:00Z',
   modelVersion: 'audit-test-model',
   dataVersion: 'audit-test-data',
-  sourceSnapshotHash: 'abc123',
+  sourceSnapshotHash: HASH_A,
   predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
   predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
   predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
@@ -58,7 +61,7 @@ const equivalentNewSnapshot = createPredictionRecord({
   createdAtUtc: '2026-07-01T12:30:00Z',
   modelVersion: 'audit-test-model',
   dataVersion: 'audit-test-data',
-  sourceSnapshotHash: 'metadata-only-change',
+  sourceSnapshotHash: HASH_B,
   predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
   predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
   predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
@@ -73,10 +76,54 @@ assert.throws(() => createPredictionRecord({
   createdAtUtc: '2026-07-01T19:00:01Z',
   modelVersion: 'late-model',
   dataVersion: 'late-data',
-  sourceSnapshotHash: 'late',
+  sourceSnapshotHash: HASH_C,
   predictedWdlProbs: { home_win: 0.4, draw: 0.3, away_win: 0.3 },
   predictedScorelineDistribution: [],
   predictedAdvancementProbs: {}
 }), /after kickoff/);
+
+assert.throws(() => createPredictionRecord({
+  match,
+  createdAtUtc: '2026-07-01T12:00:00Z',
+  modelVersion: 'audit-test-model',
+  dataVersion: 'audit-test-data',
+  sourceSnapshotHash: 'short-hash',
+  predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
+  predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
+  predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
+}), /sourceSnapshotHash/);
+
+assert.throws(() => createPredictionRecord({
+  match,
+  createdAtUtc: '2026-07-01T12:00:00Z',
+  modelVersion: 'audit-test-model',
+  dataVersion: 'audit-test-data',
+  sourceSnapshotHash: HASH_C,
+  predictedWdlProbs: { home_win: 0.45, draw: 0.28 },
+  predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
+  predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
+}), /predictedWdlProbs/);
+
+assert.throws(() => createPredictionRecord({
+  match,
+  createdAtUtc: '2026-07-01T12:00:00Z',
+  modelVersion: 'audit-test-model',
+  dataVersion: 'audit-test-data',
+  sourceSnapshotHash: HASH_C,
+  predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
+  predictedScorelineDistribution: [],
+  predictedAdvancementProbs: { home: 0.45, draw: 0.28, away: 0.27 }
+}), /predictedScorelineDistribution/);
+
+assert.throws(() => createPredictionRecord({
+  match,
+  createdAtUtc: '2026-07-01T12:00:00Z',
+  modelVersion: 'audit-test-model',
+  dataVersion: 'audit-test-data',
+  sourceSnapshotHash: HASH_C,
+  predictedWdlProbs: { home_win: 0.45, draw: 0.28, away_win: 0.27 },
+  predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
+  predictedAdvancementProbs: { home: 0.45, away: 0.27 }
+}), /predictedAdvancementProbs/);
 
 console.log('prediction audit tests passed');

@@ -169,6 +169,43 @@ export function favoriteKey(probs) {
   return WDL_KEYS.slice().sort((a, b) => normalized[b] - normalized[a] || a.localeCompare(b))[0];
 }
 
+function finiteProbability(value) {
+  return value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)) &&
+    Number(value) >= 0 && Number(value) <= 1;
+}
+
+function hasExactProbabilityInput(value, keys) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const actualKeys = Object.keys(value).sort();
+  const expectedKeys = keys.slice().sort();
+  if (stableJson(actualKeys) !== stableJson(expectedKeys)) return false;
+  const total = keys.reduce((sum, key) => sum + Number(value[key]), 0);
+  return keys.every(key => finiteProbability(value[key])) && Math.abs(total - 1) <= 1e-6;
+}
+
+function parseScorelineInput(row) {
+  if (typeof row?.score === 'string') {
+    const match = row.score.match(/^(\d+)-(\d+)$/);
+    return match ? [Number(match[1]), Number(match[2])] : [NaN, NaN];
+  }
+  return [Number(row?.a), Number(row?.b)];
+}
+
+function hasUsableScorelineDistribution(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return false;
+  let total = 0;
+  const seen = new Set();
+  for (const row of rows) {
+    const probability = Number(row?.probability ?? row?.p);
+    const [home, away] = parseScorelineInput(row);
+    const key = `${home}-${away}`;
+    if (!finiteProbability(probability) || !isSaneScore(home) || !isSaneScore(away) || seen.has(key)) return false;
+    seen.add(key);
+    total += probability;
+  }
+  return total > 0 && total <= 1 + 1e-6;
+}
+
 export function calibrationBucket(probsOrConfidence) {
   const confidence = typeof probsOrConfidence === 'number'
     ? probsOrConfidence
@@ -239,6 +276,11 @@ export function createPredictionRecord(input) {
   if (!match) throw new Error('match is required');
   const createdAtUtc = input.createdAtUtc || utcNow();
   if (!isBeforeKickoff(createdAtUtc, match)) throw new Error(`cannot freeze prediction after kickoff for match ${match.no}`);
+  if (!input.modelVersion || !input.dataVersion) throw new Error('modelVersion and dataVersion are required');
+  if (!/^[0-9a-f]{64}$/.test(String(input.sourceSnapshotHash || ''))) throw new Error('sourceSnapshotHash must be a sha256 hex digest');
+  if (!hasExactProbabilityInput(input.predictedWdlProbs, WDL_KEYS)) throw new Error('predictedWdlProbs must contain finite home_win/draw/away_win probabilities that sum to 1');
+  if (!hasUsableScorelineDistribution(input.predictedScorelineDistribution)) throw new Error('predictedScorelineDistribution must contain finite scoreline probabilities');
+  if (!hasExactProbabilityInput(input.predictedAdvancementProbs, ['home', 'draw', 'away'])) throw new Error('predictedAdvancementProbs must contain finite home/draw/away probabilities that sum to 1');
   const probs = normalizeWdlProbs(input.predictedWdlProbs);
   const stage = match.stage || match.round || 'unknown';
   const record = {
