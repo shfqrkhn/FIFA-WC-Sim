@@ -3,6 +3,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import {
+  brierScore,
+  calibrationBucket,
+  logLoss,
+  scorelineError
+} from '../scripts/prediction-audit-lib.mjs';
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'wc-calibration-'));
 const htmlPath = path.join(tmp, 'index.html');
@@ -28,6 +34,46 @@ function readJson(filePath) {
 
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`);
+}
+
+function findJsonObjectEnd(text, start) {
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < text.length; index += 1) {
+    const char = text[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+    if (char === '"') {
+      inString = true;
+    } else if (char === '{') {
+      depth += 1;
+    } else if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return index + 1;
+    }
+  }
+  throw new Error('BASE_DATA JSON end not found');
+}
+
+function updateEmbeddedBaseData(updater) {
+  const html = fs.readFileSync(htmlPath, 'utf8');
+  const marker = 'const BASE_DATA = ';
+  const markerStart = html.indexOf(marker);
+  assert.notEqual(markerStart, -1, 'BASE_DATA marker not found');
+  const start = markerStart + marker.length;
+  const end = findJsonObjectEnd(html, start);
+  const data = JSON.parse(html.slice(start, end));
+  updater(data);
+  fs.writeFileSync(htmlPath, `${html.slice(0, start)}${JSON.stringify(data)}${html.slice(end)}`);
 }
 
 const clean = runValidator();
@@ -61,16 +107,22 @@ fakeSettled.predictions[0].actual_result = 'home_win';
 fakeSettled.predictions[0].actual_home_score = 1;
 fakeSettled.predictions[0].actual_away_score = 0;
 fakeSettled.predictions[0].settled_at_utc = '2026-06-28T04:00:00Z';
-fakeSettled.predictions[0].brier_score = 0.5;
-fakeSettled.predictions[0].log_loss = 0.7;
-fakeSettled.predictions[0].scoreline_error = 1;
-fakeSettled.predictions[0].calibration_bucket = '0.4-0.5';
+fakeSettled.predictions[0].brier_score = brierScore(fakeSettled.predictions[0].predicted_wdl_probs, fakeSettled.predictions[0].actual_result);
+fakeSettled.predictions[0].log_loss = logLoss(fakeSettled.predictions[0].predicted_wdl_probs, fakeSettled.predictions[0].actual_result);
+fakeSettled.predictions[0].scoreline_error = scorelineError(fakeSettled.predictions[0].predicted_scoreline_distribution, fakeSettled.predictions[0].actual_home_score, fakeSettled.predictions[0].actual_away_score);
+fakeSettled.predictions[0].calibration_bucket = calibrationBucket(fakeSettled.predictions[0].predicted_wdl_probs);
 fakeSettled.predictions[0].failure_type = 'pure_variance';
+updateEmbeddedBaseData(data => {
+  const match = data.matches.find(row => Number(row.no) === Number(fakeSettled.predictions[0].match_id));
+  assert.ok(match, 'expected fixture match to exist');
+  match.played = false;
+});
 writeJson(auditPath, fakeSettled);
 const settledTooEarly = runValidator();
 assert.notEqual(settledTooEarly.status, 0);
 assert.match(settledTooEarly.stderr, /settled before embedded match is played/);
 
+fs.copyFileSync('docs/index.html', htmlPath);
 fs.copyFileSync('data/prediction-audit.json', auditPath);
 const badTimestamp = readJson(auditPath);
 badTimestamp.predictions[0].created_at_utc = '2026-06-27T07:57:06-04:00';
