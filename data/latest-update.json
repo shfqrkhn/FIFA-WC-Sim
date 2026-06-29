@@ -1,21 +1,21 @@
 {
-  "generatedAt": "2026-06-29T15:58:28Z",
-  "updatedThrough": "2026-06-28",
+  "generatedAt": "2026-06-29T19:34:14Z",
+  "updatedThrough": "2026-06-29",
   "scoreboard": {
-    "fetchedFinals": 7,
+    "fetchedFinals": 1,
     "appliedChanges": 1,
     "changes": [
       {
-        "match": 73,
+        "match": 76,
         "teams": [
-          "South Africa",
-          "Canada"
+          "Brazil",
+          "Japan"
         ],
         "score": [
-          0,
+          2,
           1
         ],
-        "event": "760486"
+        "event": "760487"
       }
     ],
     "fetchFailures": []
