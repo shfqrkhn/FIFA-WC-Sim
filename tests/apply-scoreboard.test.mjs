@@ -37,18 +37,33 @@ function runPython(script, args, env) {
   assert.fail('Python interpreter not found');
 }
 
+function playedRows(data) {
+  return [...(data.matches || []), ...(data.knockout || [])]
+    .filter(match => match.played && Number.isInteger(match.scoreA) && Number.isInteger(match.scoreB));
+}
+
+function goalTotal(rows) {
+  return rows.reduce((sum, match) => sum + match.scoreA + match.scoreB, 0);
+}
+
 const dir = mkdtempSync(join(tmpdir(), 'fifa-scoreboard-'));
 try {
   const htmlPath = join(dir, 'index.html');
   const fixturePath = join(dir, 'scoreboard.json');
   copyFileSync('docs/index.html', htmlPath);
   const stale = readBaseData(htmlPath);
+  for (const knockoutMatch of stale.knockout) {
+    for (const field of ['scoreA', 'scoreB', 'played', 'winner', 'loser', 'note', 'pens']) {
+      delete knockoutMatch[field];
+    }
+  }
   const staleMatch = stale.knockout.find(m => m.no === 73);
-  for (const field of ['teamA', 'teamB', 'scoreA', 'scoreB', 'played', 'winner', 'loser', 'note']) {
+  for (const field of ['teamA', 'teamB']) {
     delete staleMatch[field];
   }
-  stale.currentStats.matchesPlayed = 72;
-  stale.currentStats.goalsScored = 215;
+  const stalePlayed = playedRows(stale);
+  stale.currentStats.matchesPlayed = stalePlayed.length;
+  stale.currentStats.goalsScored = goalTotal(stalePlayed);
   stale.currentStats.updatedTo = '2026-06-27';
   writeBaseData(htmlPath, stale);
   writeFileSync(fixturePath, JSON.stringify({
@@ -66,6 +81,7 @@ try {
   }), 'utf8');
 
   const before = readBaseData(htmlPath);
+  const beforePlayed = playedRows(before);
   assert.equal(before.knockout.find(m => m.no === 73).played, undefined);
   runPython('scripts/apply_scoreboard.py', [fixturePath, '--no-fetch'], { FIFA_WC_HTML_PATH: htmlPath });
   const after = readBaseData(htmlPath);
@@ -78,8 +94,8 @@ try {
   assert.equal(match.winner, 'Canada');
   assert.equal(match.loser, 'South Africa');
   assert.match(match.note, /scoreboard event 760486/);
-  assert.equal(after.currentStats.matchesPlayed, 73);
-  assert.equal(after.currentStats.goalsScored, 216);
+  assert.equal(after.currentStats.matchesPlayed, beforePlayed.length + 1);
+  assert.equal(after.currentStats.goalsScored, goalTotal(beforePlayed) + 1);
   assert.equal(after.currentStats.updatedTo, '2026-06-28');
   assert.equal(after.currentStats.topScorers.length, 0);
   assert.equal(after.knockout.filter(m => m.played).length, 1);
