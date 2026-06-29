@@ -35,6 +35,15 @@ function runPython(script, env) {
   assert.fail('Python interpreter not found');
 }
 
+function playedRows(data) {
+  return [...(data.matches || []), ...(data.knockout || [])]
+    .filter(match => match.played && Number.isInteger(match.scoreA) && Number.isInteger(match.scoreB));
+}
+
+function teamPlayedCount(data, name) {
+  return playedRows(data).filter(match => match.teamA === name || match.teamB === name).length;
+}
+
 const dir = mkdtempSync(join(tmpdir(), 'fifa-enrich-'));
 try {
   const htmlPath = join(dir, 'index.html');
@@ -49,10 +58,12 @@ try {
   }
   writeBaseData(htmlPath, before);
   const result = runPython('scripts/enrich_predictions.py', { FIFA_WC_HTML_PATH: htmlPath });
-  assert.match(result.stdout, /"playedMatches": 73/);
+  const summary = JSON.parse(result.stdout);
+  assert.equal(summary.teamsEnriched, 48);
+  assert.equal(summary.playedMatches, playedRows(before).length);
   const after = readBaseData(htmlPath);
-  assert.equal(after.teams.find(t => t.name === 'Canada')?.eloRatingMatches, 4);
-  assert.equal(after.teams.find(t => t.name === 'South Africa')?.eloRatingMatches, 4);
+  assert.equal(after.teams.find(t => t.name === 'Canada')?.eloRatingMatches, teamPlayedCount(before, 'Canada'));
+  assert.equal(after.teams.find(t => t.name === 'South Africa')?.eloRatingMatches, teamPlayedCount(before, 'South Africa'));
   assert.ok(after.modelInputs.features.includes('played results'));
 } finally {
   rmSync(dir, { recursive: true, force: true });
