@@ -1,7 +1,8 @@
-import json, os, re, sys
+import json, math, os, re, sys
 
 HTML = 'docs/index.html'
 README = 'README.md'
+HANDOFF = 'OMNI_HANDOVER.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
 UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
@@ -34,6 +35,9 @@ REQUIRED_UI = [
     'dixonColesTau',
     'calibrationStatusText',
     'calibrationAdjustedGroupOutcome',
+    'function renderForecastAuditCard',
+    'Benchmark scoring',
+    'data-forecast-audit',
     'frozen-prediction bucket adjustment',
     'Source-backed availability and incentive inputs',
     'function availabilityFactor',
@@ -178,6 +182,8 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'playwright-report/',
     'test-results/',
     'linkedin-post-package/',
+    'offline/omnios-documents/*',
+    '!offline/omnios-documents/.gitignore',
     '.codex-remote-attachments/',
 ]
 README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
@@ -326,6 +332,9 @@ REQUIRED_SCRIPT_MARKERS = {
         'scorePrediction',
         'updateCalibrationState',
         'applyCalibrationToWdl',
+        'benchmarkMetrics',
+        'uniform_wdl',
+        'rank_prior',
         'calibrationEligiblePredictions',
         'validateNoMarketFields',
         'kept_previous_validated_bucket_calibration',
@@ -347,6 +356,7 @@ REQUIRED_SCRIPT_MARKERS = {
     'scripts/update-calibration.mjs': [
         'updateCalibrationState',
         'publicCalibrationState',
+        'teamMap',
         'writeArtifact',
         'data/calibration-state.json',
     ],
@@ -354,6 +364,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'REQUIRED_LEDGER_FIELDS',
         'MIN_RESOLVED_PREDICTIONS',
         'calibration_status',
+        'benchmark_metrics',
         'Brier',
         'log loss',
         'invalid audit timestamps',
@@ -390,6 +401,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'unsettled after embedded match is played',
         'unsettled result/scoring fields',
         'public calibration state',
+        'calibration benchmark_metrics do not match eligible frozen predictions',
     ],
     'tests/run-all.mjs': [
         'prediction-audit.test.mjs',
@@ -413,6 +425,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'invalid predicted_wdl_probs keys',
         'invalid source_snapshot_hash format',
         'invalid actual_result',
+        'benchmark_metrics',
         'missing prediction audit file',
     ],
     'tests/match-window-update.test.mjs': [
@@ -440,6 +453,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'availabilityFactor',
         'group-table incentive',
         'Prediction-audit calibration status was not disclosed or failed closed.',
+        'Benchmark scoring',
         'Rank-seeded Elo prior',
         'Monte Carlo loading state did not toggle accessibly.',
         'Monte Carlo controls were not locked during simulation.',
@@ -510,12 +524,21 @@ if os.path.exists(README):
         fail('README must document QA wrapper, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
         fail('README must document match-window automation and active-match lock')
+    if 'OMNI_HANDOVER.md' not in readme or 'benchmark metrics' not in readme or 'OmniOS feedback loop' not in readme:
+        fail('README must document handoff and calibration benchmarks')
     if '### Chances' not in readme or '### Odds' in readme or '**Odds**' in readme:
         fail('README probability section must use Chances terminology')
     if '2026.06.25-patch-32-nav-fit-polish' in readme:
         fail('README contains stale hard-coded patch version')
 else:
     fail('missing README')
+if os.path.exists(HANDOFF):
+    handoff = open(HANDOFF, encoding='utf-8').read()
+    for marker in ('WC_DATA_RESCUE', 'node scripts/qa.mjs', 'Prediction Audit', 'No betting', 'Fresh-Agent Fire Drill', 'OmniOS Feedback Loop', 'FIFA-WC-Sim-lessons.md'):
+        if marker not in handoff:
+            fail('missing handoff marker: %s' % marker)
+else:
+    fail('missing OMNI_HANDOVER.md')
 for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     if not os.path.exists(path):
         fail('missing automation guard script: %s' % path)
@@ -643,6 +666,19 @@ else:
         errors.append('invalid calibration status')
     if calibration.get('resolved_predictions', 0) < 30 and calibration.get('calibration_status') != 'insufficient_sample':
         errors.append('calibration must fail closed below minimum sample')
+    benchmarks = calibration.get('benchmark_metrics')
+    if not isinstance(benchmarks, dict):
+        errors.append('missing calibration benchmark_metrics')
+    else:
+        for key in ('raw_model', 'uniform_wdl', 'rank_prior'):
+            row = benchmarks.get(key)
+            if not isinstance(row, dict) or not isinstance(row.get('count'), int) or row.get('count') < 0:
+                errors.append('invalid calibration benchmark %s' % key)
+            elif row.get('count') == 0:
+                if row.get('brier_score') is not None or row.get('log_loss') is not None:
+                    errors.append('empty calibration benchmark %s must have null metrics' % key)
+            elif not isinstance(row.get('brier_score'), (int, float)) or not isinstance(row.get('log_loss'), (int, float)) or not math.isfinite(row.get('brier_score')) or not math.isfinite(row.get('log_loss')):
+                errors.append('non-finite calibration benchmark %s' % key)
 if not isinstance(data.get('modelInputs'), dict) or 'rank-seeded Elo-style rating' not in data.get('modelInputs', {}).get('features', []):
     errors.append('missing rank-seeded Elo-style model input disclosure')
 for t in teams or []:

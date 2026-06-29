@@ -116,6 +116,7 @@ export function emptyCalibrationState(generatedAtUtc = utcNow()) {
     bucket_adjustments: [],
     raw_validation_metrics: null,
     validation_metrics: null,
+    benchmark_metrics: null,
     last_update_decision: 'raw_model_only',
     rollback_count: 0,
     notes: [
@@ -469,6 +470,51 @@ function averageMetrics(predictions, state = null) {
   };
 }
 
+function averageMetricsForProvider(predictions, provider) {
+  let count = 0;
+  let brier = 0;
+  let loss = 0;
+  for (const prediction of predictions) {
+    const probs = provider(prediction);
+    if (!probs) continue;
+    const normalized = normalizeWdlProbs(probs);
+    brier += brierScore(normalized, prediction.actual_result);
+    loss += logLoss(normalized, prediction.actual_result);
+    count += 1;
+  }
+  if (!count) return { brier_score: null, log_loss: null, count: 0 };
+  return {
+    brier_score: Number((brier / count).toFixed(12)),
+    log_loss: Number((loss / count).toFixed(12)),
+    count
+  };
+}
+
+function rankPriorWdl(prediction, teamMap = new Map()) {
+  const home = teamMap.get(prediction.home_team);
+  const away = teamMap.get(prediction.away_team);
+  const homeRank = Number(home?.rank);
+  const awayRank = Number(away?.rank);
+  if (!Number.isFinite(homeRank) || !Number.isFinite(awayRank)) return null;
+  const draw = 0.26;
+  const homeWinShare = 1 / (1 + Math.exp((homeRank - awayRank) / 18));
+  return normalizeWdlProbs({
+    home_win: (1 - draw) * homeWinShare,
+    draw,
+    away_win: (1 - draw) * (1 - homeWinShare)
+  });
+}
+
+export function benchmarkMetrics(predictions, opts = {}) {
+  const rows = Array.isArray(predictions) ? predictions : [];
+  const teamMap = opts.teamMap || new Map();
+  return {
+    raw_model: averageMetrics(rows),
+    uniform_wdl: averageMetricsForProvider(rows, () => ({ home_win: 1 / 3, draw: 1 / 3, away_win: 1 / 3 })),
+    rank_prior: averageMetricsForProvider(rows, prediction => rankPriorWdl(prediction, teamMap))
+  };
+}
+
 function buildBucketAdjustments(train) {
   const buckets = new Map();
   for (const prediction of train) {
@@ -514,15 +560,19 @@ export function applyCalibrationToWdl(probs, state) {
 export function updateCalibrationState(ledger, previousState = emptyCalibrationState(), opts = {}) {
   const asOfUtc = opts.asOfUtc || utcNow();
   const matchMap = opts.matchMap || new Map();
+  const teamMap = opts.teamMap || new Map();
   const eligible = calibrationEligiblePredictions(ledger?.predictions || [], matchMap, { asOfUtc });
+  const benchmarks = benchmarkMetrics(eligible, { teamMap });
   if (eligible.length < MIN_RESOLVED_PREDICTIONS) {
     const stableInsufficientSample = previousState?.calibration_status === 'insufficient_sample' &&
       !previousState.active &&
       !previousState.use_calibrated_probabilities &&
-      Number(previousState.resolved_predictions) === eligible.length;
+      Number(previousState.resolved_predictions) === eligible.length &&
+      stableJson(previousState.benchmark_metrics || null) === stableJson(benchmarks);
     return {
       ...emptyCalibrationState(stableInsufficientSample && previousState.generated_at_utc ? previousState.generated_at_utc : asOfUtc),
       resolved_predictions: eligible.length,
+      benchmark_metrics: benchmarks,
       last_update_decision: 'insufficient_sample',
       rollback_count: Number(previousState?.rollback_count || 0)
     };
@@ -538,6 +588,7 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
     resolved_predictions: eligible.length,
     use_calibrated_probabilities: true,
     bucket_adjustments: buildBucketAdjustments(train),
+    benchmark_metrics: benchmarks,
     last_update_decision: 'candidate'
   };
   const rawMetrics = averageMetrics(validate);
@@ -562,6 +613,7 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
         resolved_predictions: eligible.length,
         raw_validation_metrics: rawMetrics,
         validation_metrics: previousMetrics,
+        benchmark_metrics: benchmarks,
         last_update_decision: 'raw_model_only_previous_validation_worsened',
         rollback_count: Number(previousState.rollback_count || 0) + 1
       };
@@ -572,6 +624,7 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
       resolved_predictions: eligible.length,
       raw_validation_metrics: rawMetrics,
       validation_metrics: previousMetrics,
+      benchmark_metrics: benchmarks,
       last_update_decision: 'kept_previous_validated_bucket_calibration',
       rollback_count: Number(previousState.rollback_count || 0) + 1
     };
@@ -583,6 +636,7 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
     resolved_predictions: eligible.length,
     raw_validation_metrics: rawMetrics,
     validation_metrics: candidateMetrics,
+    benchmark_metrics: benchmarks,
     last_update_decision: 'raw_model_only_validation_worsened',
     rollback_count: Number(previousState?.rollback_count || 0) + 1
   };
@@ -601,6 +655,7 @@ export function publicCalibrationState(state) {
     bucket_adjustments: Array.isArray(state?.bucket_adjustments) ? state.bucket_adjustments : [],
     raw_validation_metrics: state?.raw_validation_metrics || null,
     validation_metrics: state?.validation_metrics || null,
+    benchmark_metrics: state?.benchmark_metrics || null,
     last_update_decision: state?.last_update_decision || 'raw_model_only',
     notes: Array.isArray(state?.notes) ? state.notes : []
   };

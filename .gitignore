@@ -6,5 +6,7 @@ test-results/
 data/scoreboards/
 data/manual-overrides.json
 data/latest-simulation.json
+offline/omnios-documents/*
+!offline/omnios-documents/.gitignore
 linkedin-post-package/
 .codex-remote-attachments/

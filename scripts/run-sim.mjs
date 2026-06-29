@@ -281,14 +281,18 @@ const calibrationDisclosureOk = vm.runInContext(`(() => {
   const failClosed = calibrationAdjustedGroupOutcome({runs:10,teamA:'Alpha',teamB:'Beta',outcomes:{Alpha:7,Draw:2,Beta:1}}, 'Alpha');
   DATA.calibration = original;
   renderTransparency(LAST);
+  renderMaintenance();
   const html = $('#assumptionsView')?.innerHTML || '';
+  const health = $('#maintenanceView')?.innerHTML || '';
   return state.calibration_status &&
     text.includes(state.calibration_status) &&
     sample.status === state.calibration_status &&
     failClosed.status === 'insufficient_sample' &&
     Math.abs(failClosed.prob - failClosed.raw) < 1e-12 &&
     html.includes('Calibration') &&
-    html.includes('raw model probabilities');
+    html.includes('raw model probabilities') &&
+    health.includes('Forecast audit') &&
+    health.includes('Benchmark scoring');
 })()`, sandbox, { timeout: 1000 });
 if (!calibrationDisclosureOk) {
   throw new Error('Prediction-audit calibration status was not disclosed or failed closed.');

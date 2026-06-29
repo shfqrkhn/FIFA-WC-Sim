@@ -83,6 +83,8 @@ The maintenance scripts can freeze pre-match model predictions into `data/predic
 
 `scripts/update-calibration.mjs` uses only already-settled frozen predictions. Calibration is conservative, remains separate from the base model, and stays disabled as `insufficient_sample` until at least 30 resolved predictions exist. If validation does not improve or tie raw Brier/log-loss performance, calibrated probabilities are rolled back and the app continues to show raw model probabilities.
 
+The calibration state also records benchmark metrics for the raw model, uniform WDL probabilities, and a rank-only prior. These benchmarks are shown as evidence in the Data health view; they do not change displayed probabilities by themselves.
+
 This audit loop is educational and informational only. It is used to detect overconfidence and calibration drift, not to provide betting advice.
 
 ## Data Sources and Updates
@@ -220,6 +222,8 @@ The app entrypoint is `docs/index.html`. GitHub Pages serves the static `docs/` 
 ## Maintenance Note
 
 Data updates must preserve the static/offline app shell. Failed source fetches degrade to neutral or cached inputs and must not be committed as partial updates. Current facts, fixture changes, fair-play/cards, lineups, injuries, suspensions, and regulations should be cross-checked against official FIFA or other reliable sources before changing model inputs.
+
+For a concise fresh-agent handoff, runbook, recovery checklist, and OmniOS feedback loop, see `OMNI_HANDOVER.md`. The ignored `offline/omnios-documents/` workspace can hold upstream OmniOS lessons from this app without committing the OmniOS source documents into this repo.
 
 ## Privacy and Offline Use
 

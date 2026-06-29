@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import { readArtifact } from './base-data.mjs';
 import {
+  benchmarkMetrics,
   brierScore,
   calibrationBucket,
   emptyAuditLedger,
@@ -43,6 +44,7 @@ const audit = readJson(AUDIT_PATH, emptyAuditLedger());
 const state = readJson(STATE_PATH, emptyCalibrationState());
 const artifact = readArtifact(HTML_PATH).data;
 const matchMap = new Map([...(artifact.matches || []), ...(artifact.knockout || [])].map(match => [Number(match.no), match]));
+const teamMap = new Map((artifact.teams || []).map(team => [team.name, team]));
 const errors = [];
 
 function fail(message) {
@@ -99,6 +101,12 @@ function validBucket(value) {
 function validMetricPair(metrics) {
   return metrics && finiteNumberLike(metrics.brier_score) && Number(metrics.brier_score) >= 0 && Number(metrics.brier_score) <= 2 &&
     finiteNumberLike(metrics.log_loss) && Number(metrics.log_loss) >= 0;
+}
+
+function validMetricWithCount(metrics) {
+  if (!metrics || !Number.isInteger(metrics.count) || metrics.count < 0) return false;
+  if (metrics.count === 0) return metrics.brier_score === null && metrics.log_loss === null;
+  return validMetricPair(metrics);
 }
 
 function validateProbabilityObject(value, label, predictionId) {
@@ -247,6 +255,15 @@ if (state.resolved_predictions >= MIN_RESOLVED_PREDICTIONS && state.calibration_
 const eligible = calibrationEligiblePredictions(audit.predictions || [], matchMap, { asOfUtc: state.generated_at_utc });
 if (state.resolved_predictions !== eligible.length) {
   fail(`calibration resolved_predictions ${state.resolved_predictions} does not match eligible settled predictions ${eligible.length}`);
+}
+const expectedBenchmarks = benchmarkMetrics(eligible, { teamMap });
+if (!state.benchmark_metrics || stableJson(state.benchmark_metrics) !== stableJson(expectedBenchmarks)) {
+  fail('calibration benchmark_metrics do not match eligible frozen predictions');
+}
+for (const [name, metrics] of Object.entries(state.benchmark_metrics || {})) {
+  if (!['raw_model', 'uniform_wdl', 'rank_prior'].includes(name) || !validMetricWithCount(metrics)) {
+    fail(`calibration benchmark_metrics has invalid ${name}`);
+  }
 }
 if (state.calibration_status === 'active') {
   if (!state.active || !state.use_calibrated_probabilities) fail('active calibration must explicitly enable calibrated probabilities');

@@ -102,6 +102,18 @@ assert.notEqual(staleInsufficient.status, 0);
 assert.match(staleInsufficient.stderr, /must not remain insufficient_sample/);
 
 fs.copyFileSync('data/calibration-state.json', statePath);
+const badBenchmarkState = readJson(statePath);
+badBenchmarkState.benchmark_metrics.raw_model.count += 1;
+writeJson(statePath, badBenchmarkState);
+updateEmbeddedBaseData(data => {
+  data.calibration = badBenchmarkState;
+});
+const invalidBenchmark = runValidator();
+assert.notEqual(invalidBenchmark.status, 0);
+assert.match(invalidBenchmark.stderr, /benchmark_metrics/);
+
+fs.copyFileSync('docs/index.html', htmlPath);
+fs.copyFileSync('data/calibration-state.json', statePath);
 const fakeSettled = readJson(auditPath);
 fakeSettled.predictions[0].actual_result = 'home_win';
 fakeSettled.predictions[0].actual_home_score = 1;
