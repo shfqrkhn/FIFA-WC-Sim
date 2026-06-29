@@ -345,6 +345,21 @@ const groupsMcOk = unplayedGroupMatches === 0 || groupsHtml.includes('MC:');
 if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsMcOk || !bracketHtml.includes('MC:')) {
   throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
 }
+const playedKnockoutMcHiddenOk = vm.runInContext(`(() => {
+  const played = DATA.knockout.find(m => m.played);
+  if (!played) return true;
+  renderResult(MC.representative);
+  const html = $('#bracketView').innerHTML || '';
+  const start = html.indexOf('M' + played.no);
+  if (start < 0) return false;
+  const nextNo = DATA.knockout.find(m => (m.no || 0) > played.no)?.no;
+  const end = nextNo ? html.indexOf('M' + nextNo, start + 1) : -1;
+  const card = html.slice(start, end > start ? end : start + 1400);
+  return !card.includes('MC:');
+})()`, sandbox, { timeout: 5000 });
+if (!playedKnockoutMcHiddenOk) {
+  throw new Error('Played knockout matches must not display Monte Carlo prediction summaries.');
+}
 const representativeRunOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
 if (!representativeRunOk) {
   throw new Error('Sample path, Groups, and Bracket were not informed by the Monte Carlo representative run.');
