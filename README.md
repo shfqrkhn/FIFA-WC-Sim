@@ -20,6 +20,25 @@ World Cup 2026 Simulator is a static, offline-capable web app for exploring the 
 6. Use **Groups**, **Bracket**, and **Chances** for more detail.
 7. Use **How**, **Data**, **Checks**, **Health**, and **Sources** only when you want deeper transparency or maintenance detail.
 
+## Repository Layout
+
+The GitHub repo intentionally contains more than the single-file app because it also owns data updates, audit scoring, calibration validation, smoke tests, and Pages deployment.
+
+Tracked project files:
+
+* `docs/index.html`: static app entrypoint and embedded `BASE_DATA`.
+* `docs/assets/`: README/demo assets only.
+* `data/*.json`: generated update health, prediction audit, calibration state, and manual override example.
+* `scripts/`: data update, validation, prediction audit, calibration, rescue, and refinement scripts.
+* `tests/`: unit, regression, no-leakage, workflow, and browser smoke tests.
+* `.github/workflows/`: daily, match-window, and UI-smoke automation.
+* `OMNI_HANDOVER.md`: current handoff, recovery checklist, and OmniOS feedback loop.
+
+Local-only ignored files:
+
+* `offline/omnios-documents/`: private OmniOS/source documents and local lesson notes. This folder is ignored by `.gitignore` and should not appear in GitHub.
+* `node_modules/`, `playwright-report/`, `test-results/`, `data/scoreboards/`, `data/latest-simulation.json`, and `data/manual-overrides.json`.
+
 ## Main Tabs
 
 ### Sim
@@ -179,7 +198,7 @@ Recommended full local gate:
 
 ```bash
 npm install
-node scripts/qa.mjs
+npm run qa
 ```
 
 Browser smoke test:
@@ -194,11 +213,11 @@ Individual gates:
 python scripts/validate_base_data.py
 for f in scripts/*.mjs; do node --check "$f"; done
 node scripts/build-html.mjs
-node scripts/validate.mjs
+npm run validate
 node scripts/validate-calibration.mjs
-node tests/run-all.mjs
+npm test
 python scripts/test_idempotence.py
-node scripts/run-sim.mjs
+npm run smoke
 ```
 
 On PowerShell, use `foreach` loops for wildcard script checks.
@@ -223,7 +242,7 @@ The app entrypoint is `docs/index.html`. GitHub Pages serves the static `docs/` 
 
 Data updates must preserve the static/offline app shell. Failed source fetches degrade to neutral or cached inputs and must not be committed as partial updates. Current facts, fixture changes, fair-play/cards, lineups, injuries, suspensions, and regulations should be cross-checked against official FIFA or other reliable sources before changing model inputs.
 
-For a concise fresh-agent handoff, runbook, recovery checklist, and OmniOS feedback loop, see `OMNI_HANDOVER.md`. The ignored `offline/omnios-documents/` workspace can hold upstream OmniOS lessons from this app without committing the OmniOS source documents into this repo.
+For a concise fresh-agent handoff, runbook, recovery checklist, and OmniOS feedback loop, see `OMNI_HANDOVER.md`. If present locally, the ignored `offline/omnios-documents/` workspace can hold upstream OmniOS lessons from this app. It is intentionally absent from GitHub and must remain untracked.
 
 ## Privacy and Offline Use
 

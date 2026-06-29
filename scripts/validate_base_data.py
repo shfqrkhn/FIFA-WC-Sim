@@ -519,11 +519,11 @@ if os.path.exists(README):
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
     if README_MANUAL_TRIGGER_MARKER not in readme:
         fail('README must document the emergency manual update trigger')
-    if 'node scripts/qa.mjs' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
+    if 'npm run qa' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
         fail('README must document QA wrapper, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
         fail('README must document match-window automation and active-match lock')
-    if 'OMNI_HANDOVER.md' not in readme or 'benchmark metrics' not in readme or 'OmniOS feedback loop' not in readme:
+    if 'OMNI_HANDOVER.md' not in readme or 'benchmark metrics' not in readme or 'OmniOS feedback loop' not in readme or 'must remain untracked' not in readme:
         fail('README must document handoff and calibration benchmarks')
     if '### Chances' not in readme or '### Odds' in readme or '**Odds**' in readme:
         fail('README probability section must use Chances terminology')
@@ -533,7 +533,7 @@ else:
     fail('missing README')
 if os.path.exists(HANDOFF):
     handoff = open(HANDOFF, encoding='utf-8').read()
-    for marker in ('WC_DATA_RESCUE', 'node scripts/qa.mjs', 'Prediction Audit', 'No betting', 'Fresh-Agent Fire Drill', 'OmniOS Feedback Loop', 'FIFA-WC-Sim-lessons.md'):
+    for marker in ('WC_DATA_RESCUE', 'node scripts/qa.mjs', 'Prediction Audit', 'No betting', 'Fresh-Agent Fire Drill', 'OmniOS Feedback Loop', 'FIFA-WC-Sim-lessons.md', 'git ls-files offline', 'absent from GitHub'):
         if marker not in handoff:
             fail('missing handoff marker: %s' % marker)
 else:

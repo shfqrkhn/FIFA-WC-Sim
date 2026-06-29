@@ -5,6 +5,9 @@
   "type": "module",
   "scripts": {
     "qa": "node scripts/qa.mjs",
+    "test": "node tests/run-all.mjs",
+    "validate": "node scripts/validate.mjs",
+    "smoke": "node scripts/run-sim.mjs",
     "ui:smoke": "playwright test"
   },
   "devDependencies": {

@@ -22,6 +22,9 @@ Maintain a static, offline-capable World Cup 2026 simulator that updates embedde
 - Latest update health: `data/latest-update.json`, `data/update-health.json`
 - Main update path: `scripts/update-base-data.mjs`
 - Manual rescue trigger: `WC_DATA_RESCUE`
+- Local-only private doctrine workspace, if present: `offline/omnios-documents/`
+
+`offline/omnios-documents/` is intentionally ignored and absent from GitHub. Do not add, force-add, or commit private OmniOS/source documents.
 
 ## Autonomous Update Flow
 
@@ -47,7 +50,7 @@ Frozen records are immutable pre-match snapshots. Scoring uses Brier score, log 
 
 ## OmniOS Feedback Loop
 
-Use the local ignored `offline/omnios-documents/` package as the doctrine input for app hardening, especially OmniFocaOS, OmniDevOS, OmniRedTeamOS, and the core framework. After app work reveals durable lessons, update `offline/omnios-documents/FIFA-WC-Sim-lessons.md` and fold only source-backed, generally reusable lessons back into the OmniOS documents.
+If available locally, use the ignored `offline/omnios-documents/` package as the doctrine input for app hardening, especially OmniFocaOS, OmniDevOS, OmniRedTeamOS, and the core framework. After app work reveals durable lessons, update `offline/omnios-documents/FIFA-WC-Sim-lessons.md` and fold only source-backed, generally reusable lessons back into the OmniOS documents.
 
 Loop:
 
@@ -90,7 +93,8 @@ node scripts/run-sim.mjs
 3. Run `node scripts/validate-calibration.mjs` and `python scripts/validate_base_data.py`.
 4. If data is stale, run the guarded updater or `WC_DATA_RESCUE`.
 5. If any gate fails, fix the root cause before committing.
-6. Push only after the working tree contains intentional validated changes.
+6. Confirm `git ls-files offline` returns no tracked private files.
+7. Push only after the working tree contains intentional validated changes.
 
 ## Evidence Checklist
 
@@ -100,3 +104,4 @@ node scripts/run-sim.mjs
 - Audit scoring never uses predictions frozen after kickoff.
 - Calibration state matches the embedded public calibration state.
 - Health tab discloses data limitations, validation status, and benchmark scoring.
+- Local OmniOS/private documents remain ignored and absent from the GitHub tree.
