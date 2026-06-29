@@ -182,8 +182,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'playwright-report/',
     'test-results/',
     'linkedin-post-package/',
-    'offline/omnios-documents/*',
-    '!offline/omnios-documents/.gitignore',
+    'offline/omnios-documents/',
     '.codex-remote-attachments/',
 ]
 README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
