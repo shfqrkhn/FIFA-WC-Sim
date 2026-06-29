@@ -1,0 +1,13 @@
+{
+  "name": "fifa-wc-sim",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "qa": "node scripts/qa.mjs",
+    "ui:smoke": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

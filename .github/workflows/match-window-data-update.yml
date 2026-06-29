@@ -24,13 +24,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
       - run: node --check scripts/match-window-update.mjs
       - run: node scripts/match-window-update.mjs
       - run: python3 scripts/validate_base_data.py
       - run: node scripts/validate-calibration.mjs
       - run: node tests/run-all.mjs
       - run: node scripts/run-sim.mjs
+      - name: Write update summary
+        if: always()
+        run: node scripts/write-workflow-summary.mjs >> "$GITHUB_STEP_SUMMARY" || true
       - run: |
           if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json; then
             echo "No validated match-window BASE_DATA changes to commit."

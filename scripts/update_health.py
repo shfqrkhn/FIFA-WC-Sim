@@ -1,4 +1,4 @@
-import json, os
+import datetime, json, os
 from automation_utils import utc_stamp
 
 HTML_PATH='docs/index.html'
@@ -16,6 +16,17 @@ played_group=[m for m in ms if m.get('played')]
 played_ko=[m for m in ko if m.get('played')]
 w=data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'),dict) else {}
 failed_weather=[{'match':k,'error':v.get('error')} for k,v in w.items() if isinstance(v,dict) and v.get('error')]
+today=datetime.datetime.now(datetime.timezone.utc).date()
+def match_day(m):
+    raw=str(m.get('date') or '')
+    try:
+        return datetime.date.fromisoformat(raw[:10]) if raw else None
+    except ValueError:
+        return None
+unplayed_days=[match_day(m) for m in todo]
+unplayed_days=[d for d in unplayed_days if d]
+overdue=[m for m in todo if (match_day(m) and match_day(m)<today)]
+future_days=sorted(d for d in unplayed_days if d>=today)
 stats=data.get('currentStats') if isinstance(data.get('currentStats'),dict) else {}
 latest={}
 if os.path.exists('data/latest-update.json'):
@@ -33,7 +44,7 @@ predictions=audit.get('predictions',[]) if isinstance(audit,dict) else []
 settled=[p for p in predictions if isinstance(p,dict) and p.get('actual_result')]
 health={
     'generatedAt':utc_stamp(),
-    'scoreboard':{'playedMatches':len(played),'totalMatches':len(all_matches),'playedGroupMatches':len(played_group),'totalGroupMatches':len(ms),'playedKnockoutMatches':len(played_ko),'totalKnockoutMatches':len(ko),'currentStats':stats,'latestUpdate':latest},
+    'scoreboard':{'playedMatches':len(played),'totalMatches':len(all_matches),'playedGroupMatches':len(played_group),'totalGroupMatches':len(ms),'playedKnockoutMatches':len(played_ko),'totalKnockoutMatches':len(ko),'overdueUnplayedMatches':len(overdue),'nextScheduledMatchDay':future_days[0].isoformat() if future_days else None,'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
     'dataQuality':data.get('dataQuality',{}),

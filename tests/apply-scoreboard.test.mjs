@@ -85,6 +85,38 @@ try {
   assert.equal(after.knockout.filter(m => m.played).length, 1);
   assert.equal(after.matches.filter(m => m.played).length, 72);
   assert.equal(after.knockout.filter(m => !m.played && (m.scoreA !== undefined || m.scoreB !== undefined)).length, 0);
+
+  const aliasHtmlPath = join(dir, 'alias-index.html');
+  const aliasFixturePath = join(dir, 'alias-scoreboard.json');
+  copyFileSync('docs/index.html', aliasHtmlPath);
+  const aliasStale = readBaseData(aliasHtmlPath);
+  const aliasMatch = aliasStale.matches.find(m => m.no === 59);
+  for (const field of ['scoreA', 'scoreB', 'played', 'note']) {
+    delete aliasMatch[field];
+  }
+  aliasStale.currentStats.matchesPlayed -= 1;
+  aliasStale.currentStats.goalsScored -= 2;
+  writeBaseData(aliasHtmlPath, aliasStale);
+  writeFileSync(aliasFixturePath, JSON.stringify({
+    events: [{
+      id: 'alias-dza-aut',
+      date: '2026-06-27T22:00Z',
+      competitions: [{
+        status: { type: { name: 'STATUS_FULL_TIME', completed: true } },
+        competitors: [
+          { homeAway: 'home', score: '0', winner: false, team: { abbreviation: 'DZA', displayName: 'Algeria' } },
+          { homeAway: 'away', score: '2', winner: true, team: { abbreviation: 'AUT', displayName: 'Austria' } }
+        ]
+      }]
+    }]
+  }), 'utf8');
+  runPython('scripts/apply_scoreboard.py', [aliasFixturePath, '--no-fetch'], { FIFA_WC_HTML_PATH: aliasHtmlPath });
+  const aliasAfter = readBaseData(aliasHtmlPath);
+  const aliasUpdated = aliasAfter.matches.find(m => m.no === 59);
+  assert.equal(aliasUpdated.played, true);
+  assert.equal(aliasUpdated.scoreA, 0);
+  assert.equal(aliasUpdated.scoreB, 2);
+  assert.match(aliasUpdated.note, /alias-dza-aut/);
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

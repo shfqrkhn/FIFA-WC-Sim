@@ -4,6 +4,7 @@ import './calibration.test.mjs';
 import './no-leakage.test.mjs';
 import './validate-calibration.test.mjs';
 import './manual-update-trigger.test.mjs';
+import './manual-overrides.test.mjs';
 import './match-window-update.test.mjs';
 import './apply-scoreboard.test.mjs';
 import './enrich-predictions.test.mjs';

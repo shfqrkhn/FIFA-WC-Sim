@@ -4,6 +4,7 @@ HTML = 'docs/index.html'
 README = 'README.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
+UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
 GITIGNORE = '.gitignore'
 REQUIRED_UI = [
     '<title>FIFA World Cup 2026 \u2014 Whole Tournament Simulator</title>',
@@ -77,6 +78,9 @@ REQUIRED_UI = [
     'FIFA Peace Prize - Football Unites the World',
     'function awardProjectionRows',
     'function renderAwardProjectionTable',
+    'function freshnessWarningHtml',
+    'freshnessWarn',
+    'Data freshness check:',
     'Matches left',
     'Calendar days to final',
     'Last data update:',
@@ -128,6 +132,7 @@ REQUIRED_WORKFLOW_STEPS = [
     'node tests/run-all.mjs',
     'node scripts/run-sim.mjs',
     'python3 scripts/validate_base_data.py',
+    'scripts/write-workflow-summary.mjs',
     'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
@@ -148,14 +153,30 @@ REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     'node scripts/validate-calibration.mjs',
     'node tests/run-all.mjs',
     'node scripts/run-sim.mjs',
+    'scripts/write-workflow-summary.mjs',
     'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
     'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
 ]
+REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
+    'name: Static UI smoke',
+    'workflow_dispatch',
+    'branches: [main]',
+    'actions/setup-node@v4',
+    "node-version: '24'",
+    'npm ci',
+    'npx playwright install --with-deps chromium',
+    'npm run ui:smoke',
+    'actions/upload-artifact@v4',
+]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
+    'data/manual-overrides.json',
     'data/latest-simulation.json',
+    'node_modules/',
+    'playwright-report/',
+    'test-results/',
     'linkedin-post-package/',
     '.codex-remote-attachments/',
 ]
@@ -193,6 +214,8 @@ REQUIRED_SCRIPT_MARKERS = {
         'data/calibration-state.json',
         "'predictionAudit'",
         "'latestUpdate':latest",
+        "'overdueUnplayedMatches'",
+        "'nextScheduledMatchDay'",
     ],
     'scripts/test_idempotence.py': ['scripts/test_deterministic.py'],
     'scripts/test_deterministic.py': [
@@ -227,6 +250,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'nowArgs',
         'function snapshot',
         'function restore',
+        'scripts/apply_manual_overrides.py',
         'scripts/freeze-predictions.mjs',
         'scripts/apply_scoreboard.py',
         'scripts/enrich_predictions.py',
@@ -274,6 +298,26 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/update-base-data.mjs',
         'scripts/test_idempotence.py',
         "process.stdout.write('THE END\\n')",
+    ],
+    'scripts/qa.mjs': [
+        'scripts/refinement-pass.mjs',
+        'Iterate until reaching THE END. ',
+    ],
+    'scripts/apply_manual_overrides.py': [
+        "DEFAULT_OVERRIDE_PATH",
+        "data/manual-overrides.json",
+        "manual override file must be an object with schema: 1",
+        "requires source",
+        "validate_availability",
+        "manual_verified",
+        "def apply_team_override",
+        "def apply_match_override",
+    ],
+    'scripts/write-workflow-summary.mjs': [
+        'BASE_DATA update summary',
+        'Overdue unplayed matches',
+        'Calibration status',
+        'data/update-health.json',
     ],
     'scripts/prediction-audit-lib.mjs': [
         'REQUIRED_LEDGER_FIELDS',
@@ -354,6 +398,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'no-leakage.test.mjs',
         'validate-calibration.test.mjs',
         'manual-update-trigger.test.mjs',
+        'manual-overrides.test.mjs',
         'match-window-update.test.mjs',
     ],
     'tests/validate-calibration.test.mjs': [
@@ -441,6 +486,13 @@ if os.path.exists(MATCH_WINDOW_WORKFLOW):
             fail('missing match-window workflow marker: %s' % marker)
 else:
     fail('missing match-window BASE_DATA workflow')
+if os.path.exists(UI_SMOKE_WORKFLOW):
+    workflow = open(UI_SMOKE_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_UI_SMOKE_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing UI smoke workflow marker: %s' % marker)
+else:
+    fail('missing static UI smoke workflow')
 if os.path.exists(GITIGNORE):
     gitignore = open(GITIGNORE, encoding='utf-8').read().splitlines()
     for entry in REQUIRED_GITIGNORE_ENTRIES:
@@ -454,6 +506,8 @@ if os.path.exists(README):
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
     if README_MANUAL_TRIGGER_MARKER not in readme:
         fail('README must document the emergency manual update trigger')
+    if 'node scripts/qa.mjs' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
+        fail('README must document QA wrapper, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
         fail('README must document match-window automation and active-match lock')
     if '### Chances' not in readme or '### Odds' in readme or '**Odds**' in readme:

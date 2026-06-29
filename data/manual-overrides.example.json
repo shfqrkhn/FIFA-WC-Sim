@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "updatedAt": "2026-06-29T00:00:00Z",
+  "notes": "Example only. Copy to data/manual-overrides.json for local source-backed patches.",
+  "sources": [
+    {
+      "name": "Manual verified availability patches",
+      "url": "https://www.fifa.com/",
+      "use": "Operator-reviewed official/team-confirmed availability, lineup, suspension, or conduct corrections",
+      "tier": "manual verified source",
+      "confidence": "high"
+    }
+  ],
+  "teams": [
+    {
+      "id": "canada",
+      "source": "Example neutral patch only",
+      "sourceUrl": "https://www.fifa.com/",
+      "injuryPenalty": 0,
+      "suspensionPenalty": 0
+    }
+  ],
+  "matches": [
+    {
+      "no": 73,
+      "source": "Example neutral patch only",
+      "sourceUrl": "https://www.fifa.com/",
+      "availability": {
+        "A": {
+          "status": "manual_verified",
+          "source": "Example neutral patch only",
+          "sourceUrl": "https://www.fifa.com/",
+          "keyAbsences": 0,
+          "confirmedSuspensions": 0,
+          "keeperDowngrade": 0,
+          "rotationRisk": 0
+        }
+      }
+    }
+  ]
+}

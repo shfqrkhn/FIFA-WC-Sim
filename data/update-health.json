@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T16:03:16Z",
+  "generatedAt": "2026-06-29T16:59:45Z",
   "scoreboard": {
     "playedMatches": 73,
     "totalMatches": 104,
@@ -7,6 +7,8 @@
     "totalGroupMatches": 72,
     "playedKnockoutMatches": 1,
     "totalKnockoutMatches": 32,
+    "overdueUnplayedMatches": 0,
+    "nextScheduledMatchDay": "2026-06-29",
     "currentStats": {
       "updatedTo": "2026-06-28",
       "source": "ESPN public scoreboard for completed World Cup matches through 2026-06-28",

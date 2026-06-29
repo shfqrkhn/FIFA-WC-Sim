@@ -114,6 +114,8 @@ The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, p
 
 The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
 
+Both update workflows write a GitHub Actions job summary with data version, played-match counts, overdue unplayed match count, latest scoreboard changes, prediction-audit counts, and calibration status. A separate static UI smoke workflow runs Playwright against `docs/index.html` for desktop and mobile layouts.
+
 ### Automated Sources
 
 The updater currently uses:
@@ -123,6 +125,7 @@ The updater currently uses:
 * Embedded schedule and venue coordinates for rest/travel context.
 * Embedded FIFA ranking fields for the rank-seeded Elo-style model input.
 * Embedded standings for conservative final group-table incentive adjustments.
+* Optional local `data/manual-overrides.json` patches that follow `data/manual-overrides.example.json`; these must include source metadata and can only touch narrow verified availability, lineup, context, suspension, injury, and conduct fields.
 * Official FIFA pages remain the preferred manual authority for fixtures, reports, rankings, regulations, discipline, and disputed data.
 
 ### Not Automatically Updated
@@ -169,6 +172,21 @@ node scripts/validate-calibration.mjs
 ```
 
 ### Local Validation
+
+Recommended full local gate:
+
+```bash
+npm install
+node scripts/qa.mjs
+```
+
+Browser smoke test:
+
+```bash
+npm run ui:smoke
+```
+
+Individual gates:
 
 ```bash
 python scripts/validate_base_data.py

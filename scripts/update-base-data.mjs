@@ -52,6 +52,7 @@ function runNode(script, scriptArgs = []) {
 
 const steps = [
   ['validate baseline', () => runPythonScript('scripts/validate_base_data.py')],
+  ['apply manual verified overrides', () => runPythonScript('scripts/apply_manual_overrides.py')],
   ['freeze pre-match predictions', () => runNode('scripts/freeze-predictions.mjs', nowArgs)],
   ['apply scoreboard', () => runPythonScript('scripts/apply_scoreboard.py', [...scoreboardArgs, ...fetchArgs])],
   ['enrich predictions', () => runPythonScript('scripts/enrich_predictions.py')],
