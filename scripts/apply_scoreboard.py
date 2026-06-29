@@ -15,15 +15,15 @@ FETCH_FAILURES = []
 TEAM = {
     'MEX': 'Mexico', 'RSA': 'South Africa', 'KOR': 'South Korea', 'CZE': 'Czechia',
     'CAN': 'Canada', 'QAT': 'Qatar', 'SUI': 'Switzerland', 'BIH': 'Bosnia and Herzegovina',
-    'BRA': 'Brazil', 'MAR': 'Morocco', 'SCO': 'Scotland', 'HAI': 'Haiti',
+    'BRA': 'Brazil', 'MAR': 'Morocco', 'SCO': 'Scotland', 'HAI': 'Haiti', 'HTI': 'Haiti',
     'USA': 'United States', 'AUS': 'Australia', 'PAR': 'Paraguay', 'TUR': 'Turkey',
     'ESP': 'Spain', 'ECU': 'Ecuador', 'CPV': 'Cape Verde', 'KSA': 'Saudi Arabia',
     'FRA': 'France', 'SEN': 'Senegal', 'NED': 'Netherlands', 'IRQ': 'Iraq',
-    'ARG': 'Argentina', 'ALG': 'Algeria', 'AUT': 'Austria', 'JOR': 'Jordan',
-    'POR': 'Portugal', 'COL': 'Colombia', 'COD': 'DR Congo', 'UZB': 'Uzbekistan',
+    'ARG': 'Argentina', 'ALG': 'Algeria', 'DZA': 'Algeria', 'AUT': 'Austria', 'JOR': 'Jordan',
+    'POR': 'Portugal', 'COL': 'Colombia', 'COD': 'DR Congo', 'DRC': 'DR Congo', 'UZB': 'Uzbekistan',
     'ENG': 'England', 'CRO': 'Croatia', 'GHA': 'Ghana', 'PAN': 'Panama',
     'GER': 'Germany', 'JPN': 'Japan', 'CIV': 'Ivory Coast', 'NZL': 'New Zealand',
-    'BEL': 'Belgium', 'IRN': 'Iran', 'EGY': 'Egypt', 'CUR': 'Curaçao',
+    'BEL': 'Belgium', 'IRN': 'Iran', 'IRI': 'Iran', 'EGY': 'Egypt', 'CUR': 'Curaçao', 'CUW': 'Curaçao',
     'ITA': 'Italy', 'DEN': 'Denmark', 'TUN': 'Tunisia', 'CHI': 'Chile',
     'URU': 'Uruguay', 'NOR': 'Norway', 'CRC': 'Costa Rica', 'UAE': 'United Arab Emirates',
 }
@@ -51,6 +51,22 @@ def latest_played_day(matches):
     days = [match_day(m) for m in matches if m.get('played')]
     days = [d for d in days if d is not None]
     return max(days).isoformat() if days else None
+
+
+def earliest_stale_unplayed_day(matches, today):
+    days = [match_day(m) for m in matches if not m.get('played')]
+    days = [d for d in days if d is not None and d <= today]
+    return min(days).isoformat() if days else None
+
+
+def event_day(event):
+    raw = event.get('date') or ((event.get('competitions') or [{}])[0].get('date'))
+    if not raw:
+        return None
+    try:
+        return datetime.date.fromisoformat(str(raw)[:10])
+    except ValueError:
+        return None
 
 
 def score_int(value):
@@ -114,7 +130,7 @@ def event_state(event):
 
 def is_final(event):
     comp, status_type = event_state(event)
-    return bool(status_type.get('completed') or status_type.get('name') in {'STATUS_FINAL', 'STATUS_FULL_TIME'})
+    return bool(status_type.get('completed') or status_type.get('name') in {'STATUS_FINAL', 'STATUS_FULL_TIME', 'STATUS_FINAL_PEN', 'STATUS_FINAL_AET'})
 
 
 def competitor_name(c):
@@ -419,8 +435,25 @@ def match_index(data):
     idx = {}
     for match in all_matches(data):
         if match.get('teamA') and match.get('teamB'):
-            idx[key(match['teamA'], match['teamB'])] = match
+            idx.setdefault(key(match['teamA'], match['teamB']), []).append(match)
     return idx
+
+
+def find_match_for_event(idx, teams, event):
+    candidates = idx.get(key(teams[0], teams[1])) or []
+    if not candidates:
+        return None
+    day = event_day(event)
+    if day:
+        dated = [m for m in candidates if match_day(m) == day]
+        if len(dated) == 1:
+            return dated[0]
+        if dated:
+            candidates = dated
+    unplayed = [m for m in candidates if not m.get('played')]
+    if len(unplayed) == 1:
+        return unplayed[0]
+    return sorted(candidates, key=lambda m: (m.get('played') is True, m.get('no') or 9999))[0]
 
 
 def apply_event_to_match(match, event_id, comps, teams, scores):
@@ -490,9 +523,10 @@ fetched = 0
 applied = 0
 
 if not events and not NO_FETCH:
-    start_day = latest_played_day(all_matches(data))
-    start_day = datetime.date.fromisoformat(start_day) if start_day else datetime.date(2026, 6, 11)
     today = datetime.datetime.now(datetime.timezone.utc).date()
+    stale_day = earliest_stale_unplayed_day(all_matches(data), today)
+    start_day = stale_day or latest_played_day(all_matches(data))
+    start_day = datetime.date.fromisoformat(start_day) if start_day else datetime.date(2026, 6, 11)
     for offset in range((min(today, STOP_DATE) - start_day).days + 1):
         events.extend(fetch_day(start_day + datetime.timedelta(days=offset)))
 
@@ -504,7 +538,7 @@ for event in events:
         continue
     comps, teams, scores = parsed
     fetched += 1
-    match = idx.get(key(teams[0], teams[1]))
+    match = find_match_for_event(idx, teams, event)
     if not match:
         continue
     if apply_event_to_match(match, event.get('id') or event.get('uid') or 'unknown', comps, teams, scores):

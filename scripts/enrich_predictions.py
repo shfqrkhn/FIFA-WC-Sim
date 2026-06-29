@@ -1,7 +1,7 @@
-import datetime, json
+import datetime, json, os
 from automation_utils import utc_stamp
 
-HTML_PATH = 'docs/index.html'
+HTML_PATH = os.environ.get('FIFA_WC_HTML_PATH', 'docs/index.html')
 MARKER = 'const BASE_DATA = '
 END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 
@@ -43,6 +43,16 @@ def team_group(name, teams):
 
 def group_unplayed(group, matches):
     return [m for m in matches if m.get('stage') == 'group' and m.get('group') == group and not m.get('played')]
+
+def played_result_rows(data):
+    rows = []
+    for m in list(data.get('matches', [])) + list(data.get('knockout', [])):
+        if not m.get('played') or not m.get('teamA') or not m.get('teamB'):
+            continue
+        if not isinstance(m.get('scoreA'), int) or not isinstance(m.get('scoreB'), int):
+            continue
+        rows.append(m)
+    return rows
 
 def group_incentive(name, group, state, matches):
     row = state.get(name, {})
@@ -87,11 +97,7 @@ ratings = {t['name']: rank_seeded_elo(ranks.get(t['name'], 60)) for t in teams}
 rating_matches = {t['name']: 0 for t in teams}
 played = []
 changed = False
-for m in sorted(data.get('matches', []), key=lambda x: x.get('no') or 0):
-    if m.get('stage') != 'group' or not m.get('played'):
-        continue
-    if not isinstance(m.get('scoreA'), int) or not isinstance(m.get('scoreB'), int):
-        continue
+for m in sorted(played_result_rows(data), key=lambda x: (str(x.get('date') or ''), x.get('no') or 0)):
     a, b, sa, sb = m['teamA'], m['teamB'], m['scoreA'], m['scoreB']
     played.append(m)
     if a in ratings and b in ratings:

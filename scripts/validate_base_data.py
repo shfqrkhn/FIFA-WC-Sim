@@ -267,6 +267,14 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/run-sim.mjs',
         'Manual World Cup BASE_DATA update',
     ],
+    'scripts/refinement-pass.mjs': [
+        'REFINEMENT_TRIGGER',
+        'Iterate until reaching THE END. ',
+        'MAX_PASSES = 3',
+        'scripts/update-base-data.mjs',
+        'scripts/test_idempotence.py',
+        "process.stdout.write('THE END\\n')",
+    ],
     'scripts/prediction-audit-lib.mjs': [
         'REQUIRED_LEDGER_FIELDS',
         'MIN_RESOLVED_PREDICTIONS',

@@ -90,7 +90,7 @@ This audit loop is educational and informational only. It is used to detect over
 The embedded data includes:
 
 * Teams, groups, venues, and knockout slots.
-* Played group-stage results.
+* Played match results, including resolved knockout results as they become available.
 * FIFA ranking priors, rank-seeded Elo-style ratings, and team-strength assumptions.
 * Venue, climate, rest/travel, and weather context.
 * Fair-play/team-conduct inputs where available.
@@ -182,6 +182,18 @@ node scripts/run-sim.mjs
 ```
 
 On PowerShell, use `foreach` loops for wildcard script checks.
+
+### Iterative Refinement Gate
+
+The exact trigger phrase is `Iterate until reaching THE END. `, including one trailing space after the period.
+
+When that phrase is used for a repo refinement pass, run:
+
+```bash
+node scripts/refinement-pass.mjs --trigger "Iterate until reaching THE END. "
+```
+
+The script performs up to three no-fetch convergence passes. Each pass runs the guarded updater, syntax checks, data validation, calibration validation, unit/regression tests, simulation smoke, idempotence, and diff hygiene. It stops only when candidate data artifacts are stable and every gate passes. On successful convergence it prints exactly `THE END`; otherwise it fails with the first material gate that did not pass.
 
 ## Deployment
 
