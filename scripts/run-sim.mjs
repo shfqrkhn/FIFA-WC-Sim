@@ -182,6 +182,25 @@ const todayHighlightOk = vm.runInContext(`(() => {
 if (!todayHighlightOk) {
   throw new Error('Today match highlighting did not classify and render schedule dates correctly.');
 }
+const knockoutTodayTimeOk = vm.runInContext(`(() => {
+  const rows = [74, 75, 76].map(no => DATA.knockout.find(m => m.no === no));
+  const date = new Date(Date.UTC(2026, 5, 29, 12));
+  renderTodayMatches(date);
+  const html = $('#todayView')?.innerHTML || '';
+  const ordered = todayMatches(date).map(m => m.no);
+  const m76 = DATA.knockout.find(m => m.no === 76);
+  const m74 = DATA.knockout.find(m => m.no === 74);
+  return rows.every(m => m && m.kickoffUtc && matchTimeLabel(m)) &&
+    html.includes('M76') &&
+    html.includes(matchTimeLabel(m76)) &&
+    html.includes('M74') &&
+    html.includes(matchTimeLabel(m74)) &&
+    ordered.indexOf(76) >= 0 &&
+    ordered.indexOf(74) > ordered.indexOf(76);
+})()`, sandbox, { timeout: 1000 });
+if (!knockoutTodayTimeOk) {
+  throw new Error('Today knockout matches did not render localized kickoff times in chronological order.');
+}
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
   const parts = key.split('-').map(Number);

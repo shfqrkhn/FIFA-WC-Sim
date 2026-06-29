@@ -63,7 +63,7 @@ rest = data.get('restTravel') if isinstance(data.get('restTravel'), dict) else {
 model_inputs = data.get('modelInputs') if isinstance(data.get('modelInputs'), dict) else {}
 quality_core = {
     'scores': {'status': status(bool(played)), 'playedMatches': len(played), 'totalMatches': len(all_match_rows), 'playedGroupMatches': len(played_group), 'totalGroupMatches': len(matches), 'playedKnockoutMatches': len(played_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'scoreboard updater'},
-    'fixtures': {'status': 'partial', 'coveredMatches': len(all_match_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(matches), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter'},
+    'fixtures': {'status': 'partial', 'coveredMatches': len(all_match_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(matches), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule; automated pass cross-matches scoreboard events by teams and fills missing kickoffUtc timestamps without overwriting existing venue fields'},
     'weather': {'status': status(len(weather) >= len(unplayed), bool(weather)), 'coveredUnplayedMatches': len([m for m in unplayed if str(m.get('no')) in weather]), 'totalUnplayedMatches': len(unplayed), 'source': 'open-meteo'},
     'restTravel': {'status': status(len(rest) >= len(all_match_rows), bool(rest)), 'coveredMatches': len(rest), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len([m for m in matches if str(m.get('no')) in rest]), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len([m for m in knockout if str(m.get('no')) in rest]), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
@@ -85,7 +85,7 @@ maintenance_before = json.dumps(data.get('maintenance'), sort_keys=True)
 upsert_source(data, {
     'name': 'ESPN public soccer scoreboard API',
     'url': 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',
-    'use': 'Automated completed-match score refresh and scoreboard health ledger',
+    'use': 'Automated completed-match score refresh, matched kickoff timestamp fill, and scoreboard health ledger',
     'tier': 'public sports data API',
     'confidence': 'medium-high',
     'maintenanceNote': 'Used for automation because no stable unauthenticated FIFA match API is assumed; official FIFA should remain the manual cross-check source.'

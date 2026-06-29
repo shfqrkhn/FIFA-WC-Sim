@@ -93,6 +93,7 @@ try {
   assert.equal(match.played, true);
   assert.equal(match.winner, 'Canada');
   assert.equal(match.loser, 'South Africa');
+  assert.equal(match.kickoffUtc, '2026-06-28T19:00:00Z');
   assert.match(match.note, /scoreboard event 760486/);
   assert.equal(after.currentStats.matchesPlayed, beforePlayed.length + 1);
   assert.equal(after.currentStats.goalsScored, goalTotal(beforePlayed) + 1);
@@ -133,6 +134,41 @@ try {
   assert.equal(aliasUpdated.scoreA, 0);
   assert.equal(aliasUpdated.scoreB, 2);
   assert.match(aliasUpdated.note, /alias-dza-aut/);
+
+  const scheduledHtmlPath = join(dir, 'scheduled-index.html');
+  const scheduledFixturePath = join(dir, 'scheduled-scoreboard.json');
+  copyFileSync('docs/index.html', scheduledHtmlPath);
+  const scheduledStale = readBaseData(scheduledHtmlPath);
+  const scheduledMatch = scheduledStale.knockout.find(m => m.no === 74);
+  scheduledMatch.teamA = 'Germany';
+  delete scheduledMatch.teamB;
+  scheduledMatch.date = '2026-06-29';
+  for (const field of ['kickoffUtc', 'scoreA', 'scoreB', 'played', 'winner', 'loser', 'note', 'pens']) {
+    delete scheduledMatch[field];
+  }
+  writeBaseData(scheduledHtmlPath, scheduledStale);
+  writeFileSync(scheduledFixturePath, JSON.stringify({
+    events: [{
+      id: 'scheduled-ger-par',
+      date: '2026-06-29T20:30Z',
+      competitions: [{
+        status: { type: { name: 'STATUS_HALFTIME', completed: false } },
+        competitors: [
+          { homeAway: 'home', score: '0', winner: false, team: { abbreviation: 'GER', displayName: 'Germany' } },
+          { homeAway: 'away', score: '1', winner: false, team: { abbreviation: 'PAR', displayName: 'Paraguay' } }
+        ]
+      }]
+    }]
+  }), 'utf8');
+  runPython('scripts/apply_scoreboard.py', [scheduledFixturePath, '--no-fetch'], { FIFA_WC_HTML_PATH: scheduledHtmlPath });
+  const scheduledAfter = readBaseData(scheduledHtmlPath);
+  const scheduledUpdated = scheduledAfter.knockout.find(m => m.no === 74);
+  assert.equal(scheduledUpdated.teamA, 'Germany');
+  assert.equal(scheduledUpdated.teamB, 'Paraguay');
+  assert.equal(scheduledUpdated.kickoffUtc, '2026-06-29T20:30:00Z');
+  assert.equal(scheduledUpdated.played, undefined);
+  assert.equal(scheduledUpdated.scoreA, undefined);
+  assert.equal(scheduledUpdated.scoreB, undefined);
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

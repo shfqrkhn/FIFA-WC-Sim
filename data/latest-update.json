@@ -1,21 +1,39 @@
 {
-  "generatedAt": "2026-06-29T19:34:14Z",
+  "generatedAt": "2026-06-29T21:38:55Z",
   "updatedThrough": "2026-06-29",
   "scoreboard": {
     "fetchedFinals": 1,
-    "appliedChanges": 1,
-    "changes": [
+    "appliedChanges": 0,
+    "kickoffUpdates": 3,
+    "teamSlotUpdates": 1,
+    "changes": [],
+    "scheduleChanges": [
       {
         "match": 76,
         "teams": [
           "Brazil",
           "Japan"
         ],
-        "score": [
-          2,
-          1
-        ],
+        "kickoffUtc": "2026-06-29T17:00:00Z",
         "event": "760487"
+      },
+      {
+        "match": 74,
+        "teams": [
+          "Germany",
+          "Paraguay"
+        ],
+        "kickoffUtc": "2026-06-29T20:30:00Z",
+        "event": "760489"
+      },
+      {
+        "match": 75,
+        "teams": [
+          "Netherlands",
+          "Morocco"
+        ],
+        "kickoffUtc": "2026-06-30T01:00:00Z",
+        "event": "760488"
       }
     ],
     "fetchFailures": []

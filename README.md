@@ -141,7 +141,7 @@ Both update workflows write a GitHub Actions job summary with data version, play
 
 The updater currently uses:
 
-* ESPN public soccer scoreboard API for machine-readable completed match scores.
+* ESPN public soccer scoreboard API for machine-readable completed match scores and matched kickoff timestamps.
 * Open-Meteo for upcoming-match venue weather where available.
 * Embedded schedule and venue coordinates for rest/travel context.
 * Embedded FIFA ranking fields for the rank-seeded Elo-style model input.
@@ -156,7 +156,7 @@ The updater does not invent unavailable data. These remain neutral unless reliab
 * Lineups, injuries, suspensions, and referee assignments.
 * Confirmed lineup, goalkeeper, suspension, and key-absence modifiers unless verified source metadata is patched into embedded availability fields.
 * Full disciplinary/fair-play card ledger beyond embedded known conduct notes.
-* Official fixture/venue/kickoff rewrites when no stable unauthenticated source adapter is configured.
+* Official fixture or venue rewrites beyond matched scoreboard kickoff timestamps when no stable unauthenticated source adapter is configured.
 * Betting odds or gambling-market data, which are not used.
 
 ### Manual Update

@@ -69,6 +69,20 @@ def event_day(event):
         return None
 
 
+def event_kickoff_utc(event):
+    comp, _ = event_state(event)
+    raw = event.get('date') or comp.get('date') or comp.get('startDate')
+    if not raw or 'T' not in str(raw):
+        return None
+    try:
+        parsed = datetime.datetime.fromisoformat(str(raw).replace('Z', '+00:00'))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=datetime.timezone.utc)
+    return parsed.astimezone(datetime.timezone.utc).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+
+
 def score_int(value):
     try:
         if value is None or value == '':
@@ -138,14 +152,25 @@ def competitor_name(c):
     return TEAM.get(team.get('abbreviation')) or team.get('displayName') or team.get('name')
 
 
-def event_teams_scores(event):
+def event_team_names(event):
     comp, _ = event_state(event)
     comps = comp.get('competitors') or []
     if len(comps) < 2:
         return None
     teams = [competitor_name(c) for c in comps[:2]]
+    return teams if all(teams) else None
+
+
+def event_teams_scores(event):
+    comp, _ = event_state(event)
+    comps = comp.get('competitors') or []
+    if len(comps) < 2:
+        return None
+    teams = event_team_names(event)
+    if not teams:
+        return None
     scores = [score_int(c.get('score')) for c in comps[:2]]
-    if not all(teams) or any(s is None for s in scores):
+    if any(s is None for s in scores):
         return None
     return comps[:2], teams, scores
 
@@ -439,10 +464,32 @@ def match_index(data):
     return idx
 
 
-def find_match_for_event(idx, teams, event):
+def partial_match_candidates(matches, teams, day):
+    team_set = set(teams)
+    candidates = []
+    for match in matches:
+        if match.get('played'):
+            continue
+        known = [match.get('teamA'), match.get('teamB')]
+        known = [team for team in known if team]
+        if len(known) != 1 or known[0] not in team_set:
+            continue
+        match_date = match_day(match)
+        if day and match_date and abs((match_date - day).days) > 1:
+            continue
+        candidates.append(match)
+    if day:
+        same_day = [match for match in candidates if match_day(match) == day]
+        if len(same_day) == 1:
+            return same_day
+    return candidates
+
+
+def find_match_for_event(idx, teams, event, matches=None):
     candidates = idx.get(key(teams[0], teams[1])) or []
     if not candidates:
-        return None
+        partial = partial_match_candidates(matches or [], teams, event_day(event))
+        return partial[0] if len(partial) == 1 else None
     day = event_day(event)
     if day:
         dated = [m for m in candidates if match_day(m) == day]
@@ -454,6 +501,40 @@ def find_match_for_event(idx, teams, event):
     if len(unplayed) == 1:
         return unplayed[0]
     return sorted(candidates, key=lambda m: (m.get('played') is True, m.get('no') or 9999))[0]
+
+
+def has_full_kickoff(match):
+    for field in ('kickoffUtc', 'kickoff', 'kickoffLocal', 'date', 'utc', 'time'):
+        value = match.get(field)
+        if value and 'T' in str(value):
+            return True
+    return False
+
+
+def apply_event_schedule_to_match(match, event):
+    kickoff = event_kickoff_utc(event)
+    if not kickoff or has_full_kickoff(match):
+        return False
+    match['kickoffUtc'] = kickoff
+    return True
+
+
+def apply_event_teams_to_match(match, teams):
+    team_a = match.get('teamA')
+    team_b = match.get('teamB')
+    changes = {}
+    if team_a and not team_b and team_a in teams:
+        other = next((team for team in teams if team != team_a), None)
+        if other:
+            changes['teamB'] = other
+    elif team_b and not team_a and team_b in teams:
+        other = next((team for team in teams if team != team_b), None)
+        if other:
+            changes['teamA'] = other
+    if not changes:
+        return False
+    match.update(changes)
+    return True
 
 
 def apply_event_to_match(match, event_id, comps, teams, scores):
@@ -519,8 +600,11 @@ resolved_slots = resolve_knockout_slots(data)
 idx = match_index(data)
 events = read_events_from_args()
 changes = []
+schedule_changes = []
 fetched = 0
 applied = 0
+schedule_applied = 0
+team_applied = 0
 
 if not events and not NO_FETCH:
     today = datetime.datetime.now(datetime.timezone.utc).date()
@@ -531,6 +615,25 @@ if not events and not NO_FETCH:
         events.extend(fetch_day(start_day + datetime.timedelta(days=offset)))
 
 for event in events:
+    event_id = event.get('id') or event.get('uid') or 'unknown'
+    teams_only = event_team_names(event)
+    match = find_match_for_event(idx, teams_only, event, all_matches(data)) if teams_only else None
+    team_changed = False
+    kickoff_changed = False
+    if match and teams_only:
+        team_changed = apply_event_teams_to_match(match, teams_only)
+        kickoff_changed = apply_event_schedule_to_match(match, event)
+        if team_changed:
+            team_applied += 1
+        if kickoff_changed:
+            schedule_applied += 1
+        if team_changed or kickoff_changed:
+            schedule_changes.append({
+                'match': match.get('no'),
+                'teams': [match.get('teamA'), match.get('teamB')],
+                'kickoffUtc': match.get('kickoffUtc'),
+                'event': event_id,
+            })
     if not is_final(event):
         continue
     parsed = event_teams_scores(event)
@@ -538,16 +641,20 @@ for event in events:
         continue
     comps, teams, scores = parsed
     fetched += 1
-    match = find_match_for_event(idx, teams, event)
+    if not match:
+        match = find_match_for_event(idx, teams, event, all_matches(data))
     if not match:
         continue
-    if apply_event_to_match(match, event.get('id') or event.get('uid') or 'unknown', comps, teams, scores):
+    if not match.get('teamA') or not match.get('teamB'):
+        FETCH_FAILURES.append({'match': match.get('no'), 'event': event_id, 'error': 'scoreboard event matched unresolved fixture without both teams'})
+        continue
+    if apply_event_to_match(match, event_id, comps, teams, scores):
         applied += 1
         changes.append({
             'match': match.get('no'),
             'teams': [match.get('teamA'), match.get('teamB')],
             'score': [match.get('scoreA'), match.get('scoreB')],
-            'event': event.get('id') or event.get('uid'),
+            'event': event_id,
         })
 
 post_score_slots = resolve_knockout_slots(data)
@@ -555,9 +662,9 @@ played = [m for m in all_matches(data) if completed_score(m)]
 goals = sum(completed_score(m)[0] + completed_score(m)[1] for m in played)
 updated_to = latest_played_day(played) or stamp[:10]
 stats_changed = refresh_current_stats(data, played, goals, stamp, updated_to)
-source_note = f'Automated scoreboard update at {stamp}; applied {applied} completed result(s), resolved knockout slots from completed group standings, and used neutral values for unavailable inputs.'
+source_note = f'Automated scoreboard update at {stamp}; applied {applied} completed result(s), refreshed {schedule_applied} kickoff timestamp(s), resolved knockout slots from completed group standings, and used neutral values for unavailable inputs.'
 
-if applied or resolved_slots or post_score_slots or stats_changed or FETCH_FAILURES:
+if applied or schedule_applied or team_applied or resolved_slots or post_score_slots or stats_changed or FETCH_FAILURES:
     data['version'] = f'{updated_to}-auto-daily'
     data['generatedAt'] = stamp
     data['sourceNote'] = source_note
@@ -567,7 +674,7 @@ if applied or resolved_slots or post_score_slots or stats_changed or FETCH_FAILU
         data.setdefault('maintenance', {}).pop('scoreboardFetchFailures', None)
     save_base_data(html, start, end, data)
 
-if not NO_FETCH and (applied or FETCH_FAILURES):
+if not NO_FETCH and (applied or schedule_applied or team_applied or FETCH_FAILURES):
     os.makedirs('data', exist_ok=True)
     with open('data/latest-update.json', 'w', encoding='utf-8') as f:
         json.dump({
@@ -576,7 +683,10 @@ if not NO_FETCH and (applied or FETCH_FAILURES):
             'scoreboard': {
                 'fetchedFinals': fetched,
                 'appliedChanges': applied,
+                'kickoffUpdates': schedule_applied,
+                'teamSlotUpdates': team_applied,
                 'changes': changes,
+                'scheduleChanges': schedule_changes,
                 'fetchFailures': FETCH_FAILURES,
             },
         }, f, indent=2)
@@ -584,6 +694,9 @@ if not NO_FETCH and (applied or FETCH_FAILURES):
 print(json.dumps({
     'fetchedFinals': fetched,
     'appliedChanges': applied,
+    'kickoffUpdates': schedule_applied,
+    'teamSlotUpdates': team_applied,
+    'scheduleChanges': schedule_changes,
     'changes': changes,
     'resolvedKnockoutSlots': bool(resolved_slots or post_score_slots),
     'fetchFailures': FETCH_FAILURES,

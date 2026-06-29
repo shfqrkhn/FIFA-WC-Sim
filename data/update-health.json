@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-29T19:34:15Z",
+  "generatedAt": "2026-06-29T21:39:53Z",
   "scoreboard": {
     "playedMatches": 74,
     "totalMatches": 104,
@@ -37,23 +37,41 @@
       "lastUpdated": "2026-06-29T19:34:14Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-06-29T19:34:14Z",
+      "generatedAt": "2026-06-29T21:38:55Z",
       "updatedThrough": "2026-06-29",
       "scoreboard": {
         "fetchedFinals": 1,
-        "appliedChanges": 1,
-        "changes": [
+        "appliedChanges": 0,
+        "kickoffUpdates": 3,
+        "teamSlotUpdates": 1,
+        "changes": [],
+        "scheduleChanges": [
           {
             "match": 76,
             "teams": [
               "Brazil",
               "Japan"
             ],
-            "score": [
-              2,
-              1
-            ],
+            "kickoffUtc": "2026-06-29T17:00:00Z",
             "event": "760487"
+          },
+          {
+            "match": 74,
+            "teams": [
+              "Germany",
+              "Paraguay"
+            ],
+            "kickoffUtc": "2026-06-29T20:30:00Z",
+            "event": "760489"
+          },
+          {
+            "match": 75,
+            "teams": [
+              "Netherlands",
+              "Morocco"
+            ],
+            "kickoffUtc": "2026-06-30T01:00:00Z",
+            "event": "760488"
           }
         ],
         "fetchFailures": []
@@ -66,7 +84,7 @@
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 6,
+    "frozenPredictions": 7,
     "settledPredictions": 6,
     "calibrationStatus": "insufficient_sample",
     "resolvedPredictions": 6,
@@ -91,7 +109,7 @@
       "totalGroupMatches": 72,
       "coveredKnockoutMatches": 32,
       "totalKnockoutMatches": 32,
-      "source": "embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter"
+      "source": "embedded schedule; automated pass cross-matches scoreboard events by teams and fills missing kickoffUtc timestamps without overwriting existing venue fields"
     },
     "weather": {
       "status": "missing",
@@ -156,7 +174,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-29T19:34:15Z"
+    "updatedAt": "2026-06-29T21:38:56Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
