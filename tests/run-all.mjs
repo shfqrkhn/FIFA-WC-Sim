@@ -5,3 +5,4 @@ import './no-leakage.test.mjs';
 import './validate-calibration.test.mjs';
 import './manual-update-trigger.test.mjs';
 import './match-window-update.test.mjs';
+import './apply-scoreboard.test.mjs';

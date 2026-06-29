@@ -60,6 +60,7 @@ REQUIRED_UI = [
     'function todayMatchSort',
     'timeZoneName',
     'todayMatch',
+    'function fixedKnockoutResult',
     'function scheduleSnapshot',
     'Schedule progress',
     'Award projections',
@@ -168,19 +169,21 @@ REQUIRED_SCRIPT_MARKERS = {
     ],
     'scripts/apply_scoreboard.py': [
         'from automation_utils import utc_stamp',
+        "HTML_PATH = os.environ.get('FIFA_WC_HTML_PATH'",
         "NO_FETCH = '--no-fetch' in sys.argv",
         'datetime.datetime.now(datetime.timezone.utc).date()',
         'if not NO_FETCH and (applied or FETCH_FAILURES):',
         "'fetchFailures': FETCH_FAILURES",
-        "'path': path",
         'def latest_played_day(matches):',
-        'def refresh_current_stats(current, played, goals, updated_to, stamp):',
-        "'attendanceSource'",
-        "'topScorersSource'",
+        'def resolve_knockout_slots(data):',
+        'def allocate_third_slots(q, knockout):',
+        'def event_winner(comps):',
+        'def refresh_current_stats(data, played, goals, stamp, updated_to):',
+        "'ESPN public scoreboard for completed World Cup matches through",
+        'knockout final score tied without winner/advance flag',
         'scoreboard file invalid shape',
-        'isinstance(events, list)',
-        "status = ev.get('status') if isinstance(ev.get('status'), dict) else {}",
-        "typ = status.get('type') if isinstance(status.get('type'), dict) else {}",
+        'isinstance(payload, list)',
+        'status_type = status.get(',
         'data/latest-update.json',
     ],
     'scripts/update_health.py': [
@@ -532,6 +535,32 @@ else:
         no = m.get('no') if isinstance(m, dict) else None
         if no in knockout_seen: errors.append('duplicate knockout match no %s' % no)
         knockout_seen.add(no)
+        if not isinstance(m, dict):
+            errors.append('bad knockout match row %s' % no)
+            continue
+        if m.get('teamA') and m.get('teamA') not in team_names:
+            errors.append('bad knockout teamA reference on match %s' % no)
+        if m.get('teamB') and m.get('teamB') not in team_names:
+            errors.append('bad knockout teamB reference on match %s' % no)
+        if m.get('teamA') and m.get('teamA') == m.get('teamB'):
+            errors.append('same-team knockout match %s' % no)
+        score_a, score_b = m.get('scoreA'), m.get('scoreB')
+        if m.get('played') and not (isinstance(score_a, int) and isinstance(score_b, int)):
+            errors.append('played knockout match without integer score %s' % no)
+        if m.get('played') and isinstance(score_a, int) and isinstance(score_b, int):
+            if score_a < 0 or score_b < 0 or score_a > 15 or score_b > 15:
+                errors.append('played knockout match has out-of-range score %s' % no)
+            if not m.get('teamA') or not m.get('teamB'):
+                errors.append('played knockout match missing concrete teams %s' % no)
+            winner, loser = m.get('winner'), m.get('loser')
+            if winner not in {m.get('teamA'), m.get('teamB')} or loser not in {m.get('teamA'), m.get('teamB')} or winner == loser:
+                errors.append('played knockout match missing valid winner/loser %s' % no)
+            if score_a != score_b:
+                expected = m.get('teamA') if score_a > score_b else m.get('teamB')
+                if winner != expected:
+                    errors.append('played knockout winner disagrees with score %s' % no)
+        if not m.get('played') and (score_a is not None or score_b is not None):
+            errors.append('unplayed knockout match carries fake score %s' % no)
 if isinstance(matches, list) and isinstance(knockout, list) and len(matches) + len(knockout) != 104:
     errors.append('expected 104 total matches')
 if isinstance(matches, list) and isinstance(knockout, list):
@@ -564,7 +593,8 @@ for t in teams or []:
         if not (800 <= rating <= 2400):
             errors.append('out-of-range eloRating for %s' % t.get('name'))
 current_stats = data.get('currentStats') if isinstance(data.get('currentStats'), dict) else {}
-played_matches = [m for m in matches or [] if m.get('stage') == 'group' and m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+all_match_rows = (matches or []) + (knockout or [])
+played_matches = [m for m in all_match_rows if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
 played_goals = sum(m.get('scoreA', 0) + m.get('scoreB', 0) for m in played_matches)
 if current_stats:
     if current_stats.get('matchesPlayed') != len(played_matches):
@@ -574,7 +604,7 @@ if current_stats:
     source = str(current_stats.get('source', ''))
     if 'all statistics correct as of June 24' in source and current_stats.get('updatedTo') != '2026-06-24':
         errors.append('currentStats source overclaims an older complete snapshot')
-    if 'ESPN scoreboard updater refreshed' in source:
+    if 'ESPN scoreboard updater refreshed' in source or 'ESPN public scoreboard' in source:
         if current_stats.get('attendance') is not None or current_stats.get('attendancePerMatch') is not None:
             errors.append('scoreboard-refreshed currentStats must not retain stale attendance totals')
         if current_stats.get('topScorers'):

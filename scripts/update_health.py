@@ -8,8 +8,12 @@ END=';\nconst BLOCKED_PATCH_KEYS'
 html=open(HTML_PATH,encoding='utf-8').read()
 s=html.index(MARKER)+len(MARKER); e=html.index(END,s); data=json.loads(html[s:e])
 ms=[m for m in data.get('matches',[]) if m.get('stage')=='group']
-todo=[m for m in ms if not m.get('played')]
-played=[m for m in ms if m.get('played')]
+ko=data.get('knockout',[]) if isinstance(data.get('knockout'),list) else []
+all_matches=ms+ko
+todo=[m for m in all_matches if not m.get('played')]
+played=[m for m in all_matches if m.get('played')]
+played_group=[m for m in ms if m.get('played')]
+played_ko=[m for m in ko if m.get('played')]
 w=data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'),dict) else {}
 failed_weather=[{'match':k,'error':v.get('error')} for k,v in w.items() if isinstance(v,dict) and v.get('error')]
 stats=data.get('currentStats') if isinstance(data.get('currentStats'),dict) else {}
@@ -29,7 +33,7 @@ predictions=audit.get('predictions',[]) if isinstance(audit,dict) else []
 settled=[p for p in predictions if isinstance(p,dict) and p.get('actual_result')]
 health={
     'generatedAt':utc_stamp(),
-    'scoreboard':{'playedGroupMatches':len(played),'totalGroupMatches':len(ms),'currentStats':stats,'latestUpdate':latest},
+    'scoreboard':{'playedMatches':len(played),'totalMatches':len(all_matches),'playedGroupMatches':len(played_group),'totalGroupMatches':len(ms),'playedKnockoutMatches':len(played_ko),'totalKnockoutMatches':len(ko),'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
     'dataQuality':data.get('dataQuality',{}),

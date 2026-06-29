@@ -216,6 +216,20 @@ const statsSnapshotOk = vm.runInContext(`(() => {
 if (!statsSnapshotOk) {
   throw new Error('Tournament snapshot schedule progress did not render expected remaining-match fields.');
 }
+const playedKnockoutFixedOk = vm.runInContext(`(() => {
+  const fixed = DATA.knockout.find(m => m.played && Number.isFinite(m.scoreA) && Number.isFinite(m.scoreB));
+  if (!fixed) return true;
+  const run = simulate('played-knockout-fixed-smoke', { weatherOff: true });
+  const simulated = run.ko.find(m => m.no === fixed.no);
+  return simulated &&
+    simulated.scoreA === fixed.scoreA &&
+    simulated.scoreB === fixed.scoreB &&
+    simulated.winner === fixed.winner &&
+    simulated.simulated === false;
+})()`, sandbox, { timeout: 1000 });
+if (!playedKnockoutFixedOk) {
+  throw new Error('Played knockout results were not preserved as fixed simulator inputs.');
+}
 const ensembleModelOk = vm.runInContext(`(() => {
   const breakdown = ensembleBreakdown('Argentina', { matches: DATA.matches });
   const weightTotal = Object.values(ensembleWeights()).reduce((sum, x) => sum + x, 0);

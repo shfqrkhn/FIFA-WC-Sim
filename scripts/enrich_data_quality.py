@@ -52,16 +52,20 @@ def append_unique_text(rows, text):
 
 html, start, end, data = load_data()
 matches = [m for m in data.get('matches', []) if m.get('stage') == 'group']
-played = [m for m in matches if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
-unplayed = [m for m in matches if not m.get('played')]
+knockout = data.get('knockout', []) if isinstance(data.get('knockout'), list) else []
+all_match_rows = matches + knockout
+played = [m for m in all_match_rows if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+played_group = [m for m in matches if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+played_knockout = [m for m in knockout if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
+unplayed = [m for m in all_match_rows if not m.get('played')]
 weather = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
 rest = data.get('restTravel') if isinstance(data.get('restTravel'), dict) else {}
 model_inputs = data.get('modelInputs') if isinstance(data.get('modelInputs'), dict) else {}
 quality_core = {
-    'scores': {'status': status(bool(played)), 'playedGroupMatches': len(played), 'totalGroupMatches': len(matches), 'source': 'scoreboard updater'},
-    'fixtures': {'status': 'partial', 'coveredGroupMatches': len(matches), 'totalGroupMatches': len(matches), 'source': 'embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter'},
+    'scores': {'status': status(bool(played)), 'playedMatches': len(played), 'totalMatches': len(all_match_rows), 'playedGroupMatches': len(played_group), 'totalGroupMatches': len(matches), 'playedKnockoutMatches': len(played_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'scoreboard updater'},
+    'fixtures': {'status': 'partial', 'coveredMatches': len(all_match_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(matches), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter'},
     'weather': {'status': status(len(weather) >= len(unplayed), bool(weather)), 'coveredUnplayedMatches': len([m for m in unplayed if str(m.get('no')) in weather]), 'totalUnplayedMatches': len(unplayed), 'source': 'open-meteo'},
-    'restTravel': {'status': status(len(rest) >= len(matches), bool(rest)), 'coveredGroupMatches': len(rest), 'totalGroupMatches': len(matches), 'source': 'embedded schedule and venue coordinates'},
+    'restTravel': {'status': status(len(rest) >= len(all_match_rows), bool(rest)), 'coveredMatches': len(rest), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len([m for m in matches if str(m.get('no')) in rest]), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len([m for m in knockout if str(m.get('no')) in rest]), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
     'awardProjections': {'status': 'partial', 'source': 'simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured'},
     'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},

@@ -1,14 +1,23 @@
 {
-  "generatedAt": "2026-06-28T12:57:11Z",
-  "fetchedFinals": 69,
-  "appliedChanges": 6,
-  "changes": [
-    "M72 Croatia 2-1 Ghana",
-    "M71 Panama 0-2 England",
-    "M65 Colombia 0-0 Portugal",
-    "M66 DR Congo 3-1 Uzbekistan",
-    "M59 Algeria 3-3 Austria",
-    "M60 Jordan 1-3 Argentina"
-  ],
-  "fetchFailures": []
+  "generatedAt": "2026-06-29T15:58:28Z",
+  "updatedThrough": "2026-06-28",
+  "scoreboard": {
+    "fetchedFinals": 7,
+    "appliedChanges": 1,
+    "changes": [
+      {
+        "match": 73,
+        "teams": [
+          "South Africa",
+          "Canada"
+        ],
+        "score": [
+          0,
+          1
+        ],
+        "event": "760486"
+      }
+    ],
+    "fetchFailures": []
+  }
 }

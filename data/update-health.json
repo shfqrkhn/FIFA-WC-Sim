@@ -1,14 +1,18 @@
 {
-  "generatedAt": "2026-06-28T12:57:11Z",
+  "generatedAt": "2026-06-29T16:03:16Z",
   "scoreboard": {
+    "playedMatches": 73,
+    "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
+    "playedKnockoutMatches": 1,
+    "totalKnockoutMatches": 32,
     "currentStats": {
-      "updatedTo": "2026-06-27",
-      "source": "ESPN scoreboard updater refreshed completed group results, match count, and goals through 2026-06-27. Attendance, top-scorer, and conduct snapshots are not refreshed by this automated score pass.",
-      "matchesPlayed": 72,
-      "goalsScored": 215,
-      "goalsPerMatch": 2.99,
+      "updatedTo": "2026-06-28",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-06-28",
+      "matchesPlayed": 73,
+      "goalsScored": 216,
+      "goalsPerMatch": 2.96,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -27,26 +31,36 @@
       ],
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
-      "topScorersSource": "Not refreshed by automated scoreboard updater after score totals advanced."
+      "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
+      "lastUpdated": "2026-06-29T16:03:16Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-06-28T12:57:11Z",
-      "fetchedFinals": 69,
-      "appliedChanges": 6,
-      "changes": [
-        "M72 Croatia 2-1 Ghana",
-        "M71 Panama 0-2 England",
-        "M65 Colombia 0-0 Portugal",
-        "M66 DR Congo 3-1 Uzbekistan",
-        "M59 Algeria 3-3 Austria",
-        "M60 Jordan 1-3 Argentina"
-      ],
-      "fetchFailures": []
+      "generatedAt": "2026-06-29T15:58:28Z",
+      "updatedThrough": "2026-06-28",
+      "scoreboard": {
+        "fetchedFinals": 7,
+        "appliedChanges": 1,
+        "changes": [
+          {
+            "match": 73,
+            "teams": [
+              "South Africa",
+              "Canada"
+            ],
+            "score": [
+              0,
+              1
+            ],
+            "event": "760486"
+          }
+        ],
+        "fetchFailures": []
+      }
     }
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 0,
+    "totalUnplayedMatches": 31,
     "failedMatches": []
   },
   "predictionAudit": {
@@ -59,26 +73,38 @@
   "dataQuality": {
     "scores": {
       "status": "current",
+      "playedMatches": 73,
+      "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
+      "playedKnockoutMatches": 1,
+      "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
     "fixtures": {
       "status": "partial",
+      "coveredMatches": 104,
+      "totalMatches": 104,
       "coveredGroupMatches": 72,
       "totalGroupMatches": 72,
+      "coveredKnockoutMatches": 32,
+      "totalKnockoutMatches": 32,
       "source": "embedded schedule; automated pass cross-matches scoreboard events by teams but does not overwrite venue/kickoff fields without an unambiguous source adapter"
     },
     "weather": {
-      "status": "current",
+      "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 0,
+      "totalUnplayedMatches": 31,
       "source": "open-meteo"
     },
     "restTravel": {
-      "status": "current",
+      "status": "partial",
+      "coveredMatches": 72,
+      "totalMatches": 104,
       "coveredGroupMatches": 72,
       "totalGroupMatches": 72,
+      "coveredKnockoutMatches": 0,
+      "totalKnockoutMatches": 32,
       "source": "embedded schedule and venue coordinates"
     },
     "modelInputs": {
@@ -128,7 +154,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-28T12:57:11Z"
+    "updatedAt": "2026-06-29T15:58:29Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
