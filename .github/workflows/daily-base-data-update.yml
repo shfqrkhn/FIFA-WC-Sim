@@ -37,12 +37,12 @@ jobs:
         if: always()
         run: node scripts/write-workflow-summary.mjs >> "$GITHUB_STEP_SUMMARY" || true
       - run: |
-          if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json; then
+          if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json; then
             echo "No validated BASE_DATA changes to commit."
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json
+          git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json
           git commit -m 'Daily World Cup BASE_DATA update'
           git push

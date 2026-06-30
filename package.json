@@ -8,6 +8,7 @@
     "test": "node tests/run-all.mjs",
     "validate": "node scripts/validate.mjs",
     "smoke": "node scripts/run-sim.mjs",
+    "backtest": "node scripts/backtest-audit.mjs",
     "ui:smoke": "playwright test"
   },
   "devDependencies": {

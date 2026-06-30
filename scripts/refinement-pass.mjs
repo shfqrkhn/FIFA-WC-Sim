@@ -16,7 +16,8 @@ const candidateFiles = [
   'data/latest-update.json',
   'data/update-health.json',
   'data/prediction-audit.json',
-  'data/calibration-state.json'
+  'data/calibration-state.json',
+  'data/backtest-audit.json'
 ];
 
 function argValue(name) {

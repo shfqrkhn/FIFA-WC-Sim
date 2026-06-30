@@ -104,6 +104,8 @@ The maintenance scripts can freeze pre-match model predictions into `data/predic
 
 The calibration state also records benchmark metrics for the raw model, uniform WDL probabilities, and a rank-only prior. These benchmarks are shown as evidence in the Data health view; they do not change displayed probabilities by themselves.
 
+`scripts/backtest-audit.mjs` builds `data/backtest-audit.json` from the same frozen ledger. It reports resolved frozen-prediction count, Brier score, log loss, favorite hit rate, scoreline error, confidence-bucket accuracy, stage splits, failure classes, and comparisons against uniform and rank-prior baselines. This is a prospective audit only: it uses predictions frozen before kickoff and already settled after final results. It does not reconstruct historical matchdays from archival inputs, so it avoids future-data leakage instead of pretending to be a full historical replay.
+
 This audit loop is educational and informational only. It is used to detect overconfidence and calibration drift, not to provide betting advice.
 
 ## Data Sources and Updates
@@ -131,7 +133,7 @@ It runs on:
 
 GitHub cron is UTC-only and can be delayed or skipped by GitHub infrastructure. The safety run, match-window checks, and manual dispatch are intentional; one morning-only run is not sufficient for reliable maintenance. America/Montreal local time shifts with DST because the cron schedule remains UTC.
 
-The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, and `data/calibration-state.json`, and only after validation passes.
+The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, prediction-audit calibration validation, unit tests, and simulation smoke checks. It commits only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`, and only after validation passes.
 
 The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
 
@@ -189,6 +191,7 @@ Audit/calibration maintenance can also be run one step at a time:
 node scripts/freeze-predictions.mjs
 node scripts/score-predictions.mjs
 node scripts/update-calibration.mjs
+node scripts/backtest-audit.mjs
 node scripts/validate-calibration.mjs
 ```
 
@@ -215,6 +218,7 @@ for f in scripts/*.mjs; do node --check "$f"; done
 node scripts/build-html.mjs
 npm run validate
 node scripts/validate-calibration.mjs
+npm run backtest
 npm test
 python scripts/test_idempotence.py
 npm run smoke

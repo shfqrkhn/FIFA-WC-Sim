@@ -17,6 +17,7 @@ function row(label, value) {
 const { data } = readArtifact('docs/index.html');
 const latest = readJson('data/latest-update.json') || {};
 const health = readJson('data/update-health.json') || {};
+const backtest = readJson('data/backtest-audit.json') || {};
 const scoreboard = health.scoreboard || {};
 const audit = health.predictionAudit || {};
 const latestScoreboard = latest.scoreboard || {};
@@ -40,6 +41,8 @@ const lines = [
   row('Frozen predictions', audit.frozenPredictions),
   row('Settled predictions', audit.settledPredictions),
   row('Calibration status', audit.calibrationStatus),
+  row('Backtest sample status', backtest.sample_status),
+  row('Backtest raw Brier/log loss', `${backtest.overall?.metrics?.raw_model?.brier_score ?? 'n/a'} / ${backtest.overall?.metrics?.raw_model?.log_loss ?? 'n/a'}`),
   '',
   data.dataQuality?.principle || health.principle || 'Missing or failed sources degrade to neutral inputs unless validated data is available.'
 ];

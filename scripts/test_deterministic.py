@@ -1,7 +1,7 @@
 import hashlib, json, os, subprocess, sys
 
 CORE_FILES=['docs/index.html','data/latest-update.json','data/update-health.json']
-AUDIT_FILES=CORE_FILES+['data/prediction-audit.json','data/calibration-state.json']
+AUDIT_FILES=CORE_FILES+['data/prediction-audit.json','data/calibration-state.json','data/backtest-audit.json']
 CORE_CMDS=[[sys.executable,'scripts/apply_scoreboard.py','--no-fetch'],[sys.executable,'scripts/enrich_predictions.py'],[sys.executable,'scripts/enrich_rest_travel.py'],[sys.executable,'scripts/enrich_weather.py','--no-fetch'],[sys.executable,'scripts/enrich_data_quality.py'],[sys.executable,'scripts/update_health.py']]
 
 def digest(p):
@@ -50,6 +50,7 @@ audit_cmds=[
     [NODE,'scripts/freeze-predictions.mjs','--now',audit_now],
     [NODE,'scripts/score-predictions.mjs','--now',audit_now],
     [NODE,'scripts/update-calibration.mjs','--now',audit_now],
+    [NODE,'scripts/backtest-audit.mjs'],
     [NODE,'scripts/validate-calibration.mjs']
 ]
 saved=snapshot_bytes(AUDIT_FILES)

@@ -137,13 +137,14 @@ REQUIRED_WORKFLOW_STEPS = [
     'node scripts/run-sim.mjs',
     'python3 scripts/validate_base_data.py',
     'scripts/write-workflow-summary.mjs',
-    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
-    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
     'data/update-health.json',
     'data/prediction-audit.json',
     'data/calibration-state.json',
+    'data/backtest-audit.json',
 ]
 REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     "on:\n  workflow_dispatch:\n  schedule:",
@@ -158,10 +159,10 @@ REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     'node tests/run-all.mjs',
     'node scripts/run-sim.mjs',
     'scripts/write-workflow-summary.mjs',
-    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
-    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json',
+    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
 ]
 REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
     'name: Static UI smoke',
@@ -221,7 +222,9 @@ REQUIRED_SCRIPT_MARKERS = {
         'data/latest-update.json',
         'data/prediction-audit.json',
         'data/calibration-state.json',
+        'data/backtest-audit.json',
         "'predictionAudit'",
+        "'backtestAudit'",
         "'latestUpdate':latest",
         "'overdueUnplayedMatches'",
         "'nextScheduledMatchDay'",
@@ -234,6 +237,8 @@ REQUIRED_SCRIPT_MARKERS = {
         "scripts/enrich_weather.py','--no-fetch",
         'scripts/enrich_data_quality.py',
         'scripts/update_health.py',
+        'data/backtest-audit.json',
+        'scripts/backtest-audit.mjs',
         'before!=after or after!=final',
     ],
     'scripts/node-python.mjs': [
@@ -268,6 +273,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/enrich_data_quality.py',
         'scripts/score-predictions.mjs',
         'scripts/update-calibration.mjs',
+        'scripts/backtest-audit.mjs',
         'scripts/update_health.py',
         'scripts/validate-calibration.mjs',
         'scripts/build-html.mjs',
@@ -326,6 +332,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'BASE_DATA update summary',
         'Overdue unplayed matches',
         'Calibration status',
+        'Backtest sample status',
         'data/update-health.json',
     ],
     'scripts/prediction-audit-lib.mjs': [
@@ -362,6 +369,17 @@ REQUIRED_SCRIPT_MARKERS = {
         'teamMap',
         'writeArtifact',
         'data/calibration-state.json',
+    ],
+    'scripts/backtest-audit.mjs': [
+        'buildBacktestAuditReport',
+        'calibrationEligiblePredictions',
+        'benchmarkMetrics',
+        'by_confidence_bucket',
+        'raw_vs_uniform_wdl',
+        'raw_vs_rank_prior',
+        'Prospective backtest from frozen pre-match predictions only',
+        'data/backtest-audit.json',
+        'validateNoMarketFields',
     ],
     'scripts/validate-calibration.mjs': [
         'REQUIRED_LEDGER_FIELDS',
@@ -410,6 +428,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'prediction-audit.test.mjs',
         'scoring.test.mjs',
         'calibration.test.mjs',
+        'backtest-audit.test.mjs',
         'no-leakage.test.mjs',
         'validate-calibration.test.mjs',
         'manual-update-trigger.test.mjs',
@@ -430,6 +449,13 @@ REQUIRED_SCRIPT_MARKERS = {
         'invalid actual_result',
         'benchmark_metrics',
         'missing prediction audit file',
+    ],
+    'tests/backtest-audit.test.mjs': [
+        'buildBacktestAuditReport',
+        'resolved_predictions',
+        'rejected_predictions',
+        'raw_vs_uniform_wdl',
+        'historical replay',
     ],
     'tests/match-window-update.test.mjs': [
         'pre_kickoff',
@@ -720,13 +746,13 @@ if weather_by_match:
         errors.append('weatherByMatch retains completed match rows: %s' % ', '.join(played_weather[:12]))
 if errors:
     fail('; '.join(errors[:12]))
-for path in ('data/prediction-audit.json', 'data/calibration-state.json'):
+for path in ('data/prediction-audit.json', 'data/calibration-state.json', 'data/backtest-audit.json'):
     if not os.path.exists(path):
-        fail('missing prediction audit artifact: %s' % path)
+        fail('missing audit artifact: %s' % path)
     try:
         artifact = json.load(open(path, encoding='utf-8'))
     except Exception as e:
-        fail('unreadable prediction audit artifact %s: %s' % (path, e))
+        fail('unreadable audit artifact %s: %s' % (path, e))
     if not isinstance(artifact, dict) or artifact.get('schema') != 1:
-        fail('invalid prediction audit artifact schema: %s' % path)
+        fail('invalid audit artifact schema: %s' % path)
 print(json.dumps({'ok': True, 'teams': len(teams), 'groupMatches': 72, 'knockoutMatches': len(knockout), 'workflowGuarded': True, 'singleInputGuarded': True}, indent=2))

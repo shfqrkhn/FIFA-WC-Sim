@@ -40,6 +40,10 @@ calibration={}
 if os.path.exists('data/calibration-state.json'):
     try: calibration=json.load(open('data/calibration-state.json',encoding='utf-8'))
     except Exception: calibration={'error':'calibration-state unreadable'}
+backtest={}
+if os.path.exists('data/backtest-audit.json'):
+    try: backtest=json.load(open('data/backtest-audit.json',encoding='utf-8'))
+    except Exception: backtest={'error':'backtest-audit unreadable'}
 predictions=audit.get('predictions',[]) if isinstance(audit,dict) else []
 settled=[p for p in predictions if isinstance(p,dict) and p.get('actual_result')]
 health={
@@ -47,6 +51,7 @@ health={
     'scoreboard':{'playedMatches':len(played),'totalMatches':len(all_matches),'playedGroupMatches':len(played_group),'totalGroupMatches':len(ms),'playedKnockoutMatches':len(played_ko),'totalKnockoutMatches':len(ko),'overdueUnplayedMatches':len(overdue),'nextScheduledMatchDay':future_days[0].isoformat() if future_days else None,'currentStats':stats,'latestUpdate':latest},
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
+    'backtestAudit':{'sampleStatus':backtest.get('sample_status'),'resolvedPredictions':backtest.get('resolved_predictions'),'rawModel':((backtest.get('overall') or {}).get('metrics') or {}).get('raw_model')},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
 }

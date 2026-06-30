@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-30T19:22:22Z",
+  "generatedAt": "2026-06-30T23:41:23Z",
   "scoreboard": {
     "playedMatches": 77,
     "totalMatches": 104,
@@ -74,6 +74,15 @@
     "calibrationStatus": "insufficient_sample",
     "resolvedPredictions": 8,
     "minimumResolvedPredictions": 30
+  },
+  "backtestAudit": {
+    "sampleStatus": "insufficient_sample",
+    "resolvedPredictions": 8,
+    "rawModel": {
+      "brier_score": 0.404345270659,
+      "log_loss": 0.672058078137,
+      "count": 8
+    }
   },
   "dataQuality": {
     "scores": {
