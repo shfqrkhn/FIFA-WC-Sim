@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-06-30T13:26:27Z",
+  "generated_at_utc": "2026-06-30T19:22:22Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -801,15 +801,15 @@
         "draw": 0,
         "away": 0.4877551863
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 1,
+      "actual_away_score": 2,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-06-30T19:22:22Z",
+      "brier_score": 0.652486255148,
+      "log_loss": 1.073327791081,
+      "scoreline_error": 1.127379,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-06-30T17:00:00Z",
       "venue": "AT&T Stadium",
       "group": null,
