@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-06-29T23:56:18Z",
+  "generatedAt": "2026-06-30T06:36:38Z",
   "scoreboard": {
-    "playedMatches": 75,
+    "playedMatches": 76,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 3,
+    "playedKnockoutMatches": 4,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-06-29",
+    "nextScheduledMatchDay": "2026-06-30",
     "currentStats": {
       "updatedTo": "2026-06-29",
       "source": "ESPN public scoreboard for completed World Cup matches through 2026-06-29",
-      "matchesPlayed": 75,
-      "goalsScored": 221,
-      "goalsPerMatch": 2.95,
+      "matchesPlayed": 76,
+      "goalsScored": 223,
+      "goalsPerMatch": 2.93,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -34,55 +34,83 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-06-29T23:56:17Z"
+      "lastUpdated": "2026-06-30T06:36:38Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-06-29T23:56:17Z",
+      "generatedAt": "2026-06-30T06:36:38Z",
       "updatedThrough": "2026-06-29",
       "scoreboard": {
-        "fetchedFinals": 2,
+        "fetchedFinals": 3,
         "appliedChanges": 1,
-        "kickoffUpdates": 0,
-        "teamSlotUpdates": 0,
+        "kickoffUpdates": 3,
+        "teamSlotUpdates": 2,
         "changes": [
           {
-            "match": 74,
+            "match": 75,
             "teams": [
-              "Germany",
-              "Paraguay"
+              "Netherlands",
+              "Morocco"
             ],
             "score": [
               1,
               1
             ],
-            "event": "760489"
+            "event": "760488"
           }
         ],
-        "scheduleChanges": [],
+        "scheduleChanges": [
+          {
+            "match": 78,
+            "teams": [
+              "Ivory Coast",
+              "Norway"
+            ],
+            "kickoffUtc": "2026-06-30T17:00:00Z",
+            "event": "760490"
+          },
+          {
+            "match": 77,
+            "teams": [
+              "France",
+              "Sweden"
+            ],
+            "kickoffUtc": "2026-06-30T21:00:00Z",
+            "event": "760492"
+          },
+          {
+            "match": 79,
+            "teams": [
+              "Mexico",
+              "Ecuador"
+            ],
+            "kickoffUtc": "2026-07-01T01:00:00Z",
+            "event": "760491"
+          }
+        ],
         "fetchFailures": []
       }
     }
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 29,
+    "totalUnplayedMatches": 28,
     "failedMatches": []
   },
   "predictionAudit": {
     "frozenPredictions": 7,
-    "settledPredictions": 6,
+    "settledPredictions": 7,
     "calibrationStatus": "insufficient_sample",
-    "resolvedPredictions": 6,
+    "resolvedPredictions": 7,
     "minimumResolvedPredictions": 30
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 75,
+      "playedMatches": 76,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 3,
+      "playedKnockoutMatches": 4,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -99,7 +127,7 @@
     "weather": {
       "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 29,
+      "totalUnplayedMatches": 28,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -159,7 +187,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-06-29T23:56:17Z"
+    "updatedAt": "2026-06-30T06:36:38Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

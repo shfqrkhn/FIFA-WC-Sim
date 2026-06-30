@@ -1,26 +1,54 @@
 {
-  "generatedAt": "2026-06-29T23:56:17Z",
+  "generatedAt": "2026-06-30T06:36:38Z",
   "updatedThrough": "2026-06-29",
   "scoreboard": {
-    "fetchedFinals": 2,
+    "fetchedFinals": 3,
     "appliedChanges": 1,
-    "kickoffUpdates": 0,
-    "teamSlotUpdates": 0,
+    "kickoffUpdates": 3,
+    "teamSlotUpdates": 2,
     "changes": [
       {
-        "match": 74,
+        "match": 75,
         "teams": [
-          "Germany",
-          "Paraguay"
+          "Netherlands",
+          "Morocco"
         ],
         "score": [
           1,
           1
         ],
-        "event": "760489"
+        "event": "760488"
       }
     ],
-    "scheduleChanges": [],
+    "scheduleChanges": [
+      {
+        "match": 78,
+        "teams": [
+          "Ivory Coast",
+          "Norway"
+        ],
+        "kickoffUtc": "2026-06-30T17:00:00Z",
+        "event": "760490"
+      },
+      {
+        "match": 77,
+        "teams": [
+          "France",
+          "Sweden"
+        ],
+        "kickoffUtc": "2026-06-30T21:00:00Z",
+        "event": "760492"
+      },
+      {
+        "match": 79,
+        "teams": [
+          "Mexico",
+          "Ecuador"
+        ],
+        "kickoffUtc": "2026-07-01T01:00:00Z",
+        "event": "760491"
+      }
+    ],
     "fetchFailures": []
   }
 }
