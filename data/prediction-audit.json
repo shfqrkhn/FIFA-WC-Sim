@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-06-30T06:36:34Z",
+  "generated_at_utc": "2026-06-30T13:26:27Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -635,6 +635,279 @@
         "weather_adjustment_abs": 0,
         "recent_form_adjustment_abs": 0,
         "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "f68b20d552926650a1fc64e7",
+      "created_at_utc": "2026-06-30T13:26:27Z",
+      "match_id": 77,
+      "stage": "R32",
+      "home_team": "France",
+      "away_team": "Sweden",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-06-30-accuracy-enriched",
+      "source_snapshot_hash": "69419b35210378e732b64e196524f1ab7b24b397ff43e6829c7c98719dc2c5c2",
+      "predicted_wdl_probs": {
+        "home_win": 0.9653397561,
+        "draw": 0.0290375874,
+        "away_win": 0.0056226565
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "4-0",
+          "probability": 0.13509464
+        },
+        {
+          "score": "3-0",
+          "probability": 0.12165917
+        },
+        {
+          "score": "5-0",
+          "probability": 0.12001109
+        },
+        {
+          "score": "6-0",
+          "probability": 0.08884303
+        },
+        {
+          "score": "2-0",
+          "probability": 0.08216991
+        },
+        {
+          "score": "7-0",
+          "probability": 0.05637397
+        },
+        {
+          "score": "4-1",
+          "probability": 0.04676578
+        },
+        {
+          "score": "3-1",
+          "probability": 0.04211482
+        },
+        {
+          "score": "5-1",
+          "probability": 0.0415443
+        },
+        {
+          "score": "1-0",
+          "probability": 0.03597433
+        },
+        {
+          "score": "8-0",
+          "probability": 0.03129982
+        },
+        {
+          "score": "6-1",
+          "probability": 0.03075484
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9798585498,
+        "draw": 0,
+        "away": 0.0201414502
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-06-30T21:00:00Z",
+      "venue": "MetLife Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "30e9a42aa15123d02787c1b2",
+      "created_at_utc": "2026-06-30T13:26:27Z",
+      "match_id": 78,
+      "stage": "R32",
+      "home_team": "Ivory Coast",
+      "away_team": "Norway",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-06-30-accuracy-enriched",
+      "source_snapshot_hash": "34f6cdf0c768251965d8fe3bcbe887f35431e778252327456909bc02d255553e",
+      "predicted_wdl_probs": {
+        "home_win": 0.3663585813,
+        "draw": 0.2917724648,
+        "away_win": 0.3418689539
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.13899116
+        },
+        {
+          "score": "1-0",
+          "probability": 0.09565643
+        },
+        {
+          "score": "0-0",
+          "probability": 0.0939946
+        },
+        {
+          "score": "0-1",
+          "probability": 0.09136996
+        },
+        {
+          "score": "2-1",
+          "probability": 0.08145595
+        },
+        {
+          "score": "1-2",
+          "probability": 0.07816052
+        },
+        {
+          "score": "2-0",
+          "probability": 0.06706081
+        },
+        {
+          "score": "0-2",
+          "probability": 0.06174447
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04947056
+        },
+        {
+          "score": "3-1",
+          "probability": 0.0343709
+        },
+        {
+          "score": "1-3",
+          "probability": 0.0316461
+        },
+        {
+          "score": "3-0",
+          "probability": 0.02829678
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.5122448137,
+        "draw": 0,
+        "away": 0.4877551863
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-06-30T17:00:00Z",
+      "venue": "AT&T Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "96a53d9a6f8e95701840f0d9",
+      "created_at_utc": "2026-06-30T13:26:27Z",
+      "match_id": 79,
+      "stage": "R32",
+      "home_team": "Mexico",
+      "away_team": "Ecuador",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-06-30-accuracy-enriched",
+      "source_snapshot_hash": "362f119be23a416f925545a3682d05b032192eb2ec021c862f6ebb8f644fce5c",
+      "predicted_wdl_probs": {
+        "home_win": 0.7681598549,
+        "draw": 0.1613683681,
+        "away_win": 0.070471777
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "2-0",
+          "probability": 0.13820181
+        },
+        {
+          "score": "3-0",
+          "probability": 0.11256859
+        },
+        {
+          "score": "1-0",
+          "probability": 0.10742054
+        },
+        {
+          "score": "2-1",
+          "probability": 0.08696256
+        },
+        {
+          "score": "1-1",
+          "probability": 0.07687078
+        },
+        {
+          "score": "3-1",
+          "probability": 0.07083303
+        },
+        {
+          "score": "4-0",
+          "probability": 0.06876731
+        },
+        {
+          "score": "0-0",
+          "probability": 0.05198488
+        },
+        {
+          "score": "4-1",
+          "probability": 0.04327137
+        },
+        {
+          "score": "5-0",
+          "probability": 0.03360755
+        },
+        {
+          "score": "2-2",
+          "probability": 0.0273603
+        },
+        {
+          "score": "0-1",
+          "probability": 0.02343401
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.848844039,
+        "draw": 0,
+        "away": 0.151155961
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-01T01:00:00Z",
+      "venue": "Estadio Azteca",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0.18,
         "attack_defense_weight": 0.14,
         "lineups_missing": false,
         "suspensions_missing": false
