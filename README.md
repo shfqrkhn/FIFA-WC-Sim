@@ -28,11 +28,10 @@ Tracked project files:
 
 * `docs/index.html`: static app entrypoint and embedded `BASE_DATA`.
 * `docs/assets/`: README/demo assets only.
-* `data/*.json`: generated update health, prediction audit, calibration state, and manual override example.
+* `data/*.json`: generated latest-update health, prediction audit ledger, calibration state, prospective backtest audit, and manual override example.
 * `scripts/`: data update, validation, prediction audit, calibration, rescue, and refinement scripts.
 * `tests/`: unit, regression, no-leakage, workflow, and browser smoke tests.
 * `.github/workflows/`: daily, match-window, and UI-smoke automation.
-* `OMNI_HANDOVER.md`: current handoff, recovery checklist, and OmniOS feedback loop.
 
 Local-only ignored files:
 
@@ -108,6 +107,8 @@ The calibration state also records benchmark metrics for the raw model, uniform 
 
 This audit loop is educational and informational only. It is used to detect overconfidence and calibration drift, not to provide betting advice.
 
+Current match counts, overdue-match status, audit sample size, calibration status, and backtest scores are generated artifacts, not duplicated manually in this README. Check the deployed app's **Health** section plus `data/update-health.json` and `data/backtest-audit.json` for the current state.
+
 ## Data Sources and Updates
 
 The embedded data includes:
@@ -137,7 +138,7 @@ The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, p
 
 The match-window workflow runs `node scripts/match-window-update.mjs`. That script no-ops unless the current UTC time is near a configured pre-kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches. It refuses full updates during the active-match lock, so in-progress matches are not mutated by partial scores or weather/context refreshes; if a later match needs a pre-kickoff freeze during that lock, it runs a freeze-only path. Full runs delegate to the same rollback-capable `scripts/update-base-data.mjs` path and commit only validated candidate artifacts.
 
-Both update workflows write a GitHub Actions job summary with data version, played-match counts, overdue unplayed match count, latest scoreboard changes, prediction-audit counts, and calibration status. A separate static UI smoke workflow runs Playwright against `docs/index.html` for desktop and mobile layouts.
+Both update workflows write a GitHub Actions job summary with data version, played-match counts, overdue unplayed match count, latest scoreboard changes, prediction-audit counts, calibration status, and backtest sample/score metrics. A separate static UI smoke workflow runs Playwright against `docs/index.html` for desktop and mobile layouts.
 
 ### Automated Sources
 
@@ -183,7 +184,7 @@ For a local guarded rescue run:
 node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE
 ```
 
-That command runs the same prediction-supporting update path as automation: freeze pre-match predictions, ingest completed scores, refresh form/Elo-style inputs, rest/travel, weather, data health, audit scoring, calibration, and validation. It refuses to run without the exact trigger word, refuses to overwrite already-dirty candidate data artifacts, restores candidate files on validation failure, and does not commit unless `--commit` is supplied. Use `--push` only after a validated local commit is intended.
+That command runs the same prediction-supporting update path as automation: freeze pre-match predictions, ingest completed scores, refresh form/Elo-style inputs, rest/travel, weather, data health, audit scoring, calibration, prospective backtest reporting, and validation. It refuses to run without the exact trigger word, refuses to overwrite already-dirty candidate data artifacts, restores candidate files on validation failure, and does not commit unless `--commit` is supplied. Use `--push` only after a validated local commit is intended.
 
 Audit/calibration maintenance can also be run one step at a time:
 
@@ -236,7 +237,7 @@ When that phrase is used for a repo refinement pass, run:
 node scripts/refinement-pass.mjs --trigger "Iterate until reaching THE END. "
 ```
 
-The script performs up to three no-fetch convergence passes. Each pass runs the guarded updater, syntax checks, data validation, calibration validation, unit/regression tests, simulation smoke, idempotence, and diff hygiene. It stops only when candidate data artifacts are stable and every gate passes. On successful convergence it prints exactly `THE END`; otherwise it fails with the first material gate that did not pass.
+The script performs up to three no-fetch convergence passes. Each pass runs the guarded updater, syntax checks, data validation, calibration validation, unit/regression tests, simulation smoke, idempotence, and diff hygiene. The guarded updater also regenerates the backtest audit report, so the refinement pass fails if the current data/audit artifacts do not converge. On successful convergence it prints exactly `THE END`; otherwise it fails with the first material gate that did not pass.
 
 ## Deployment
 
@@ -246,7 +247,7 @@ The app entrypoint is `docs/index.html`. GitHub Pages serves the static `docs/` 
 
 Data updates must preserve the static/offline app shell. Failed source fetches degrade to neutral or cached inputs and must not be committed as partial updates. Current facts, fixture changes, fair-play/cards, lineups, injuries, suspensions, and regulations should be cross-checked against official FIFA or other reliable sources before changing model inputs.
 
-For a concise fresh-agent handoff, runbook, recovery checklist, and OmniOS feedback loop, see `OMNI_HANDOVER.md`. If present locally, the ignored `offline/omnios-documents/` workspace can hold upstream OmniOS lessons from this app. It is intentionally absent from GitHub and must remain untracked.
+Private handoff notes and local source documents must stay out of GitHub. If present locally, the ignored `offline/omnios-documents/` workspace can hold private lessons and upstream source notes for this app. It is intentionally absent from GitHub and must remain untracked.
 
 ## Privacy and Offline Use
 
@@ -260,4 +261,4 @@ Current facts, match results, injuries, suspensions, lineups, rankings, and offi
 
 ## Stability
 
-The project is guarded by syntax checks, runtime smoke tests, ensemble-model checks, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, and responsive UI regression checks.
+The project is guarded by syntax checks, runtime smoke tests, ensemble-model checks, Monte Carlo invariant tests, third-place allocation checks across all 495 valid combinations, corrupt-cache rejection tests, storage-failure tests, malformed saved-data repair tests, penalty shootout validation, frozen-prediction audit/backtest checks, calibration fail-closed checks, no-leakage checks, idempotence checks, and responsive UI regression checks.

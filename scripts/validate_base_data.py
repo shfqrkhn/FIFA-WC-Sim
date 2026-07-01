@@ -2,7 +2,7 @@ import json, math, os, re, sys
 
 HTML = 'docs/index.html'
 README = 'README.md'
-HANDOFF = 'OMNI_HANDOVER.md'
+PRIVATE_HANDOFF = 'OMNI_HANDOVER.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
 UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
@@ -184,6 +184,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'test-results/',
     'linkedin-post-package/',
     'offline/omnios-documents/',
+    PRIVATE_HANDOFF,
     '.codex-remote-attachments/',
 ]
 README_VERSION_MARKER = "shown in the deployed app's Data health view from embedded `BASE_DATA`"
@@ -553,21 +554,14 @@ if os.path.exists(README):
         fail('README must document QA wrapper, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
         fail('README must document match-window automation and active-match lock')
-    if 'OMNI_HANDOVER.md' not in readme or 'benchmark metrics' not in readme or 'OmniOS feedback loop' not in readme or 'must remain untracked' not in readme:
-        fail('README must document handoff and calibration benchmarks')
+    if 'benchmark metrics' not in readme or 'must remain untracked' not in readme:
+        fail('README must document private-file guardrails and calibration benchmarks')
     if '### Chances' not in readme or '### Odds' in readme or '**Odds**' in readme:
         fail('README probability section must use Chances terminology')
     if '2026.06.25-patch-32-nav-fit-polish' in readme:
         fail('README contains stale hard-coded patch version')
 else:
     fail('missing README')
-if os.path.exists(HANDOFF):
-    handoff = open(HANDOFF, encoding='utf-8').read()
-    for marker in ('WC_DATA_RESCUE', 'node scripts/qa.mjs', 'Prediction Audit', 'No betting', 'Fresh-Agent Fire Drill', 'OmniOS Feedback Loop', 'FIFA-WC-Sim-lessons.md', 'git ls-files offline', 'absent from GitHub'):
-        if marker not in handoff:
-            fail('missing handoff marker: %s' % marker)
-else:
-    fail('missing OMNI_HANDOVER.md')
 for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     if not os.path.exists(path):
         fail('missing automation guard script: %s' % path)
