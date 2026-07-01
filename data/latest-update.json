@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-07-01T18:22:03Z",
+  "generatedAt": "2026-07-01T23:13:26Z",
   "updatedThrough": "2026-07-01",
   "scoreboard": {
-    "fetchedFinals": 1,
+    "fetchedFinals": 2,
     "appliedChanges": 1,
     "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 80,
+        "match": 82,
         "teams": [
-          "England",
-          "DR Congo"
+          "Belgium",
+          "Senegal"
         ],
         "score": [
-          2,
-          1
+          3,
+          2
         ],
-        "event": "760495"
+        "event": "760493"
       }
     ],
     "scheduleChanges": [],
