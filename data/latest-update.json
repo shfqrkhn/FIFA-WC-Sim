@@ -1,26 +1,66 @@
 {
-  "generatedAt": "2026-06-30T19:22:22Z",
+  "generatedAt": "2026-07-01T06:49:38Z",
   "updatedThrough": "2026-06-30",
   "scoreboard": {
-    "fetchedFinals": 1,
-    "appliedChanges": 1,
-    "kickoffUpdates": 0,
-    "teamSlotUpdates": 0,
+    "fetchedFinals": 3,
+    "appliedChanges": 2,
+    "kickoffUpdates": 3,
+    "teamSlotUpdates": 3,
     "changes": [
       {
-        "match": 78,
+        "match": 77,
         "teams": [
-          "Ivory Coast",
-          "Norway"
+          "France",
+          "Sweden"
         ],
         "score": [
-          1,
-          2
+          3,
+          0
         ],
-        "event": "760490"
+        "event": "760492"
+      },
+      {
+        "match": 79,
+        "teams": [
+          "Mexico",
+          "Ecuador"
+        ],
+        "score": [
+          2,
+          0
+        ],
+        "event": "760491"
       }
     ],
-    "scheduleChanges": [],
+    "scheduleChanges": [
+      {
+        "match": 80,
+        "teams": [
+          "England",
+          "DR Congo"
+        ],
+        "kickoffUtc": "2026-07-01T16:00:00Z",
+        "event": "760495"
+      },
+      {
+        "match": 82,
+        "teams": [
+          "Belgium",
+          "Senegal"
+        ],
+        "kickoffUtc": "2026-07-01T20:00:00Z",
+        "event": "760493"
+      },
+      {
+        "match": 81,
+        "teams": [
+          "United States",
+          "Bosnia and Herzegovina"
+        ],
+        "kickoffUtc": "2026-07-02T00:00:00Z",
+        "event": "760494"
+      }
+    ],
     "fetchFailures": []
   }
 }
