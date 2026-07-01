@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-01T13:53:11Z",
+  "generated_at_utc": "2026-07-01T18:22:00Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -983,15 +983,15 @@
         "draw": 0,
         "away": 0.0144440981
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 2,
+      "actual_away_score": 1,
+      "actual_result": "home_win",
+      "settled_at_utc": "2026-07-01T18:22:00Z",
+      "brier_score": 0.001102898437,
+      "log_loss": 0.025455177214,
+      "scoreline_error": 3.33579,
+      "calibration_bucket": "0.9-1.0",
+      "failure_type": "bad_attack_defense_weight",
       "kickoff_utc": "2026-07-01T16:00:00Z",
       "venue": "Mercedes-Benz Stadium",
       "group": null,
