@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-01T06:49:34Z",
+  "generated_at_utc": "2026-07-01T13:53:11Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -908,6 +908,279 @@
         "weather_adjustment_abs": 0,
         "recent_form_adjustment_abs": 0,
         "host_adjustment_abs": 0.18,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "4fd4bcfacda31cee8dbfe1d6",
+      "created_at_utc": "2026-07-01T13:53:11Z",
+      "match_id": 80,
+      "stage": "R32",
+      "home_team": "England",
+      "away_team": "DR Congo",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-01-accuracy-enriched",
+      "source_snapshot_hash": "b26d14c3e1f3e801dab36883282cffac39c27e7271122b3466c57b2b877a6d14",
+      "predicted_wdl_probs": {
+        "home_win": 0.9748660742,
+        "draw": 0.0213796554,
+        "away_win": 0.0037542704
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "4-0",
+          "probability": 0.13249775
+        },
+        {
+          "score": "5-0",
+          "probability": 0.1264516
+        },
+        {
+          "score": "3-0",
+          "probability": 0.1110664
+        },
+        {
+          "score": "6-0",
+          "probability": 0.10056779
+        },
+        {
+          "score": "2-0",
+          "probability": 0.06982615
+        },
+        {
+          "score": "7-0",
+          "probability": 0.06855619
+        },
+        {
+          "score": "4-1",
+          "probability": 0.04269392
+        },
+        {
+          "score": "8-0",
+          "probability": 0.04089239
+        },
+        {
+          "score": "5-1",
+          "probability": 0.04074571
+        },
+        {
+          "score": "3-1",
+          "probability": 0.03578823
+        },
+        {
+          "score": "6-1",
+          "probability": 0.03240533
+        },
+        {
+          "score": "1-0",
+          "probability": 0.02851151
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9855559019,
+        "draw": 0,
+        "away": 0.0144440981
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-01T16:00:00Z",
+      "venue": "Mercedes-Benz Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "1dd25f1f7e2641b37129f68f",
+      "created_at_utc": "2026-07-01T13:53:11Z",
+      "match_id": 81,
+      "stage": "R32",
+      "home_team": "United States",
+      "away_team": "Bosnia and Herzegovina",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-01-accuracy-enriched",
+      "source_snapshot_hash": "359c3e8d76b1b9ab3ba2b55d64363a02002040e2293de6d62e6689fa00c04a7a",
+      "predicted_wdl_probs": {
+        "home_win": 0.9919823282,
+        "draw": 0.0072043401,
+        "away_win": 0.0008133317
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "5-0",
+          "probability": 0.13264971
+        },
+        {
+          "score": "6-0",
+          "probability": 0.12822805
+        },
+        {
+          "score": "4-0",
+          "probability": 0.1143532
+        },
+        {
+          "score": "7-0",
+          "probability": 0.1062461
+        },
+        {
+          "score": "3-0",
+          "probability": 0.07886427
+        },
+        {
+          "score": "8-0",
+          "probability": 0.07702842
+        },
+        {
+          "score": "10-0",
+          "probability": 0.05674901
+        },
+        {
+          "score": "9-0",
+          "probability": 0.04964054
+        },
+        {
+          "score": "2-0",
+          "probability": 0.04079187
+        },
+        {
+          "score": "5-1",
+          "probability": 0.02942717
+        },
+        {
+          "score": "6-1",
+          "probability": 0.02844627
+        },
+        {
+          "score": "4-1",
+          "probability": 0.02536825
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9955844982,
+        "draw": 0,
+        "away": 0.0044155018
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-02T00:00:00Z",
+      "venue": "Levi’s Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0.18,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "8038e56811b0ad9c787db8a7",
+      "created_at_utc": "2026-07-01T13:53:11Z",
+      "match_id": 82,
+      "stage": "R32",
+      "home_team": "Belgium",
+      "away_team": "Senegal",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-01-accuracy-enriched",
+      "source_snapshot_hash": "ddce64e5ad34fab0486ebb19aaf13253ab8abbdbd0e169a855188770307d4627",
+      "predicted_wdl_probs": {
+        "home_win": 0.5313659670531367,
+        "draw": 0.26420745632642073,
+        "away_win": 0.20442657662044264
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.12586007
+        },
+        {
+          "score": "1-0",
+          "probability": 0.11536417
+        },
+        {
+          "score": "2-0",
+          "probability": 0.10256342
+        },
+        {
+          "score": "2-1",
+          "probability": 0.09585947
+        },
+        {
+          "score": "0-0",
+          "probability": 0.08511452
+        },
+        {
+          "score": "0-1",
+          "probability": 0.06151456
+        },
+        {
+          "score": "3-0",
+          "probability": 0.05624347
+        },
+        {
+          "score": "1-2",
+          "probability": 0.05445989
+        },
+        {
+          "score": "3-1",
+          "probability": 0.05256717
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04479686
+        },
+        {
+          "score": "0-2",
+          "probability": 0.03310365
+        },
+        {
+          "score": "3-2",
+          "probability": 0.02456559
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.6634696952,
+        "draw": 0,
+        "away": 0.3365303048
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-01T20:00:00Z",
+      "venue": "Lumen Field",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
         "attack_defense_weight": 0.14,
         "lineups_missing": false,
         "suspensions_missing": false
