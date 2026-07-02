@@ -411,6 +411,15 @@ function hasResolvedMetrics(prediction) {
     Number.isFinite(Number(prediction.log_loss));
 }
 
+function calibrationTimeline(prediction, matchMap) {
+  const match = matchMap.get(Number(prediction.match_id)) || matchMap.get(String(prediction.match_id));
+  return {
+    created: utcTimestampMs(prediction.created_at_utc),
+    settled: utcTimestampMs(prediction.settled_at_utc),
+    kickoff: match ? matchKickoffMs(match) : utcTimestampMs(prediction.kickoff_utc)
+  };
+}
+
 function isSaneScore(value) {
   return Number.isInteger(value) && value >= 0 && value <= 15;
 }
@@ -425,15 +434,21 @@ export function calibrationEligiblePredictions(predictions, matchMap = new Map()
   return (predictions || [])
     .filter(hasResolvedMetrics)
     .filter(prediction => {
-      const created = utcTimestampMs(prediction.created_at_utc);
-      const settled = utcTimestampMs(prediction.settled_at_utc);
+      const { created, settled, kickoff } = calibrationTimeline(prediction, matchMap);
       if (!Number.isFinite(created) || !Number.isFinite(settled)) return false;
       if (created > asOf || settled > asOf || settled < created) return false;
-      const match = matchMap.get(Number(prediction.match_id)) || matchMap.get(String(prediction.match_id));
-      const kickoff = match ? matchKickoffMs(match) : utcTimestampMs(prediction.kickoff_utc);
       return Number.isFinite(kickoff) && created < kickoff && kickoff <= asOf && settled >= kickoff;
     })
-    .sort((a, b) => Date.parse(a.created_at_utc) - Date.parse(b.created_at_utc) || String(a.prediction_id).localeCompare(String(b.prediction_id)));
+    .sort((a, b) => {
+      const ta = calibrationTimeline(a, matchMap);
+      const tb = calibrationTimeline(b, matchMap);
+      const matchDelta = Number(a.match_id) - Number(b.match_id);
+      return ta.settled - tb.settled ||
+        ta.kickoff - tb.kickoff ||
+        ta.created - tb.created ||
+        (Number.isFinite(matchDelta) ? matchDelta : 0) ||
+        String(a.prediction_id).localeCompare(String(b.prediction_id));
+    });
 }
 
 function applyBucketAdjustmentUnchecked(probs, state) {

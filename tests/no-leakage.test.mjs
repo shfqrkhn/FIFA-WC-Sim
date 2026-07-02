@@ -41,6 +41,16 @@ const eligible = calibrationEligiblePredictions([
 
 assert.deepEqual(eligible.map(p => p.prediction_id), ['p']);
 
+const sameBatch = calibrationEligiblePredictions([
+  { ...base, prediction_id: 'z-earlier-kickoff', match_id: 11, settled_at_utc: '2026-06-22T00:00:00Z' },
+  { ...base, prediction_id: 'a-later-kickoff', match_id: 12, settled_at_utc: '2026-06-22T00:00:00Z' }
+], new Map([
+  [11, { no: 11, date: '2026-06-20T18:00:00Z' }],
+  [12, { no: 12, date: '2026-06-21T18:00:00Z' }]
+]), { asOfUtc: '2026-06-23T00:00:00Z' });
+
+assert.deepEqual(sameBatch.map(p => p.prediction_id), ['z-earlier-kickoff', 'a-later-kickoff']);
+
 const repoText = [
   fs.readFileSync('README.md', 'utf8'),
   fs.readFileSync('docs/index.html', 'utf8')
