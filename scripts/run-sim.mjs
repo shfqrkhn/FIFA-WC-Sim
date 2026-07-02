@@ -111,13 +111,13 @@ if (!footerMetadataOk) {
   throw new Error('Footer metadata did not render app version, data version, copyright, and legal notice.');
 }
 const sponsorButtonOk =
-  html.includes('src="https://github.com/sponsors/shfqrkhn/button"') &&
-  html.includes('title="Sponsor shfqrkhn"') &&
-  html.includes('loading="lazy"') &&
+  html.includes('href="https://github.com/sponsors/shfqrkhn?o=esb"') &&
+  html.includes('target="_blank"') &&
+  html.includes('rel="noopener noreferrer"') &&
   html.includes('class="footerSupport"') &&
-  html.includes('class="sponsorFrame"');
+  html.includes('class="btn sponsorLink"');
 if (!sponsorButtonOk) {
-  throw new Error('GitHub sponsor button was not embedded as a lazy nonessential footer control.');
+  throw new Error('GitHub sponsor link was not embedded as a nonessential footer control.');
 }
 const footerLatestOk = vm.runInContext(`(() => {
   const vals = [DATA.dataQuality?.updatedAt, DATA.generatedAt, DATA.currentStats?.updatedAt].filter(Boolean);
