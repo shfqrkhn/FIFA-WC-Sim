@@ -1,5 +1,7 @@
 # World Cup 2026 Simulator
 
+<p><a href="https://github.com/sponsors/shfqrkhn?o=esb"><strong>Sponsor this project</strong></a></p>
+
 **Current Data Version:** shown in the deployed app's Data health view from embedded `BASE_DATA`.
 
 Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026 format. It combines embedded results, FIFA-style group ranking, knockout rules, venue/weather/rest/travel context, transparent model assumptions, seeded randomness, and Monte Carlo tournament runs into one portable web app.
