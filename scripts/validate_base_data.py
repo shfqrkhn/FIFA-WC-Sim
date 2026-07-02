@@ -120,7 +120,8 @@ REQUIRED_BRACKET_UI = [
     'text-overflow:ellipsis',
     'venueText',
     'teamText',
-    'title="${venue}"',
+    'matchTimeVenueLabel',
+    'title="${meta}"',
     'title="${teamA}"',
 ]
 REQUIRED_WORKFLOW_STEPS = [

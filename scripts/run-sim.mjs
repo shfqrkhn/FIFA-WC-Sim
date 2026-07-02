@@ -159,6 +159,10 @@ const todayHighlightOk = vm.runInContext(`(() => {
       ko: []
     }).map(m => m.no).join(',');
     const bracketHtml = matchCard({ no: 999, round: 'R32', date: key, venue: 'Smoke Venue', teamA: 'Argentina', teamB: 'Portugal' });
+    const penaltyToday = { no: 998, round: 'R32', stage: 'R32', date: key, kickoffUtc: key + 'T16:00:00Z', venue: 'Smoke Venue', teamA: 'Portugal', teamB: 'Croatia', scoreA: 2, scoreB: 2, played: true, winner: 'Portugal', loser: 'Croatia', pens: { winner: 'Portugal', score: '6-4' } };
+    renderTodayMatches(date, { matches: [], ko: [penaltyToday] });
+    const todayPenaltyHtml = $('#todayView')?.innerHTML || '';
+    const bracketPenaltyHtml = matchCard(penaltyToday);
     return localDateKey(date) === key &&
       isTodayMatch({ date: key }, date) &&
       !isTodayMatch({ date: '2099-01-01' }, date) &&
@@ -172,6 +176,10 @@ const todayHighlightOk = vm.runInContext(`(() => {
       todayHtml.includes(localTime) &&
       !matchTimeLabel({ date: key }) &&
       runTodayRows.every(m => runTodayHtml.includes('M' + m.no) && runTodayHtml.includes(m.scoreA + '–' + m.scoreB)) &&
+      todayPenaltyHtml.includes('Portugal on penalties 6-4') &&
+      bracketPenaltyHtml.includes('Portugal on penalties 6-4') &&
+      todayPenaltyHtml.includes(matchTimeLabel(penaltyToday)) &&
+      bracketPenaltyHtml.includes(matchTimeLabel(penaltyToday)) &&
       (groupsHtml.match(/todayMatch/g) || []).length >= runTodayRows.length &&
       bracketHtml.includes('todayMatch') &&
       bracketHtml.includes('Today');
@@ -190,11 +198,13 @@ const knockoutTodayTimeOk = vm.runInContext(`(() => {
   const ordered = todayMatches(date).map(m => m.no);
   const m76 = DATA.knockout.find(m => m.no === 76);
   const m74 = DATA.knockout.find(m => m.no === 74);
+  const bracket74 = matchCard(m74);
   return rows.every(m => m && m.kickoffUtc && matchTimeLabel(m)) &&
     html.includes('M76') &&
     html.includes(matchTimeLabel(m76)) &&
     html.includes('M74') &&
     html.includes(matchTimeLabel(m74)) &&
+    bracket74.includes(matchTimeLabel(m74)) &&
     ordered.indexOf(76) >= 0 &&
     ordered.indexOf(74) > ordered.indexOf(76);
 })()`, sandbox, { timeout: 1000 });
