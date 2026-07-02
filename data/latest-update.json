@@ -1,26 +1,54 @@
 {
-  "generatedAt": "2026-07-01T23:13:26Z",
+  "generatedAt": "2026-07-02T06:13:33Z",
   "updatedThrough": "2026-07-01",
   "scoreboard": {
-    "fetchedFinals": 2,
+    "fetchedFinals": 3,
     "appliedChanges": 1,
-    "kickoffUpdates": 0,
-    "teamSlotUpdates": 0,
+    "kickoffUpdates": 3,
+    "teamSlotUpdates": 1,
     "changes": [
       {
-        "match": 82,
+        "match": 81,
         "teams": [
-          "Belgium",
-          "Senegal"
+          "United States",
+          "Bosnia and Herzegovina"
         ],
         "score": [
-          3,
-          2
+          2,
+          0
         ],
-        "event": "760493"
+        "event": "760494"
       }
     ],
-    "scheduleChanges": [],
+    "scheduleChanges": [
+      {
+        "match": 84,
+        "teams": [
+          "Spain",
+          "Austria"
+        ],
+        "kickoffUtc": "2026-07-02T19:00:00Z",
+        "event": "760497"
+      },
+      {
+        "match": 83,
+        "teams": [
+          "Portugal",
+          "Croatia"
+        ],
+        "kickoffUtc": "2026-07-02T23:00:00Z",
+        "event": "760496"
+      },
+      {
+        "match": 85,
+        "teams": [
+          "Switzerland",
+          "Algeria"
+        ],
+        "kickoffUtc": "2026-07-03T03:00:00Z",
+        "event": "760498"
+      }
+    ],
     "fetchFailures": []
   }
 }

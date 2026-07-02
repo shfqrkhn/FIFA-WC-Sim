@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-01T23:13:23Z",
+  "generated_at_utc": "2026-07-02T06:13:30Z",
   "calibration_status": "insufficient_sample",
   "active": false,
-  "resolved_predictions": 12,
+  "resolved_predictions": 13,
   "min_resolved_predictions": 30,
   "use_calibrated_probabilities": false,
   "method": "conservative_bucket_calibration",
@@ -12,19 +12,19 @@
   "validation_metrics": null,
   "benchmark_metrics": {
     "raw_model": {
-      "brier_score": 0.304492560705,
-      "log_loss": 0.527771389816,
-      "count": 12
+      "brier_score": 0.281079044273,
+      "log_loss": 0.487792820305,
+      "count": 13
     },
     "uniform_wdl": {
       "brier_score": 0.666666666667,
       "log_loss": 1.098612288668,
-      "count": 12
+      "count": 13
     },
     "rank_prior": {
-      "brier_score": 0.44889266418,
-      "log_loss": 0.787916923943,
-      "count": 12
+      "brier_score": 0.427182349771,
+      "log_loss": 0.755922202113,
+      "count": 13
     }
   },
   "last_update_decision": "insufficient_sample",
