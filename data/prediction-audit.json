@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-02T06:13:30Z",
+  "generated_at_utc": "2026-07-02T13:20:26Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -1176,6 +1176,279 @@
       "failure_type": "bad_attack_defense_weight",
       "kickoff_utc": "2026-07-01T20:00:00Z",
       "venue": "Lumen Field",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "ba179c1a9f2a30ad33636892",
+      "created_at_utc": "2026-07-02T13:20:26Z",
+      "match_id": 83,
+      "stage": "R32",
+      "home_team": "Portugal",
+      "away_team": "Croatia",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-02-accuracy-enriched",
+      "source_snapshot_hash": "b7013de2c5cdf4e06e569e581b3682f85c66c675533fb5432bbfb3e17ad4a881",
+      "predicted_wdl_probs": {
+        "home_win": 0.5520878261447911,
+        "draw": 0.2578710956742129,
+        "away_win": 0.190041078180996
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.12284162
+        },
+        {
+          "score": "1-0",
+          "probability": 0.11658862
+        },
+        {
+          "score": "2-0",
+          "probability": 0.10677736
+        },
+        {
+          "score": "2-1",
+          "probability": 0.09662893
+        },
+        {
+          "score": "0-0",
+          "probability": 0.08307326
+        },
+        {
+          "score": "3-0",
+          "probability": 0.06047464
+        },
+        {
+          "score": "0-1",
+          "probability": 0.05784381
+        },
+        {
+          "score": "3-1",
+          "probability": 0.05472696
+        },
+        {
+          "score": "1-2",
+          "probability": 0.05146593
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04372252
+        },
+        {
+          "score": "0-2",
+          "probability": 0.03029036
+        },
+        {
+          "score": "4-0",
+          "probability": 0.02568791
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.681023374,
+        "draw": 0,
+        "away": 0.318976626
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-02T23:00:00Z",
+      "venue": "BMO Field",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "af039c1c69585fe6c3b263ba",
+      "created_at_utc": "2026-07-02T13:20:26Z",
+      "match_id": 84,
+      "stage": "R32",
+      "home_team": "Spain",
+      "away_team": "Austria",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-02-accuracy-enriched",
+      "source_snapshot_hash": "8a30a8243498f41d93c799625bd8fc1e3d31e7f28eb4ca446149b5555fb6a7dc",
+      "predicted_wdl_probs": {
+        "home_win": 0.8587079881,
+        "draw": 0.1059982834,
+        "away_win": 0.0352937285
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "2-0",
+          "probability": 0.13469654
+        },
+        {
+          "score": "3-0",
+          "probability": 0.13364143
+        },
+        {
+          "score": "4-0",
+          "probability": 0.09944594
+        },
+        {
+          "score": "1-0",
+          "probability": 0.08676634
+        },
+        {
+          "score": "2-1",
+          "probability": 0.06958152
+        },
+        {
+          "score": "3-1",
+          "probability": 0.06903647
+        },
+        {
+          "score": "5-0",
+          "probability": 0.05920017
+        },
+        {
+          "score": "4-1",
+          "probability": 0.05137177
+        },
+        {
+          "score": "1-1",
+          "probability": 0.05049423
+        },
+        {
+          "score": "0-0",
+          "probability": 0.03414738
+        },
+        {
+          "score": "5-1",
+          "probability": 0.03058161
+        },
+        {
+          "score": "6-0",
+          "probability": 0.02936822
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9117071298,
+        "draw": 0,
+        "away": 0.0882928702
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-02T19:00:00Z",
+      "venue": "SoFi Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "4a997e898b2ef4caa2e13ae2",
+      "created_at_utc": "2026-07-02T13:20:26Z",
+      "match_id": 85,
+      "stage": "R32",
+      "home_team": "Switzerland",
+      "away_team": "Algeria",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-02-accuracy-enriched",
+      "source_snapshot_hash": "3c51181be5fdbab01307b083d6a7b089b276814184122756d8bf5a095ab1e199",
+      "predicted_wdl_probs": {
+        "home_win": 0.67559543,
+        "draw": 0.2091108331,
+        "away_win": 0.1152937369
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "2-0",
+          "probability": 0.12867974
+        },
+        {
+          "score": "1-0",
+          "probability": 0.11687115
+        },
+        {
+          "score": "1-1",
+          "probability": 0.09961378
+        },
+        {
+          "score": "2-1",
+          "probability": 0.09552336
+        },
+        {
+          "score": "3-0",
+          "probability": 0.08884497
+        },
+        {
+          "score": "0-0",
+          "probability": 0.06736513
+        },
+        {
+          "score": "3-1",
+          "probability": 0.06595265
+        },
+        {
+          "score": "4-0",
+          "probability": 0.04600625
+        },
+        {
+          "score": "0-1",
+          "probability": 0.0371511
+        },
+        {
+          "score": "2-2",
+          "probability": 0.03545513
+        },
+        {
+          "score": "1-2",
+          "probability": 0.03423459
+        },
+        {
+          "score": "4-1",
+          "probability": 0.03415201
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.7801508465,
+        "draw": 0,
+        "away": 0.2198491535
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-03T03:00:00Z",
+      "venue": "BC Place",
       "group": null,
       "feature_flags": {
         "weather_adjustment_abs": 0,
