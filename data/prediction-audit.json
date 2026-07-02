@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-02T13:20:26Z",
+  "generated_at_utc": "2026-07-02T21:41:42Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -1347,15 +1347,15 @@
         "draw": 0,
         "away": 0.0882928702
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 3,
+      "actual_away_score": 0,
+      "actual_result": "home_win",
+      "settled_at_utc": "2026-07-02T21:41:42Z",
+      "brier_score": 0.032444715982,
+      "log_loss": 0.152326358797,
+      "scoreline_error": 0.511381,
+      "calibration_bucket": "0.8-0.9",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-02T19:00:00Z",
       "venue": "SoFi Stadium",
       "group": null,
