@@ -211,6 +211,22 @@ const knockoutTodayTimeOk = vm.runInContext(`(() => {
 if (!knockoutTodayTimeOk) {
   throw new Error('Today knockout matches did not render localized kickoff times in chronological order.');
 }
+const todayMcPredictionOk = vm.runInContext(`(() => {
+  const candidate = DATA.knockout.find(m => !m.played && m.kickoffUtc);
+  if (!candidate) return true;
+  const date = new Date(candidate.kickoffUtc);
+  const run = MC.representative || simulate('today-mc-smoke');
+  const row = todayMatches(date, run).find(m => m.no === candidate.no);
+  if (!row) return false;
+  const text = formatKnockoutMCPrediction(row.no, row.teamA, row.teamB);
+  renderTodayMatches(date, run);
+  const todayHtml = $('#todayView')?.innerHTML || '';
+  const bracketHtml = matchCard(row);
+  return !!text && todayHtml.includes(text) && bracketHtml.includes(text);
+})()`, sandbox, { timeout: 5000 });
+if (!todayMcPredictionOk) {
+  throw new Error('Today match cards did not include the same Monte Carlo prediction summary as Bracket cards.');
+}
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
   const parts = key.split('-').map(Number);
