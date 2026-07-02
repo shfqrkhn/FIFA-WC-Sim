@@ -362,6 +362,12 @@ export function scorePrediction(prediction, match, settledAtUtc = utcNow()) {
   if (!prediction || !match) return { scored: false, reason: 'missing prediction or match' };
   if (prediction.actual_result) return { scored: false, reason: 'already settled', prediction };
   if (!isBeforeKickoff(prediction.created_at_utc, match)) return { scored: false, reason: 'prediction created after kickoff' };
+  const created = Date.parse(prediction.created_at_utc);
+  const kickoff = matchKickoffMs(match);
+  const settled = Date.parse(settledAtUtc);
+  if (!Number.isFinite(settled)) return { scored: false, reason: 'settlement timestamp is invalid' };
+  if (Number.isFinite(created) && settled < created) return { scored: false, reason: 'settlement timestamp before prediction creation' };
+  if (Number.isFinite(kickoff) && settled < kickoff) return { scored: false, reason: 'settlement timestamp before kickoff' };
   const scoreA = match.scoreA;
   const scoreB = match.scoreB;
   if (!match.played || !isSaneScore(scoreA) || !isSaneScore(scoreB)) {

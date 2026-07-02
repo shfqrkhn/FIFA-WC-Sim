@@ -58,6 +58,14 @@ const late = scorePrediction({ ...frozen, created_at_utc: '2026-06-20T18:00:01Z'
 assert.equal(late.scored, false);
 assert.match(late.reason, /after kickoff/);
 
+const prematureSettlement = scorePrediction(frozen, completed, '2026-06-20T17:59:59Z');
+assert.equal(prematureSettlement.scored, false);
+assert.match(prematureSettlement.reason, /before kickoff/);
+
+const impossibleSettlementOrder = scorePrediction(frozen, completed, '2026-06-20T11:59:59Z');
+assert.equal(impossibleSettlementOrder.scored, false);
+assert.match(impossibleSettlementOrder.reason, /before prediction creation/);
+
 const malformedScore = scorePrediction(frozen, { ...completed, scoreA: 1.5 }, '2026-06-20T20:00:00Z');
 assert.equal(malformedScore.scored, false);
 assert.match(malformedScore.reason, /sane integer/);
