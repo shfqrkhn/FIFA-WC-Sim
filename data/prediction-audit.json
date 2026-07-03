@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-02T21:41:42Z",
+  "generated_at_utc": "2026-07-03T01:51:15Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -1256,15 +1256,15 @@
         "draw": 0,
         "away": 0.318976626
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 2,
+      "actual_away_score": 1,
+      "actual_result": "home_win",
+      "settled_at_utc": "2026-07-03T01:51:15Z",
+      "brier_score": 0.303238428868,
+      "log_loss": 0.594048140026,
+      "scoreline_error": 0.863237,
+      "calibration_bucket": "0.5-0.6",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-02T23:00:00Z",
       "venue": "BMO Field",
       "group": null,
