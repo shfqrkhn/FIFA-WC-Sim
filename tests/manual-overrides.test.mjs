@@ -69,6 +69,32 @@ try {
   assert.equal(match.availability.A.keyAbsences, 1);
   assert.equal(match.availability.A.confirmedSuspensions, 1);
   assert.ok(data.sources.some(s => s.name === 'Verified test source'));
+
+  writeFileSync(overridePath, JSON.stringify({
+    schema: 1,
+    currentStats: {
+      topScorers: [{ player: 'Example Player', team: 'Canada', goals: 1 }]
+    }
+  }), 'utf8');
+  runPython(['--file', overridePath], { FIFA_WC_HTML_PATH: htmlPath }, 1);
+
+  writeFileSync(overridePath, JSON.stringify({
+    schema: 1,
+    currentStats: {
+      source: 'Verified stats source',
+      sourceUrl: 'https://www.fifa.com/',
+      topScorersSource: 'Official scorer snapshot verified for test',
+      topScorers: [{ player: 'Example Player', team: 'Canada', goals: 1 }],
+      thirdPlaceTableSource: 'Official conduct snapshot verified for test',
+      conductScores: [{ team: 'Canada', score: -1, note: 'Verified test conduct row' }]
+    }
+  }), 'utf8');
+  runPython(['--file', overridePath], { FIFA_WC_HTML_PATH: htmlPath });
+  const statsData = readBaseData(htmlPath);
+  assert.equal(statsData.currentStats.topScorers[0].player, 'Example Player');
+  assert.equal(statsData.currentStats.topScorers[0].goals, 1);
+  assert.equal(statsData.currentStats.conductScores[0].team, 'Canada');
+  assert.equal(statsData.currentStats.conductScores[0].score, -1);
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

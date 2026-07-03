@@ -163,7 +163,7 @@ Preserve these rules:
 - Keep raw base model output and calibrated output separable.
 - Keep calibration disabled below the threshold.
 - Roll back or fail closed if calibration worsens validation metrics.
-- Keep unavailable lineups, injuries, suspensions, referees, and incomplete discipline ledgers neutral unless reliable source-backed data exists.
+- Keep unavailable lineups, injuries, suspensions, referees, scorer snapshots, and incomplete discipline ledgers neutral unless reliable source-backed data exists.
 - Do not use betting, odds, sportsbook, wagering, market-edge, or prediction-market data.
 - If expanding toward Prediction Hub, keep the architecture as platform + templates + instances: shared shell/governance, reusable event templates, and concrete event instances. FIFA and UEFA can be first-class; March Madness, NBA playoffs, tennis slams, cricket tournaments, or other events must inherit the same frozen-ledger and source-health gates rather than weakening them.
 
@@ -255,7 +255,7 @@ Minimum expected structural invariants:
 
 - Automated scores come from ESPN public scoreboard matching, with official FIFA preferred for manual dispute resolution.
 - Weather enrichment can be missing for unplayed matches and must degrade to neutral/climate assumptions.
-- Top scorers are empty unless a reliable scorer feed or manual source-backed patch is added.
+- Top scorers are empty unless a reliable scorer feed or source-backed manual `currentStats.topScorers` patch is supplied.
 - Award projections are simulator-side estimates, not official FIFA predictions.
 - Full discipline, lineups, injuries, suspensions, goalkeeper changes, and referee assignments are not automatically ingested.
 - The backtest is prospective from frozen records, not a historical replay.
@@ -265,9 +265,9 @@ Minimum expected structural invariants:
 
 Only implement if source-backed and covered by tests:
 
-- Add a reliable official/manual scorer snapshot path.
-- Add source-backed discipline/fair-play ledger patches.
-- Add source-backed availability patches for confirmed suspensions, key absences, and goalkeeper changes.
+- Populate the official/manual scorer snapshot path when a reliable source is available.
+- Populate source-backed discipline/fair-play ledger patches when reliable source data is available.
+- Populate source-backed availability patches for confirmed suspensions, key absences, and goalkeeper changes when reliable source data is available.
 - Improve workflow observability only where it reduces real debugging time.
 - Keep expanding frozen-prediction audit sample through the rest of the tournament.
 

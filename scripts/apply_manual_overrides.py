@@ -13,6 +13,11 @@ END_MARKER = ';\nconst BLOCKED_PATCH_KEYS'
 BLOCKED_KEYS = {'__proto__', 'prototype', 'constructor'}
 TEAM_KEYS = {'injuryPenalty', 'suspensionPenalty', 'fairPlay', 'sourceNote'}
 MATCH_KEYS = {'availability', 'lineups', 'context', 'discipline', 'sourceNote', 'note'}
+CURRENT_STATS_KEYS = {
+    'source', 'sourceUrl', 'url', 'updatedTo', 'lastUpdated',
+    'topScorers', 'topScorersSource',
+    'conductScores', 'thirdPlaceTableSource',
+}
 SIDE_KEYS = {'A', 'B'}
 AVAILABILITY_KEYS = {
     'status', 'sourceTier', 'sourceStatus', 'tier', 'source', 'sourceUrl', 'url', 'note',
@@ -86,6 +91,16 @@ def require_source(row, label):
         raise ValueError(f'{label} override requires source, sourceUrl, or url')
 
 
+def stats_source(row, field):
+    if has_source(row):
+        return True
+    source_key = 'topScorersSource' if field == 'topScorers' else 'thirdPlaceTableSource'
+    source = str(row.get(source_key) or '')
+    if not source or 'not refreshed' in source.lower() or 'example only' in source.lower():
+        return False
+    return True
+
+
 def number(value, label, lo, hi):
     try:
         parsed = float(value)
@@ -133,6 +148,48 @@ def validate_context(value):
         if 'goalAdj' in row:
             require_source(row, f'context.{side}')
             row['goalAdj'] = number(row['goalAdj'], f'context.{side}.goalAdj', -0.22, 0.22)
+    return out
+
+
+def validate_top_scorers(value, parent):
+    if not isinstance(value, list):
+        raise ValueError('currentStats.topScorers must be a list')
+    if value and not stats_source(parent, 'topScorers'):
+        raise ValueError('currentStats.topScorers requires source metadata or topScorersSource')
+    out = []
+    for i, row in enumerate(value):
+        if not isinstance(row, dict):
+            raise ValueError(f'currentStats.topScorers[{i}] must be an object')
+        allowed = {'player', 'team', 'goals', 'source', 'sourceUrl', 'url', 'note'}
+        extra = set(row) - allowed
+        if extra:
+            raise ValueError(f'currentStats.topScorers[{i}] unsupported keys: {", ".join(sorted(extra))}')
+        if not row.get('player') or not row.get('team'):
+            raise ValueError(f'currentStats.topScorers[{i}] requires player and team')
+        next_row = dict(row)
+        next_row['goals'] = int(number(row.get('goals'), f'currentStats.topScorers[{i}].goals', 0, 99))
+        out.append(next_row)
+    return out
+
+
+def validate_conduct_scores(value, parent):
+    if not isinstance(value, list):
+        raise ValueError('currentStats.conductScores must be a list')
+    if value and not stats_source(parent, 'conductScores'):
+        raise ValueError('currentStats.conductScores requires source metadata or thirdPlaceTableSource')
+    out = []
+    for i, row in enumerate(value):
+        if not isinstance(row, dict):
+            raise ValueError(f'currentStats.conductScores[{i}] must be an object')
+        allowed = {'team', 'score', 'source', 'sourceUrl', 'url', 'note'}
+        extra = set(row) - allowed
+        if extra:
+            raise ValueError(f'currentStats.conductScores[{i}] unsupported keys: {", ".join(sorted(extra))}')
+        if not row.get('team'):
+            raise ValueError(f'currentStats.conductScores[{i}] requires team')
+        next_row = dict(row)
+        next_row['score'] = number(row.get('score'), f'currentStats.conductScores[{i}].score', -100, 100)
+        out.append(next_row)
     return out
 
 
@@ -218,6 +275,29 @@ def apply_match_override(data, row):
     return changed
 
 
+def apply_current_stats_override(data, row):
+    if not isinstance(row, dict):
+        raise ValueError('currentStats override must be an object')
+    for key in row:
+        if key not in CURRENT_STATS_KEYS:
+            raise ValueError(f'currentStats override key not supported: {key}')
+    current = data.get('currentStats')
+    if not isinstance(current, dict):
+        current = {}
+        data['currentStats'] = current
+    patch = {}
+    for key, value in row.items():
+        if key == 'topScorers':
+            patch[key] = validate_top_scorers(value, row)
+        elif key == 'conductScores':
+            patch[key] = validate_conduct_scores(value, row)
+        else:
+            patch[key] = value
+    before = json.dumps(current, sort_keys=True)
+    current.update(copy.deepcopy(patch))
+    return before != json.dumps(current, sort_keys=True)
+
+
 def apply_overrides(data, overrides):
     changed = False
     for source in overrides.get('sources') or []:
@@ -226,6 +306,8 @@ def apply_overrides(data, overrides):
         changed = apply_team_override(data, row) or changed
     for row in overrides.get('matches') or []:
         changed = apply_match_override(data, row) or changed
+    if overrides.get('currentStats'):
+        changed = apply_current_stats_override(data, overrides.get('currentStats')) or changed
     maintenance = data.setdefault('maintenance', {})
     if overrides.get('notes'):
         notes = maintenance.get('manualOverrideNotes')

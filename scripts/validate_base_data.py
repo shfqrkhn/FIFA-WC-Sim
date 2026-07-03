@@ -332,6 +332,8 @@ REQUIRED_SCRIPT_MARKERS = {
         "manual_verified",
         "def apply_team_override",
         "def apply_match_override",
+        "def apply_current_stats_override",
+        "topScorersSource",
     ],
     'scripts/write-workflow-summary.mjs': [
         'BASE_DATA update summary',
@@ -752,7 +754,8 @@ if current_stats:
     if 'ESPN scoreboard updater refreshed' in source or 'ESPN public scoreboard' in source:
         if current_stats.get('attendance') is not None or current_stats.get('attendancePerMatch') is not None:
             errors.append('scoreboard-refreshed currentStats must not retain stale attendance totals')
-        if current_stats.get('topScorers'):
+        scorer_source = str(current_stats.get('topScorersSource', ''))
+        if current_stats.get('topScorers') and (not scorer_source or 'not refreshed' in scorer_source.lower()):
             errors.append('scoreboard-refreshed currentStats must not retain stale top-scorer rows')
 weather_by_match = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
 if weather_by_match:

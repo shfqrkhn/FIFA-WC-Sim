@@ -61,7 +61,7 @@ Ignored local/private files are private-file guardrails:
 - **Health:** data version, validation history, patch history, forecast audit, known risks, and update checklist.
 - **Sources:** source notes and update protocol.
 
-Top scorers can be empty because the automated scoreboard feed updates match scores, not official player scorer tables. Stale scorer rows are cleared instead of reused. Award projections are simulator-side estimates from embedded team/star assumptions and Monte Carlo progression; missing player-age, goalkeeper, and full discipline ledgers remain unavailable rather than invented.
+Top scorers can be empty because the automated scoreboard feed updates match scores, not official player scorer tables. Stale scorer rows are cleared instead of reused. A verified manual `currentStats.topScorers` patch may supply a dated scorer snapshot; otherwise scorer rows remain empty. Award projections are simulator-side estimates from embedded team/star assumptions and Monte Carlo progression; missing player-age, goalkeeper, and full discipline ledgers remain unavailable rather than invented.
 
 ### Chances
 
@@ -81,7 +81,7 @@ The app keeps Monte Carlo as the tournament-level simulator. Individual matches 
 8. FIFA-style group ranking, best-third-place allocation, and knockout resolution.
 9. Monte Carlo aggregation for champion, finalist, semifinal, quarterfinal, and R16 probabilities.
 
-Unavailable lineups, injuries, suspensions, referee assignments, and incomplete discipline ledgers remain neutral unless a reliable source-backed patch is embedded.
+Unavailable lineups, injuries, suspensions, referee assignments, scorer snapshots, and incomplete discipline ledgers remain neutral unless a reliable source-backed patch is embedded.
 
 ## Prediction Audit, Backtest, And Calibration
 
@@ -121,15 +121,15 @@ Automated sources:
 - Embedded schedule and venue coordinates for rest/travel context.
 - Embedded FIFA ranking fields for rank-seeded Elo-style priors.
 - Embedded standings for conservative group-table incentive adjustments.
-- Optional local `data/manual-overrides.json` patches following `data/manual-overrides.example.json`; overrides must include source metadata and stay narrow.
+- Optional local `data/manual-overrides.json` patches following `data/manual-overrides.example.json`; overrides must include source metadata and stay narrow. This is the guarded manual path for verified availability, scorer snapshots, and discipline/fair-play corrections.
 
-Official FIFA pages remain the preferred manual authority for fixtures, reports, rankings, regulations, discipline, and disputed data.
+Official FIFA pages remain the preferred manual authority for fixtures, reports, rankings, regulations, scorer snapshots, discipline, and disputed data.
 
 Not automatically updated:
 
 - Lineups, injuries, suspensions, and referee assignments.
 - Confirmed goalkeeper/key-absence modifiers unless verified source metadata is patched.
-- Full disciplinary/fair-play card ledger beyond embedded known conduct notes.
+- Full disciplinary/fair-play card ledger beyond embedded known conduct notes unless a verified manual conduct snapshot is patched.
 - Betting odds, gambling-market data, prediction-market data, or sportsbook data. These are not used.
 
 ## Manual Update And Rescue

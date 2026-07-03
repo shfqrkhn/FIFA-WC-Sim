@@ -37,5 +37,13 @@
         }
       }
     }
-  ]
+  ],
+  "currentStats": {
+    "source": "Example neutral stats patch only",
+    "sourceUrl": "https://www.fifa.com/",
+    "topScorersSource": "Example only. Replace with an official scorer snapshot source before adding scorer rows.",
+    "topScorers": [],
+    "thirdPlaceTableSource": "Example only. Replace with an official discipline/fair-play source before adding conduct rows.",
+    "conductScores": []
+  }
 }
