@@ -1,23 +1,23 @@
 {
-  "generatedAt": "2026-07-03T05:42:30Z",
-  "updatedThrough": "2026-07-02",
+  "generatedAt": "2026-07-03T21:00:04Z",
+  "updatedThrough": "2026-07-03",
   "scoreboard": {
-    "fetchedFinals": 3,
+    "fetchedFinals": 1,
     "appliedChanges": 1,
     "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 85,
+        "match": 88,
         "teams": [
-          "Switzerland",
-          "Algeria"
+          "Australia",
+          "Egypt"
         ],
         "score": [
-          2,
-          0
+          1,
+          1
         ],
-        "event": "760498"
+        "event": "760499"
       }
     ],
     "scheduleChanges": [],

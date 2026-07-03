@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-03T05:42:31Z",
+  "generatedAt": "2026-07-03T21:00:04Z",
   "scoreboard": {
-    "playedMatches": 85,
+    "playedMatches": 86,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 13,
+    "playedKnockoutMatches": 14,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
     "nextScheduledMatchDay": "2026-07-03",
     "currentStats": {
-      "updatedTo": "2026-07-02",
-      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-02",
-      "matchesPlayed": 85,
-      "goalsScored": 249,
-      "goalsPerMatch": 2.93,
+      "updatedTo": "2026-07-03",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-03",
+      "matchesPlayed": 86,
+      "goalsScored": 251,
+      "goalsPerMatch": 2.92,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -34,28 +34,28 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-07-03T05:42:30Z"
+      "lastUpdated": "2026-07-03T21:00:04Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-03T05:42:30Z",
-      "updatedThrough": "2026-07-02",
+      "generatedAt": "2026-07-03T21:00:04Z",
+      "updatedThrough": "2026-07-03",
       "scoreboard": {
-        "fetchedFinals": 3,
+        "fetchedFinals": 1,
         "appliedChanges": 1,
         "kickoffUpdates": 0,
         "teamSlotUpdates": 0,
         "changes": [
           {
-            "match": 85,
+            "match": 88,
             "teams": [
-              "Switzerland",
-              "Algeria"
+              "Australia",
+              "Egypt"
             ],
             "score": [
-              2,
-              0
+              1,
+              1
             ],
-            "event": "760498"
+            "event": "760499"
           }
         ],
         "scheduleChanges": [],
@@ -65,33 +65,33 @@
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 19,
+    "totalUnplayedMatches": 18,
     "failedMatches": []
   },
   "predictionAudit": {
     "frozenPredictions": 19,
-    "settledPredictions": 16,
+    "settledPredictions": 17,
     "calibrationStatus": "insufficient_sample",
-    "resolvedPredictions": 16,
+    "resolvedPredictions": 17,
     "minimumResolvedPredictions": 30
   },
   "backtestAudit": {
     "sampleStatus": "insufficient_sample",
-    "resolvedPredictions": 16,
+    "resolvedPredictions": 17,
     "rawModel": {
-      "brier_score": 0.259498064483,
-      "log_loss": 0.467490126326,
-      "count": 16
+      "brier_score": 0.288546725378,
+      "log_loss": 0.512480440414,
+      "count": 17
     }
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 85,
+      "playedMatches": 86,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 13,
+      "playedKnockoutMatches": 14,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -108,7 +108,7 @@
     "weather": {
       "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 19,
+      "totalUnplayedMatches": 18,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -168,7 +168,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-03T05:42:31Z"
+    "updatedAt": "2026-07-03T21:00:04Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
