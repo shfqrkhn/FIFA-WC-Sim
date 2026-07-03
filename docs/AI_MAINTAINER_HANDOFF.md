@@ -18,6 +18,7 @@ The app must remain:
 - Offline-capable from embedded `BASE_DATA`.
 - Transparent about probabilistic assumptions and data gaps.
 - Free of tracking, hidden remote scripts, betting, odds, gambling, sportsbook, market-edge, or prediction-market features.
+- A future Prediction Hub can grow from this repo only if it preserves the current simulator's frozen-audit, no-leakage, source-backed, static/offline, and raw-vs-calibrated governance.
 
 ## Current State Snapshot
 
@@ -50,6 +51,7 @@ Verify these values before relying on them; they describe the repo at the audit 
 - `docs/index.html`: single-file app shell, embedded `BASE_DATA`, model, UI, local storage, self-tests.
 - `docs/AI_MAINTAINER_HANDOFF.md`: this public-safe continuation map.
 - `docs/assets/`: public README/demo assets.
+- Private Prediction Hub planning references may exist in the local GH workspace docs bundle; do not publish or copy them by default.
 - `data/latest-update.json`: latest update receipt.
 - `data/update-health.json`: generated health and data-quality receipt.
 - `data/prediction-audit.json`: immutable frozen prediction ledger.
@@ -163,6 +165,7 @@ Preserve these rules:
 - Roll back or fail closed if calibration worsens validation metrics.
 - Keep unavailable lineups, injuries, suspensions, referees, and incomplete discipline ledgers neutral unless reliable source-backed data exists.
 - Do not use betting, odds, sportsbook, wagering, market-edge, or prediction-market data.
+- If expanding toward Prediction Hub, keep the architecture as platform + templates + instances: shared shell/governance, reusable event templates, and concrete event instances. FIFA and UEFA can be first-class; March Madness, NBA playoffs, tennis slams, cricket tournaments, or other events must inherit the same frozen-ledger and source-health gates rather than weakening them.
 
 Failure classes currently supported:
 
