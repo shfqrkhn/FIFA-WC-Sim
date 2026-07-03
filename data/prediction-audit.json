@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-03T01:51:15Z",
+  "generated_at_utc": "2026-07-03T05:42:27Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -1438,6 +1438,97 @@
         "draw": 0,
         "away": 0.2198491535
       },
+      "actual_home_score": 2,
+      "actual_away_score": 0,
+      "actual_result": "home_win",
+      "settled_at_utc": "2026-07-03T05:42:27Z",
+      "brier_score": 0.162258311325,
+      "log_loss": 0.392160858429,
+      "scoreline_error": 0.725317,
+      "calibration_bucket": "0.6-0.7",
+      "failure_type": "pure_variance",
+      "kickoff_utc": "2026-07-03T03:00:00Z",
+      "venue": "BC Place",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "385cd849cc73dbd52049a4ce",
+      "created_at_utc": "2026-07-03T05:42:27Z",
+      "match_id": 86,
+      "stage": "R32",
+      "home_team": "Argentina",
+      "away_team": "Cape Verde",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-03-accuracy-enriched",
+      "source_snapshot_hash": "006262217c6c33145f7a29a90cfb5840836f4ea8275a878af7eeee9dea24baf0",
+      "predicted_wdl_probs": {
+        "home_win": 0.9941400721,
+        "draw": 0.0054792025,
+        "away_win": 0.0003807254
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "5-0",
+          "probability": 0.14476819
+        },
+        {
+          "score": "6-0",
+          "probability": 0.13994258
+        },
+        {
+          "score": "4-0",
+          "probability": 0.12480016
+        },
+        {
+          "score": "7-0",
+          "probability": 0.11595243
+        },
+        {
+          "score": "3-0",
+          "probability": 0.08606908
+        },
+        {
+          "score": "8-0",
+          "probability": 0.08406551
+        },
+        {
+          "score": "10-0",
+          "probability": 0.06193343
+        },
+        {
+          "score": "9-0",
+          "probability": 0.05417555
+        },
+        {
+          "score": "2-0",
+          "probability": 0.04451849
+        },
+        {
+          "score": "5-1",
+          "probability": 0.01945965
+        },
+        {
+          "score": "6-1",
+          "probability": 0.01881099
+        },
+        {
+          "score": "4-1",
+          "probability": 0.01677556
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9968796733,
+        "draw": 0,
+        "away": 0.0031203267
+      },
       "actual_home_score": null,
       "actual_away_score": null,
       "actual_result": null,
@@ -1447,8 +1538,190 @@
       "scoreline_error": null,
       "calibration_bucket": null,
       "failure_type": null,
-      "kickoff_utc": "2026-07-03T03:00:00Z",
-      "venue": "BC Place",
+      "kickoff_utc": "2026-07-03T22:00:00Z",
+      "venue": "Hard Rock Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "c2784c033fb2ece13c51efc1",
+      "created_at_utc": "2026-07-03T05:42:27Z",
+      "match_id": 87,
+      "stage": "R32",
+      "home_team": "Colombia",
+      "away_team": "Ghana",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-03-accuracy-enriched",
+      "source_snapshot_hash": "82cd69934ea7e95eff16537954619bfc2ab628a7fc10838f86dfc2e65582132b",
+      "predicted_wdl_probs": {
+        "home_win": 0.9927745585,
+        "draw": 0.0065825452,
+        "away_win": 0.0006428963
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "5-0",
+          "probability": 0.1368141
+        },
+        {
+          "score": "6-0",
+          "probability": 0.13225363
+        },
+        {
+          "score": "4-0",
+          "probability": 0.11794319
+        },
+        {
+          "score": "7-0",
+          "probability": 0.10958158
+        },
+        {
+          "score": "3-0",
+          "probability": 0.08134013
+        },
+        {
+          "score": "8-0",
+          "probability": 0.07944664
+        },
+        {
+          "score": "10-0",
+          "probability": 0.05853058
+        },
+        {
+          "score": "9-0",
+          "probability": 0.05119895
+        },
+        {
+          "score": "2-0",
+          "probability": 0.04207248
+        },
+        {
+          "score": "5-1",
+          "probability": 0.02612193
+        },
+        {
+          "score": "6-1",
+          "probability": 0.0252512
+        },
+        {
+          "score": "4-1",
+          "probability": 0.0225189
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.9960658311,
+        "draw": 0,
+        "away": 0.0039341689
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-04T01:30:00Z",
+      "venue": "Arrowhead Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "98622b4d6fee5e04aec0c3a1",
+      "created_at_utc": "2026-07-03T05:42:27Z",
+      "match_id": 88,
+      "stage": "R32",
+      "home_team": "Australia",
+      "away_team": "Egypt",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-03-accuracy-enriched",
+      "source_snapshot_hash": "ebeaf7a5837297f5e08c037233ce11ee924222d002c32972e46c97943c2328c6",
+      "predicted_wdl_probs": {
+        "home_win": 0.3367508335,
+        "draw": 0.291613651,
+        "away_win": 0.3716355155
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.13891551
+        },
+        {
+          "score": "0-1",
+          "probability": 0.09653702
+        },
+        {
+          "score": "0-0",
+          "probability": 0.09394344
+        },
+        {
+          "score": "1-0",
+          "probability": 0.09043312
+        },
+        {
+          "score": "1-2",
+          "probability": 0.08212864
+        },
+        {
+          "score": "2-1",
+          "probability": 0.07743596
+        },
+        {
+          "score": "0-2",
+          "probability": 0.06821014
+        },
+        {
+          "score": "2-0",
+          "probability": 0.06063802
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04944363
+        },
+        {
+          "score": "1-3",
+          "probability": 0.03495997
+        },
+        {
+          "score": "3-1",
+          "probability": 0.03107901
+        },
+        {
+          "score": "0-3",
+          "probability": 0.02903524
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.482557659,
+        "draw": 0,
+        "away": 0.517442341
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-03T18:00:00Z",
+      "venue": "AT&T Stadium",
       "group": null,
       "feature_flags": {
         "weather_adjustment_abs": 0,
