@@ -7,6 +7,8 @@ WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
 UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
 GITIGNORE = '.gitignore'
+PACKAGE = 'package.json'
+PACKAGE_LOCK = 'package-lock.json'
 REQUIRED_UI = [
     '<title>FIFA World Cup 2026 \u2014 Whole Tournament Simulator</title>',
     'Whole Tournament Simulator',
@@ -185,6 +187,7 @@ REQUIRED_GITIGNORE_ENTRIES = [
     'test-results/',
     'linkedin-post-package/',
     'offline/omnios-documents/',
+    'offline/prediction-hub/',
     PRIVATE_HANDOFF,
     '.codex-remote-attachments/',
 ]
@@ -551,6 +554,16 @@ if os.path.exists(README):
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
     if README_MANUAL_TRIGGER_MARKER not in readme:
         fail('README must document the emergency manual update trigger')
+    if '[GitHub latest release](https://github.com/shfqrkhn/FIFA-WC-Sim/releases/latest)' not in readme:
+        fail('README must link the latest release')
+    if '**License:** MIT' not in readme:
+        fail('README must expose the MIT license above the fold')
+    if 'python -m http.server 8080' not in readme:
+        fail('README must document the local static-server command')
+    if 'Use a local server instead of opening `index.html` directly' not in readme:
+        fail('README must prevent direct-file launch confusion')
+    if 'offline/prediction-hub/' not in readme:
+        fail('README must document the private prediction-hub guardrail')
     if 'npm run qa' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
         fail('README must document QA wrapper, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
@@ -563,6 +576,16 @@ if os.path.exists(README):
         fail('README contains stale hard-coded patch version')
 else:
     fail('missing README')
+app_version_match = re.search(r"const APP_VERSION='v([^']+)'", html)
+if not app_version_match:
+    fail('missing APP_VERSION constant')
+app_version = app_version_match.group(1)
+for path in [PACKAGE, PACKAGE_LOCK]:
+    if not os.path.exists(path):
+        fail('missing package metadata file: %s' % path)
+    meta = json.load(open(path, encoding='utf-8'))
+    if meta.get('version') != app_version:
+        fail('%s version must match APP_VERSION %s' % (path, app_version))
 for path, markers in REQUIRED_SCRIPT_MARKERS.items():
     if not os.path.exists(path):
         fail('missing automation guard script: %s' % path)

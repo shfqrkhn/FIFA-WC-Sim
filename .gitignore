@@ -7,6 +7,7 @@ data/scoreboards/
 data/manual-overrides.json
 data/latest-simulation.json
 offline/omnios-documents/
+offline/prediction-hub/
 OMNI_HANDOVER.md
 linkedin-post-package/
 .codex-remote-attachments/

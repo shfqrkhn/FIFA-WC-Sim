@@ -7,7 +7,9 @@
 Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026 format. It combines embedded results, FIFA-style group ranking, knockout rules, venue/weather/rest/travel context, transparent model assumptions, seeded randomness, and Monte Carlo tournament runs into one portable web app.
 
 - **Status:** Active flagship
+- **Latest Release:** [GitHub latest release](https://github.com/shfqrkhn/FIFA-WC-Sim/releases/latest)
 - **Live Demo:** [shfqrkhn.github.io/FIFA-WC-Sim](https://shfqrkhn.github.io/FIFA-WC-Sim/)
+- **License:** MIT
 - **Entrypoint:** `docs/index.html`
 
 ## Screenshot
@@ -39,6 +41,7 @@ Tracked project files:
 Ignored local/private files are private-file guardrails:
 
 - `offline/omnios-documents/`: private OmniOS/source notes; must remain untracked and must not be pushed.
+- `offline/prediction-hub/`: private prediction research workspace; must remain untracked and must not be pushed.
 - `OMNI_HANDOVER.md`: private handoff notes; must remain untracked and must not be pushed.
 - `linkedin-post-package/`: local LinkedIn assets; must remain untracked.
 - `node_modules/`, `playwright-report/`, `test-results/`, `data/scoreboards/`, `data/latest-simulation.json`, and `data/manual-overrides.json`.
@@ -202,6 +205,18 @@ The refinement pass performs up to three no-fetch convergence passes: guarded up
 ## Deployment
 
 GitHub Pages serves the static `docs/` app. There is no backend, account, tracking script, or build service required for normal use.
+
+## Release And Local Use
+
+- **Live/PWA:** Use the live demo in a modern browser.
+- **Local ZIP:** Download the latest release, extract it, and serve the extracted app folder with a local static server:
+
+```bash
+python -m http.server 8080
+```
+
+Then open `http://localhost:8080/`. Use a local server instead of opening `index.html` directly, so browser behavior matches the deployed static app.
+- **Self-host:** Upload the release contents to any static host.
 
 ## Disclaimer
 
