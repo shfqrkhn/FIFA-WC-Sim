@@ -11,6 +11,7 @@ Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026
 - **Live Demo:** [shfqrkhn.github.io/FIFA-WC-Sim](https://shfqrkhn.github.io/FIFA-WC-Sim/)
 - **License:** MIT
 - **Entrypoint:** `docs/index.html`
+- **Maintainer handoff:** [`docs/AI_MAINTAINER_HANDOFF.md`](./docs/AI_MAINTAINER_HANDOFF.md)
 
 ## Screenshot
 
@@ -32,6 +33,7 @@ The repo intentionally contains more than the single-file app because it owns da
 Tracked project files:
 
 - `docs/index.html`: static app entrypoint and embedded `BASE_DATA`.
+- `docs/AI_MAINTAINER_HANDOFF.md`: public-safe continuation map for future expert AI maintainers.
 - `docs/assets/`: README/demo assets.
 - `data/*.json`: latest-update health, prediction audit ledger, calibration state, prospective backtest audit, and manual override example.
 - `scripts/`: data update, validation, prediction audit, calibration, rescue, and refinement scripts.
@@ -44,7 +46,7 @@ Ignored local/private files are private-file guardrails:
 - `offline/prediction-hub/`: private prediction research workspace; must remain untracked and must not be pushed.
 - `OMNI_HANDOVER.md`: private handoff notes; must remain untracked and must not be pushed.
 - `linkedin-post-package/`: local LinkedIn assets; must remain untracked.
-- `node_modules/`, `playwright-report/`, `test-results/`, `data/scoreboards/`, `data/latest-simulation.json`, and `data/manual-overrides.json`.
+- `.codex-remote-attachments/`, `node_modules/`, `playwright-report/`, `test-results/`, `scripts/__pycache__/`, `data/scoreboards/`, `data/latest-simulation.json`, and `data/manual-overrides.json`.
 
 ## App Sections
 
