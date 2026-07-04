@@ -148,6 +148,8 @@ const todayHighlightOk = vm.runInContext(`(() => {
     renderResult(sampleRun);
     const runTodayHtml = $('#todayView')?.innerHTML || '';
     const groupsHtml = $('#groupsView')?.innerHTML || '';
+    const group65 = DATA.matches.find(m => m.no === 65);
+    const groupSchedule = matchFullScheduleLabel(group65);
     const runTodayRows = todayMatches(date, sampleRun);
     const syntheticOrder = todayMatches(date, {
       matches: [
@@ -180,9 +182,12 @@ const todayHighlightOk = vm.runInContext(`(() => {
       bracketPenaltyHtml.includes('Portugal on penalties 6-4') &&
       todayPenaltyHtml.includes(matchTimeLabel(penaltyToday)) &&
       bracketPenaltyHtml.includes(matchTimeLabel(penaltyToday)) &&
+      groupSchedule &&
+      groupsHtml.includes(groupSchedule) &&
       (groupsHtml.match(/todayMatch/g) || []).length >= runTodayRows.length &&
       bracketHtml.includes('todayMatch') &&
-      bracketHtml.includes('Today');
+      bracketHtml.includes('Today') &&
+      bracketHtml.includes(formatDateKey(key));
   } finally {
     globalThis.Date = RealDate;
   }
@@ -205,6 +210,7 @@ const knockoutTodayTimeOk = vm.runInContext(`(() => {
     html.includes('M74') &&
     html.includes(matchTimeLabel(m74)) &&
     bracket74.includes(matchTimeLabel(m74)) &&
+    bracket74.includes(matchDateLabel(m74)) &&
     ordered.indexOf(76) >= 0 &&
     ordered.indexOf(74) > ordered.indexOf(76);
 })()`, sandbox, { timeout: 1000 });
