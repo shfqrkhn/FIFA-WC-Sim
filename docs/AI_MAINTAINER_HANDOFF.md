@@ -25,7 +25,7 @@ The app must remain:
 Verify these values before relying on them; they describe the repo at the audit above.
 
 - App entrypoint: `docs/index.html`.
-- App version: `1.2.0` from `package.json`.
+- App version: `1.2.1` from `package.json`.
 - Embedded data version: `2026-07-03-accuracy-enriched`.
 - Embedded data generated at: `2026-07-03T05:42:31Z`.
 - Latest update generated at: `2026-07-03T05:42:30Z`.
