@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-04T09:41:09Z",
+  "generated_at_utc": "2026-07-04T09:59:24Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -1722,6 +1722,188 @@
       "failure_type": "knockout_penalty_variance",
       "kickoff_utc": "2026-07-03T18:00:00Z",
       "venue": "AT&T Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "b410ac84759b5550630e26af",
+      "created_at_utc": "2026-07-04T09:59:24Z",
+      "match_id": 89,
+      "stage": "R16",
+      "home_team": "Paraguay",
+      "away_team": "France",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-04-accuracy-enriched",
+      "source_snapshot_hash": "a941fc948884a2614184b12564f9098c197746d2400a2f60588bfedcbf23f1f4",
+      "predicted_wdl_probs": {
+        "home_win": 0.0022322287,
+        "draw": 0.0143063039,
+        "away_win": 0.9834614674
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "0-5",
+          "probability": 0.13004317
+        },
+        {
+          "score": "0-4",
+          "probability": 0.1250387
+        },
+        {
+          "score": "0-6",
+          "probability": 0.11270662
+        },
+        {
+          "score": "0-3",
+          "probability": 0.09618145
+        },
+        {
+          "score": "0-7",
+          "probability": 0.0837268
+        },
+        {
+          "score": "0-2",
+          "probability": 0.05548805
+        },
+        {
+          "score": "0-8",
+          "probability": 0.05442365
+        },
+        {
+          "score": "1-5",
+          "probability": 0.0384519
+        },
+        {
+          "score": "1-4",
+          "probability": 0.03697215
+        },
+        {
+          "score": "1-6",
+          "probability": 0.03332573
+        },
+        {
+          "score": "0-9",
+          "probability": 0.03144548
+        },
+        {
+          "score": "0-10",
+          "probability": 0.02952231
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.0093853807,
+        "draw": 0,
+        "away": 0.9906146193
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-04T21:00:00Z",
+      "venue": "Lincoln Financial Field",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false
+      }
+    },
+    {
+      "prediction_id": "cd5860ef43c8c182eb3c4657",
+      "created_at_utc": "2026-07-04T09:59:24Z",
+      "match_id": 90,
+      "stage": "R16",
+      "home_team": "Canada",
+      "away_team": "Morocco",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-04-accuracy-enriched",
+      "source_snapshot_hash": "fb7ec6eff57b4830e5dd20f4737284a80ed2b2fc2fa0256090af0c63879476b9",
+      "predicted_wdl_probs": {
+        "home_win": 0.0795553719,
+        "draw": 0.1726460354,
+        "away_win": 0.7477985927
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "0-2",
+          "probability": 0.13690851
+        },
+        {
+          "score": "0-1",
+          "probability": 0.11035977
+        },
+        {
+          "score": "0-3",
+          "probability": 0.10730581
+        },
+        {
+          "score": "1-2",
+          "probability": 0.08952818
+        },
+        {
+          "score": "1-1",
+          "probability": 0.0822431
+        },
+        {
+          "score": "1-3",
+          "probability": 0.07017017
+        },
+        {
+          "score": "0-4",
+          "probability": 0.06307791
+        },
+        {
+          "score": "0-0",
+          "probability": 0.05561798
+        },
+        {
+          "score": "1-4",
+          "probability": 0.04124835
+        },
+        {
+          "score": "0-5",
+          "probability": 0.02966342
+        },
+        {
+          "score": "2-2",
+          "probability": 0.02927245
+        },
+        {
+          "score": "1-0",
+          "probability": 0.02629425
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.1658783896,
+        "draw": 0,
+        "away": 0.8341216104
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-04T17:00:00Z",
+      "venue": "NRG Stadium",
       "group": null,
       "feature_flags": {
         "weather_adjustment_abs": 0,

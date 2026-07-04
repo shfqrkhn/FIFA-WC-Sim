@@ -176,7 +176,7 @@ REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
     'npm ci',
     'npx playwright install --with-deps chromium',
     'npm run ui:smoke',
-    'actions/upload-artifact@v4',
+    'actions/upload-artifact@v7',
 ]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
