@@ -8,11 +8,11 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-const policy = read('docs/RELEASE_ARTIFACT_POLICY.md');
+const policy = read('docs/REPO_ZIP_POLICY.md');
 const readme = read('README.md');
 
 for (const phrase of [
-  'Release Artifact Policy',
+  'Repository ZIP Policy',
   'source-backed generated data',
   'data/manual-overrides.json',
   'data/latest-simulation.json',
@@ -22,12 +22,14 @@ for (const phrase of [
   'npm run ui:smoke',
   'protected-path scan'
 ]) {
-  assert(policy.includes(phrase), `release artifact policy missing: ${phrase}`);
+  assert(policy.includes(phrase), `repository ZIP policy missing: ${phrase}`);
 }
 
 assert(readme.includes('No account') === false, 'FIFA README should not inherit unrelated account claims.');
 assert(readme.includes('betting') && readme.includes('These are not used'), 'README must keep betting/market exclusion.');
-assert(existsSync(join(root, 'docs', 'RELEASE_ARTIFACT_POLICY.md')), 'release policy doc missing.');
+assert(readme.includes('[Download current main ZIP](https://github.com/shfqrkhn/FIFA-WC-Sim/archive/refs/heads/main.zip)'), 'README must link the repository ZIP.');
+assert(!readme.includes('/releases/latest'), 'README must not link GitHub Releases.');
+assert(existsSync(join(root, 'docs', 'REPO_ZIP_POLICY.md')), 'repository ZIP policy doc missing.');
 
 const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
 const forbiddenTracked = tracked.filter((file) =>

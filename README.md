@@ -7,12 +7,12 @@
 Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026 format. It combines embedded results, FIFA-style group ranking, knockout rules, venue/weather/rest/travel context, transparent model assumptions, seeded randomness, and Monte Carlo tournament runs into one portable web app.
 
 - **Status:** Active flagship
-- **Latest Release:** [GitHub latest release](https://github.com/shfqrkhn/FIFA-WC-Sim/releases/latest)
 - **Live Demo:** [shfqrkhn.github.io/FIFA-WC-Sim](https://shfqrkhn.github.io/FIFA-WC-Sim/)
+- **Repository ZIP:** [Download current main ZIP](https://github.com/shfqrkhn/FIFA-WC-Sim/archive/refs/heads/main.zip)
 - **License:** MIT
 - **Entrypoint:** `docs/index.html`
 - **Maintainer handoff:** [`docs/AI_MAINTAINER_HANDOFF.md`](./docs/AI_MAINTAINER_HANDOFF.md)
-- **Release artifact policy:** [`docs/RELEASE_ARTIFACT_POLICY.md`](./docs/RELEASE_ARTIFACT_POLICY.md)
+- **Repository ZIP policy:** [`docs/REPO_ZIP_POLICY.md`](./docs/REPO_ZIP_POLICY.md)
 
 ## Screenshot
 
@@ -211,17 +211,17 @@ The refinement pass performs up to three no-fetch convergence passes: guarded up
 
 GitHub Pages serves the static `docs/` app. There is no backend, account, tracking script, or build service required for normal use.
 
-## Release And Local Use
+## Repository ZIP And Local Use
 
 - **Live/PWA:** Use the live demo in a modern browser.
-- **Local ZIP:** Download the latest release, extract it, and serve the extracted app folder with a local static server:
+- **Local ZIP:** Download the current main repository ZIP, extract it, open the `docs/` folder in a terminal, and serve it with a local static server:
 
 ```bash
 python -m http.server 8080
 ```
 
 Then open `http://localhost:8080/`. Use a local server instead of opening `index.html` directly, so browser behavior matches the deployed static app.
-- **Self-host:** Upload the release contents to any static host.
+- **Self-host:** Upload the `docs/` folder contents from the repository ZIP to any static host.
 
 ## Disclaimer
 

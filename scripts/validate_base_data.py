@@ -610,8 +610,10 @@ if os.path.exists(README):
         fail('README must point readers to embedded BASE_DATA version instead of duplicating it')
     if README_MANUAL_TRIGGER_MARKER not in readme:
         fail('README must document the emergency manual update trigger')
-    if '[GitHub latest release](https://github.com/shfqrkhn/FIFA-WC-Sim/releases/latest)' not in readme:
-        fail('README must link the latest release')
+    if '[Download current main ZIP](https://github.com/shfqrkhn/FIFA-WC-Sim/archive/refs/heads/main.zip)' not in readme:
+        fail('README must link the repository ZIP instead of GitHub Releases')
+    if '/releases/latest' in readme:
+        fail('README must not link GitHub Releases')
     if '**License:** MIT' not in readme:
         fail('README must expose the MIT license above the fold')
     if 'python -m http.server 8080' not in readme:
