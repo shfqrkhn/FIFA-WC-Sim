@@ -5,6 +5,7 @@ import './backtest-audit.test.mjs';
 import './no-leakage.test.mjs';
 import './validate-calibration.test.mjs';
 import './manual-update-trigger.test.mjs';
+import './publish-base-data-pr.test.mjs';
 import './manual-overrides.test.mjs';
 import './match-window-update.test.mjs';
 import './apply-scoreboard.test.mjs';

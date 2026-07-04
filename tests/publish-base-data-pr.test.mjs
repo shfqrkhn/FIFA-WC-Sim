@@ -1,0 +1,42 @@
+import assert from 'node:assert/strict';
+import {
+  buildPullRequestBody,
+  COMMIT_CANDIDATES,
+  parsePublishArgs,
+  validateAutomationBranch
+} from '../scripts/publish-base-data-pr.mjs';
+
+assert.ok(COMMIT_CANDIDATES.includes('docs/index.html'));
+assert.ok(COMMIT_CANDIDATES.includes('data/update-health.json'));
+assert.ok(COMMIT_CANDIDATES.includes('data/prediction-audit.json'));
+
+const parsed = parsePublishArgs([
+  '--branch',
+  'automation/match-window-base-data-update',
+  '--title',
+  'Match-window World Cup BASE_DATA update',
+  '--message',
+  'Match-window World Cup BASE_DATA update'
+], { GITHUB_TOKEN: 'test-token' });
+assert.equal(parsed.branch, 'automation/match-window-base-data-update');
+assert.equal(parsed.title, 'Match-window World Cup BASE_DATA update');
+assert.equal(parsed.message, 'Match-window World Cup BASE_DATA update');
+assert.equal(parsed.token, 'test-token');
+
+assert.equal(validateAutomationBranch('automation/daily-base-data-update'), 'automation/daily-base-data-update');
+assert.throws(() => validateAutomationBranch('main'), /automation/);
+assert.throws(() => validateAutomationBranch('automation/../main'), /automation/);
+assert.throws(() => parsePublishArgs(['--unknown'], {}), /Unknown option/);
+
+const body = buildPullRequestBody({
+  branch: 'automation/daily-base-data-update',
+  changedFiles: ['docs/index.html', 'data/latest-update.json']
+});
+assert.match(body, /validated generated World Cup artifacts/);
+assert.match(body, /source-backed data/);
+assert.match(body, /immutable frozen predictions/);
+assert.match(body, /no future leakage/);
+assert.match(body, /no betting\/odds\/markets/);
+assert.match(body, /docs\/index\.html/);
+
+console.log('publish BASE_DATA PR tests passed');

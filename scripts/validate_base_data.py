@@ -5,6 +5,8 @@ README = 'README.md'
 PRIVATE_HANDOFF = 'OMNI_HANDOVER.md'
 WORKFLOW = '.github/workflows/daily-base-data-update.yml'
 MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
+BASE_DATA_PR_CHECK_WORKFLOW = '.github/workflows/base-data-pr-check.yml'
+SECURITY_WORKFLOW = '.github/workflows/security-check.yml'
 UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
 GITIGNORE = '.gitignore'
 PACKAGE = 'package.json'
@@ -140,10 +142,12 @@ REQUIRED_WORKFLOW_STEPS = [
     'node scripts/run-sim.mjs',
     'python3 scripts/validate_base_data.py',
     'scripts/write-workflow-summary.mjs',
-    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
+    'pull-requests: write',
+    'scripts/publish-base-data-pr.mjs',
+    'automation/daily-base-data-update',
+    'GH_TOKEN: ${{ github.token }}',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
-    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
     'data/update-health.json',
     'data/prediction-audit.json',
     'data/calibration-state.json',
@@ -162,10 +166,32 @@ REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     'node tests/run-all.mjs',
     'node scripts/run-sim.mjs',
     'scripts/write-workflow-summary.mjs',
-    'git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
+    'pull-requests: write',
+    'scripts/publish-base-data-pr.mjs',
+    'automation/match-window-base-data-update',
+    'GH_TOKEN: ${{ github.token }}',
     'concurrency:',
     'group: base-data-update-${{ github.ref }}',
-    'git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json',
+]
+REQUIRED_BASE_DATA_PR_CHECK_WORKFLOW_STEPS = [
+    'name: BASE_DATA PR check',
+    'pull_request:',
+    'workflow_dispatch:',
+    'actions/setup-node@v6',
+    "node-version: '24'",
+    'python3 -m py_compile scripts/*.py',
+    'node --check "$f"',
+    'python3 scripts/validate_base_data.py',
+    'node scripts/validate-calibration.mjs',
+    'node tests/run-all.mjs',
+    'node scripts/run-sim.mjs',
+]
+REQUIRED_SECURITY_WORKFLOW_STEPS = [
+    'name: Security Check',
+    'pull_request:',
+    'actions/setup-node@v6',
+    "node-version: '24'",
+    'npm audit --audit-level=moderate',
 ]
 REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
     'name: Static UI smoke',
@@ -310,6 +336,20 @@ REQUIRED_SCRIPT_MARKERS = {
         'tests/run-all.mjs',
         'scripts/run-sim.mjs',
         'Manual World Cup BASE_DATA update',
+    ],
+    'scripts/publish-base-data-pr.mjs': [
+        'COMMIT_CANDIDATES',
+        'validateAutomationBranch',
+        'automation/base-data-update',
+        'No validated BASE_DATA changes to publish',
+        'GITHUB_TOKEN',
+        'GH_TOKEN',
+        '--force-with-lease',
+        'gh',
+        'pr create',
+        'pr edit',
+        'source-backed data',
+        'no betting/odds/markets',
     ],
     'scripts/refinement-pass.mjs': [
         'REFINEMENT_TRIGGER',
@@ -536,6 +576,20 @@ if os.path.exists(MATCH_WINDOW_WORKFLOW):
             fail('missing match-window workflow marker: %s' % marker)
 else:
     fail('missing match-window BASE_DATA workflow')
+if os.path.exists(BASE_DATA_PR_CHECK_WORKFLOW):
+    workflow = open(BASE_DATA_PR_CHECK_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_BASE_DATA_PR_CHECK_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing BASE_DATA PR check workflow marker: %s' % marker)
+else:
+    fail('missing BASE_DATA PR check workflow')
+if os.path.exists(SECURITY_WORKFLOW):
+    workflow = open(SECURITY_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_SECURITY_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing security workflow marker: %s' % marker)
+else:
+    fail('missing security workflow')
 if os.path.exists(UI_SMOKE_WORKFLOW):
     workflow = open(UI_SMOKE_WORKFLOW, encoding='utf-8').read()
     for marker in REQUIRED_UI_SMOKE_WORKFLOW_STEPS:

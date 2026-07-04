@@ -9,10 +9,6 @@ on:
       - .github/workflows/security-check.yml
   pull_request:
     branches: [main]
-    paths:
-      - package.json
-      - package-lock.json
-      - .github/workflows/security-check.yml
   workflow_dispatch:
 
 permissions:

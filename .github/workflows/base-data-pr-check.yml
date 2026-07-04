@@ -1,0 +1,24 @@
+name: BASE_DATA PR check
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  base-data-pr-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - run: python3 -m py_compile scripts/*.py
+      - run: for f in scripts/*.mjs; do node --check "$f"; done
+      - run: python3 scripts/validate_base_data.py
+      - run: node scripts/validate-calibration.mjs
+      - run: node tests/run-all.mjs
+      - run: node scripts/run-sim.mjs

@@ -60,7 +60,7 @@ Verify these values before relying on them; they describe the repo at the audit 
 - `data/manual-overrides.example.json`: source-backed override schema example.
 - `scripts/`: update, enrichment, scoring, calibration, QA, idempotence, and rescue tools.
 - `tests/`: unit, regression, no-leakage, workflow, calibration, backtest, and UI smoke tests.
-- `.github/workflows/`: daily update, match-window update, and static UI smoke workflows.
+- `.github/workflows/`: daily update, match-window update, BASE_DATA PR check, security, and static UI smoke workflows.
 - `.github/FUNDING.yml`: GitHub Sponsor metadata.
 
 ## Private Or Ignored Files
@@ -100,6 +100,7 @@ Daily update workflow:
 - Schedule: `37 11 * * *` UTC and `37 17 * * *` UTC.
 - Purpose: morning update plus safety update for delayed feeds or missed runs.
 - Manual fallback: `workflow_dispatch`.
+- Publish path: opens or updates `automation/daily-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
 
 Match-window workflow:
 
@@ -108,6 +109,13 @@ Match-window workflow:
 - Script: `node scripts/match-window-update.mjs`.
 - Behavior: no-ops unless near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window.
 - Guardrail: active-match lock refuses full updates during live-match windows and permits freeze-only records for later matches when safe.
+- Publish path: opens or updates `automation/match-window-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
+
+BASE_DATA PR check:
+
+- File: `.github/workflows/base-data-pr-check.yml`
+- Runs on pull requests and manual dispatch.
+- Executes Python/Node syntax checks, base-data validation, calibration validation, unit tests, and simulation smoke so branch protection can require a PR-safe check.
 
 Static UI smoke:
 
@@ -139,7 +147,7 @@ node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE
 
 Rescue uses the same guarded path, refuses partial failed candidates, and does not commit unless explicitly told to do so.
 
-Generated artifacts that update workflows may commit after validation:
+Generated artifacts that update workflows may propose by bot pull request after validation:
 
 - `docs/index.html`
 - `data/latest-update.json`

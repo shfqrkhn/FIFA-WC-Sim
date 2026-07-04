@@ -39,7 +39,7 @@ Tracked project files:
 - `data/*.json`: latest-update health, prediction audit ledger, calibration state, prospective backtest audit, and manual override example.
 - `scripts/`: data update, validation, prediction audit, calibration, rescue, and refinement scripts.
 - `tests/`: unit, regression, no-leakage, workflow, and browser smoke tests.
-- `.github/workflows/`: daily update, match-window update, and UI smoke automation.
+- `.github/workflows/`: daily update, match-window update, PR validation, security, and UI smoke automation.
 
 Ignored local/private files are private-file guardrails:
 
@@ -107,11 +107,13 @@ Schedules:
 
 GitHub cron is UTC-only and best-effort; it can be delayed or skipped. The safety run, match-window checks, and manual dispatch are intentional because one morning-only run is not reliable enough.
 
-The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, calibration validation, unit tests, simulation smoke, and base-data validation. It commits only validated generated artifacts: `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`.
+The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, calibration validation, unit tests, simulation smoke, and base-data validation. If validated generated artifacts changed, it opens or updates `automation/daily-base-data-update` as a bot pull request containing only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`.
 
 The match-window workflow runs `node scripts/match-window-update.mjs`. It no-ops unless the current UTC time is near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window. Its active-match lock refuses full updates during live-match windows; if a later match needs a pre-kickoff audit record during that lock, it uses a freeze-only path.
 
-Both update workflows write a GitHub Actions summary with data version, played-match counts, overdue unplayed count, latest scoreboard changes, prediction-audit counts, calibration status, and backtest metrics. `Static UI smoke` runs Playwright against `docs/index.html` for desktop and mobile layouts when relevant files change.
+The match-window workflow publishes the same validated artifact set to `automation/match-window-base-data-update` when it has source-backed changes to propose. Neither scheduled workflow pushes generated data directly to `main`.
+
+Both update workflows write a GitHub Actions summary with data version, played-match counts, overdue unplayed count, latest scoreboard changes, prediction-audit counts, calibration status, and backtest metrics. `BASE_DATA PR check` validates pull requests before merge. `Static UI smoke` runs Playwright against `docs/index.html` for desktop and mobile layouts when relevant files change.
 
 ## Sources
 
@@ -153,7 +155,7 @@ If scheduled Actions and `workflow_dispatch` both fail, use the exact trigger wo
 node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE
 ```
 
-The rescue path runs the same guarded update flow as automation, refuses dirty candidate artifacts, restores candidate files on validation failure, and does not commit unless `--commit` is supplied. Use `--push` only after a validated local commit is intended.
+The rescue path runs the same guarded update flow as automation, refuses dirty candidate artifacts, restores candidate files on validation failure, and does not commit unless `--commit` is supplied. Use `--push` only after a validated local commit is intended; scheduled automation should use the bot PR path instead.
 
 Audit/calibration maintenance:
 

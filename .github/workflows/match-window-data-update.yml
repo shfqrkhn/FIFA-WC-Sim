@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: base-data-update-${{ github.ref }}
@@ -34,13 +35,13 @@ jobs:
       - name: Write update summary
         if: always()
         run: node scripts/write-workflow-summary.mjs >> "$GITHUB_STEP_SUMMARY" || true
-      - run: |
-          if git diff --quiet -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json; then
-            echo "No validated match-window BASE_DATA changes to commit."
-            exit 0
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git add -A -- docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json
-          git commit -m 'Match-window World Cup BASE_DATA update'
-          git push
+      - name: Open or update validated BASE_DATA PR
+        # Candidate artifacts are constrained in scripts/publish-base-data-pr.mjs:
+        # docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          node scripts/publish-base-data-pr.mjs
+          --branch automation/match-window-base-data-update
+          --title "Match-window World Cup BASE_DATA update"
+          --message "Match-window World Cup BASE_DATA update"
