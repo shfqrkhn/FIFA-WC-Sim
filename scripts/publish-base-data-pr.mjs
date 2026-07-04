@@ -19,6 +19,14 @@ export const VALIDATION_WORKFLOWS = [
   'security-check.yml'
 ];
 
+export const VALIDATION_STATUS_CONTEXTS = {
+  'base-data-pr-check.yml': 'base-data-pr-check',
+  'security-check.yml': 'npm-audit'
+};
+
+const VALIDATION_POLL_MS = 5000;
+const VALIDATION_TIMEOUT_MS = 10 * 60 * 1000;
+
 export function parsePublishArgs(argv = [], env = process.env) {
   const options = {
     branch: env.BASE_DATA_PR_BRANCH || 'automation/base-data-update',
@@ -101,6 +109,67 @@ function gh(args, label, token) {
     if (message !== error.message) throw new Error(message, { cause: error });
     throw error;
   }
+}
+
+function sleep(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
+
+function repositorySlug(options) {
+  if (options.repository) return options.repository;
+  if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
+  return gh(['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner'], 'gh repo view', options.token).stdout.trim();
+}
+
+function currentHeadSha() {
+  return git(['rev-parse', 'HEAD'], 'git rev-parse HEAD', { stdio: 'pipe' }).stdout.trim();
+}
+
+function postCommitStatus(options, sha, context, state, description, targetUrl = '') {
+  const repo = repositorySlug(options);
+  const args = [
+    'api',
+    '--method',
+    'POST',
+    `repos/${repo}/statuses/${sha}`,
+    '-f',
+    `state=${state}`,
+    '-f',
+    `context=${context}`,
+    '-f',
+    `description=${description.slice(0, 140)}`
+  ];
+  if (targetUrl) args.push('-f', `target_url=${targetUrl}`);
+  gh(args, `gh status ${context}`, options.token);
+}
+
+function latestWorkflowDispatchRun(options, workflow, sha) {
+  const result = gh([
+    'run',
+    'list',
+    '--workflow',
+    workflow,
+    '--branch',
+    options.branch,
+    '--event',
+    'workflow_dispatch',
+    '--json',
+    'databaseId,headSha,status,conclusion,url,createdAt',
+    '--limit',
+    '10'
+  ], `gh run list ${workflow}`, options.token);
+  const runs = JSON.parse(result.stdout || '[]');
+  return runs.find(run => run.headSha === sha) || null;
+}
+
+function waitForWorkflowDispatchRun(options, workflow, sha) {
+  const deadline = Date.now() + VALIDATION_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const run = latestWorkflowDispatchRun(options, workflow, sha);
+    if (run?.status === 'completed') return run;
+    sleep(VALIDATION_POLL_MS);
+  }
+  throw new Error(`Timed out waiting for ${workflow} workflow_dispatch validation on ${sha}.`);
 }
 
 export function changedCandidateFiles() {
@@ -195,8 +264,26 @@ function publishBranch(options, changedFiles) {
 }
 
 export function dispatchValidationWorkflows(options, workflows = VALIDATION_WORKFLOWS) {
+  const sha = currentHeadSha();
   for (const workflow of workflows) {
+    const context = VALIDATION_STATUS_CONTEXTS[workflow];
+    if (context) postCommitStatus(options, sha, context, 'pending', `${workflow} validation dispatched`);
     gh(['workflow', 'run', workflow, '--ref', options.branch], `gh workflow run ${workflow}`, options.token);
+  }
+  for (const workflow of workflows) {
+    const context = VALIDATION_STATUS_CONTEXTS[workflow];
+    if (!context) continue;
+    const run = waitForWorkflowDispatchRun(options, workflow, sha);
+    const ok = run.conclusion === 'success';
+    postCommitStatus(
+      options,
+      sha,
+      context,
+      ok ? 'success' : 'failure',
+      `${workflow} ${run.conclusion || 'did not pass'}`,
+      run.url || ''
+    );
+    if (!ok) throw new Error(`${workflow} validation failed with conclusion: ${run.conclusion || 'unknown'}`);
   }
 }
 

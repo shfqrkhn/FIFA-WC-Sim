@@ -4,6 +4,7 @@ import {
   COMMIT_CANDIDATES,
   explainGitHubActionsPrPermission,
   parsePublishArgs,
+  VALIDATION_STATUS_CONTEXTS,
   VALIDATION_WORKFLOWS,
   validateAutomationBranch
 } from '../scripts/publish-base-data-pr.mjs';
@@ -12,6 +13,10 @@ assert.ok(COMMIT_CANDIDATES.includes('docs/index.html'));
 assert.ok(COMMIT_CANDIDATES.includes('data/update-health.json'));
 assert.ok(COMMIT_CANDIDATES.includes('data/prediction-audit.json'));
 assert.deepEqual(VALIDATION_WORKFLOWS, ['base-data-pr-check.yml', 'security-check.yml']);
+assert.deepEqual(VALIDATION_STATUS_CONTEXTS, {
+  'base-data-pr-check.yml': 'base-data-pr-check',
+  'security-check.yml': 'npm-audit'
+});
 
 const parsed = parsePublishArgs([
   '--branch',
