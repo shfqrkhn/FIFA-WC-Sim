@@ -86,15 +86,33 @@ function git(args, label, options = {}) {
 }
 
 function gh(args, label, token) {
-  return run('gh', args, label, {
-    stdio: 'pipe',
-    env: { ...process.env, GH_TOKEN: token }
-  });
+  try {
+    return run('gh', args, label, {
+      stdio: 'pipe',
+      env: { ...process.env, GH_TOKEN: token }
+    });
+  } catch (error) {
+    const message = explainGitHubActionsPrPermission(error.message);
+    if (message !== error.message) throw new Error(message, { cause: error });
+    throw error;
+  }
 }
 
 export function changedCandidateFiles() {
   const result = git(['diff', '--name-only', '--', ...COMMIT_CANDIDATES], 'git diff', { stdio: 'pipe' });
   return result.stdout.split(/\r?\n/).filter(Boolean);
+}
+
+export function explainGitHubActionsPrPermission(message) {
+  const text = String(message || '');
+  const marker = 'GitHub Actions is not permitted to create or approve pull requests';
+  if (!text.includes(marker)) return text;
+  return [
+    text,
+    '',
+    'Repository setting required: Settings > Actions > General > Workflow permissions must allow GitHub Actions to create and approve pull requests.',
+    'The workflow already requests contents: write and pull-requests: write; the repository-level setting is still required for bot PR creation.'
+  ].join('\n');
 }
 
 export function buildPullRequestBody({ branch, changedFiles }) {

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {
   buildPullRequestBody,
   COMMIT_CANDIDATES,
+  explainGitHubActionsPrPermission,
   parsePublishArgs,
   validateAutomationBranch
 } from '../scripts/publish-base-data-pr.mjs';
@@ -38,5 +39,9 @@ assert.match(body, /immutable frozen predictions/);
 assert.match(body, /no future leakage/);
 assert.match(body, /no betting\/odds\/markets/);
 assert.match(body, /docs\/index\.html/);
+
+const explained = explainGitHubActionsPrPermission('pull request create failed: GraphQL: GitHub Actions is not permitted to create or approve pull requests');
+assert.match(explained, /Workflow permissions/);
+assert.match(explained, /repository-level setting/);
 
 console.log('publish BASE_DATA PR tests passed');

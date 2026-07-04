@@ -110,6 +110,7 @@ Match-window workflow:
 - Behavior: no-ops unless near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window.
 - Guardrail: active-match lock refuses full updates during live-match windows and permits freeze-only records for later matches when safe.
 - Publish path: opens or updates `automation/match-window-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
+- Repository setting required: GitHub Actions workflow permissions must allow Actions to create pull requests; otherwise validation and branch push can pass while `gh pr create` fails.
 
 BASE_DATA PR check:
 
