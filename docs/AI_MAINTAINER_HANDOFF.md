@@ -1,6 +1,6 @@
 # AI Maintainer Handoff
 
-Last audited: 2026-07-03
+Last audited: 2026-07-04
 Branch at audit: `main`
 HEAD at audit: `20e2dab1a400ffea3e0846c49e83b5e494025738`
 Refresh context: post-parallel update pass reconciliation for a future unified GitHub projects chat.
@@ -25,24 +25,24 @@ The app must remain:
 Verify these values before relying on them; they describe the repo at the audit above.
 
 - App entrypoint: `docs/index.html`.
-- App version: `1.2.1` from `package.json`.
-- Embedded data version: `2026-07-03-accuracy-enriched`.
-- Embedded data generated at: `2026-07-03T05:42:31Z`.
-- Latest update generated at: `2026-07-03T05:42:30Z`.
-- Latest update applied one completed-score change: match 85, Switzerland 2-0 Algeria, ESPN event `760498`.
+- App version: `1.2.2` from `package.json`.
+- Embedded data version: `2026-07-04-accuracy-enriched`.
+- Embedded data generated at: `2026-07-04T09:41:13Z`.
+- Latest update generated at: `2026-07-04T09:41:12Z`.
+- Latest update applied two completed-score changes: match 86, Argentina 3-2 Cape Verde, ESPN event `760500`; match 87, Colombia 1-0 Ghana, ESPN event `760501`.
 - Latest update receipt: `data/latest-update.json`.
 - Health receipt: `data/update-health.json`.
-- Played matches: 85 of 104.
+- Played matches: 88 of 104.
 - Group matches: 72 of 72 played.
-- Knockout matches: 13 of 32 played.
+- Knockout matches: 16 of 32 played.
 - Overdue unplayed matches: 0.
-- Next scheduled match day in embedded data: `2026-07-03`.
-- Frozen prediction records: 19.
-- Settled frozen predictions: 16.
+- Next scheduled match day in embedded data: `2026-07-04`.
+- Frozen prediction records: 21.
+- Settled frozen predictions: 19.
 - Calibration status: `insufficient_sample`.
 - Calibration threshold: 30 resolved predictions.
 - Backtest status: `insufficient_sample`, prospective frozen-ledger audit only.
-- Raw frozen-ledger benchmark at audit: Brier `0.259498064483`, log loss `0.467490126326`, count `16`.
+- Raw frozen-ledger benchmark at audit: Brier `0.258181830895`, log loss `0.459226122269`, count `19`.
 - Ignored local runtime file currently expected after simulation/test runs: `data/latest-simulation.json`.
 
 ## Public Files To Know
