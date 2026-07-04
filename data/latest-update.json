@@ -1,26 +1,57 @@
 {
-  "generatedAt": "2026-07-03T21:00:04Z",
+  "generatedAt": "2026-07-04T09:41:12Z",
   "updatedThrough": "2026-07-03",
   "scoreboard": {
-    "fetchedFinals": 1,
-    "appliedChanges": 1,
-    "kickoffUpdates": 0,
+    "fetchedFinals": 3,
+    "appliedChanges": 2,
+    "kickoffUpdates": 2,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 88,
+        "match": 86,
         "teams": [
-          "Australia",
-          "Egypt"
+          "Argentina",
+          "Cape Verde"
+        ],
+        "score": [
+          3,
+          2
+        ],
+        "event": "760500"
+      },
+      {
+        "match": 87,
+        "teams": [
+          "Colombia",
+          "Ghana"
         ],
         "score": [
           1,
-          1
+          0
         ],
-        "event": "760499"
+        "event": "760501"
       }
     ],
-    "scheduleChanges": [],
+    "scheduleChanges": [
+      {
+        "match": 90,
+        "teams": [
+          "Canada",
+          "Morocco"
+        ],
+        "kickoffUtc": "2026-07-04T17:00:00Z",
+        "event": "760502"
+      },
+      {
+        "match": 89,
+        "teams": [
+          "Paraguay",
+          "France"
+        ],
+        "kickoffUtc": "2026-07-04T21:00:00Z",
+        "event": "760503"
+      }
+    ],
     "fetchFailures": []
   }
 }
