@@ -111,6 +111,7 @@ Match-window workflow:
 - Guardrail: active-match lock refuses full updates during live-match windows and permits freeze-only records for later matches when safe.
 - Publish path: opens or updates `automation/match-window-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
 - Repository setting required: GitHub Actions workflow permissions must allow Actions to create pull requests; otherwise validation and branch push can pass while `gh pr create` fails.
+- Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
 
 BASE_DATA PR check:
 

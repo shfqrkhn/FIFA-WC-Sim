@@ -14,6 +14,11 @@ export const COMMIT_CANDIDATES = [
   'data/backtest-audit.json'
 ];
 
+export const VALIDATION_WORKFLOWS = [
+  'base-data-pr-check.yml',
+  'security-check.yml'
+];
+
 export function parsePublishArgs(argv = [], env = process.env) {
   const options = {
     branch: env.BASE_DATA_PR_BRANCH || 'automation/base-data-update',
@@ -166,7 +171,8 @@ function publishBranch(options, changedFiles) {
 
   if (existing) {
     gh(['pr', 'edit', existing, '--title', options.title, '--body-file', bodyPath], 'gh pr edit', options.token);
-    writeSummary(['', `BASE_DATA update PR refreshed: #${existing}`]);
+    dispatchValidationWorkflows(options);
+    writeSummary(['', `BASE_DATA update PR refreshed: #${existing}`, 'BASE_DATA validation workflows dispatched.']);
     console.log(`BASE_DATA update PR refreshed: #${existing}`);
     return;
   }
@@ -183,8 +189,15 @@ function publishBranch(options, changedFiles) {
     '--body-file',
     bodyPath
   ], 'gh pr create', options.token).stdout.trim();
-  writeSummary(['', `BASE_DATA update PR created: ${created}`]);
+  dispatchValidationWorkflows(options);
+  writeSummary(['', `BASE_DATA update PR created: ${created}`, 'BASE_DATA validation workflows dispatched.']);
   console.log(`BASE_DATA update PR created: ${created}`);
+}
+
+export function dispatchValidationWorkflows(options, workflows = VALIDATION_WORKFLOWS) {
+  for (const workflow of workflows) {
+    gh(['workflow', 'run', workflow, '--ref', options.branch], `gh workflow run ${workflow}`, options.token);
+  }
 }
 
 export function runPublishBaseDataPr(options) {
