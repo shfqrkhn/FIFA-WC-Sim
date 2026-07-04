@@ -12,6 +12,7 @@ Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026
 - **License:** MIT
 - **Entrypoint:** `docs/index.html`
 - **Maintainer handoff:** [`docs/AI_MAINTAINER_HANDOFF.md`](./docs/AI_MAINTAINER_HANDOFF.md)
+- **Release artifact policy:** [`docs/RELEASE_ARTIFACT_POLICY.md`](./docs/RELEASE_ARTIFACT_POLICY.md)
 
 ## Screenshot
 

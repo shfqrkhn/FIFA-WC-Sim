@@ -10,3 +10,4 @@ import './match-window-update.test.mjs';
 import './apply-scoreboard.test.mjs';
 import './enrich-predictions.test.mjs';
 import './refinement-pass.test.mjs';
+import './public-surface-policy.test.mjs';
