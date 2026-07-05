@@ -1,50 +1,26 @@
 {
-  "generatedAt": "2026-07-05T12:09:24Z",
-  "updatedThrough": "2026-07-04",
+  "generatedAt": "2026-07-05T22:55:07Z",
+  "updatedThrough": "2026-07-05",
   "scoreboard": {
-    "fetchedFinals": 0,
-    "appliedChanges": 0,
-    "kickoffUpdates": 4,
+    "fetchedFinals": 1,
+    "appliedChanges": 1,
+    "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
-    "changes": [],
-    "scheduleChanges": [
+    "changes": [
       {
-        "match": 93,
+        "match": 91,
         "teams": [
-          "Portugal",
-          "Spain"
+          "Brazil",
+          "Norway"
         ],
-        "kickoffUtc": "2026-07-06T19:00:00Z",
-        "event": "760506"
-      },
-      {
-        "match": 94,
-        "teams": [
-          "United States",
-          "Belgium"
+        "score": [
+          1,
+          2
         ],
-        "kickoffUtc": "2026-07-07T00:00:00Z",
-        "event": "760507"
-      },
-      {
-        "match": 95,
-        "teams": [
-          "Argentina",
-          "Egypt"
-        ],
-        "kickoffUtc": "2026-07-07T16:00:00Z",
-        "event": "760509"
-      },
-      {
-        "match": 96,
-        "teams": [
-          "Switzerland",
-          "Colombia"
-        ],
-        "kickoffUtc": "2026-07-07T20:00:00Z",
-        "event": "760508"
+        "event": "760504"
       }
     ],
+    "scheduleChanges": [],
     "fetchFailures": []
   }
 }
