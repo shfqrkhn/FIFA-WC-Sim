@@ -3,10 +3,6 @@ name: Security Check
 on:
   push:
     branches: [main]
-    paths:
-      - package.json
-      - package-lock.json
-      - .github/workflows/security-check.yml
   pull_request:
     branches: [main]
   workflow_dispatch:
