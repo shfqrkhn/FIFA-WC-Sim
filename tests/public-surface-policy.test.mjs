@@ -42,6 +42,9 @@ for (const phrase of ['Claim Firewall Invariant', 'Claim Boundaries', 'must map'
 for (const phrase of ['Currentness Watchdog', 'stale, missing, inaccessible', 'downgrade the affected claim', 'source/repo/GitHub state']) {
   assert(evidence.includes(phrase), `evidence receipt missing currentness watchdog term: ${phrase}`);
 }
+for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub Releases', 'no protected tracked paths', 'no open security/dependabot alerts', 'remaining risks']) {
+  assert(evidence.includes(phrase), `evidence receipt missing safe-to-publish term: ${phrase}`);
+}
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }
