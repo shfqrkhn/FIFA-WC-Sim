@@ -105,6 +105,19 @@ function sourceSnapshotHash(data, match) {
 function featureFlags(data, match) {
   const ctxA = match.context?.A || {};
   const ctxB = match.context?.B || {};
+  const quality = data.dataQuality || {};
+  const qualityStatus = key => String(quality[key]?.status || '').toLowerCase();
+  const sourceLimited = key => {
+    const status = qualityStatus(key);
+    return !status ||
+      status === 'missing' ||
+      status === 'partial' ||
+      status === 'neutral_unless_verified' ||
+      status === 'unavailable' ||
+      status.includes('missing') ||
+      status.includes('neutral') ||
+      status.includes('stale');
+  };
   const hostTeam = name => {
     const t = data.teams.find(row => row.name === name);
     const venue = data.venues?.[match.venue] || {};
@@ -115,8 +128,12 @@ function featureFlags(data, match) {
     recent_form_adjustment_abs: Math.max(Math.abs(Number(ctxA.formAdj || 0)), Math.abs(Number(ctxB.formAdj || 0))),
     host_adjustment_abs: hostTeam(match.teamA) || hostTeam(match.teamB) ? Number(data.config?.homeAdvGoals || 0.18) : 0,
     attack_defense_weight: Number(data.config?.attackWeight || 0),
-    lineups_missing: data.dataQuality?.lineups?.status === 'missing',
-    suspensions_missing: data.dataQuality?.suspensions?.status === 'missing'
+    lineups_missing: qualityStatus('lineups') === 'missing',
+    suspensions_missing: qualityStatus('suspensions') === 'missing',
+    lineups_source_limited: sourceLimited('lineups'),
+    suspensions_source_limited: sourceLimited('suspensions'),
+    injuries_source_limited: sourceLimited('injuries'),
+    referees_source_limited: sourceLimited('referees')
   };
 }
 

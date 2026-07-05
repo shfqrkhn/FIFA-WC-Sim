@@ -45,6 +45,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 
 - Match facts visible in outside products, previews, search cards, broadcasts, or articles are not evidence for this app until they are embedded through a guarded update, source-backed manual override, or documented source note.
 - Unknown kickoff times, scorer rows, discipline ledgers, availability, injuries, lineups, goalkeeper changes, and referee assignments must remain neutral, unavailable, or explicitly source-gap labeled rather than inferred from memory, search snippets, screenshots, or unofficial aggregation.
+- Frozen-prediction audit labels may classify verified-missing or neutral-unless-verified availability statuses as source-limited evidence, but they must not change frozen forecast probabilities or invent match facts.
 - Any future adapter for these fields must record provenance, freshness, and failure behavior before the public UI, README, or model can claim coverage.
 
 ## Claim Boundaries

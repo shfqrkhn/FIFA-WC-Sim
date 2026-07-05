@@ -251,6 +251,11 @@ export function classifyFailure(record, outcome = {}) {
   const miss = actual !== favorite;
   const flags = record.feature_flags || {};
   const err = Number(outcome.scoreline_error ?? record.scoreline_error);
+  const sourceLimitedAvailability = flags.lineups_missing ||
+    flags.suspensions_missing ||
+    flags.lineups_source_limited ||
+    flags.suspensions_source_limited ||
+    flags.availability_source_limited;
 
   if (actual === 'draw' && probs.draw <= 0.24) return 'underestimated_draw';
   if (miss && favoriteProb >= 0.62) return 'overconfident_favorite';
@@ -259,7 +264,7 @@ export function classifyFailure(record, outcome = {}) {
   if (miss && Number(flags.recent_form_adjustment_abs || 0) >= 0.05) return 'bad_recent_form_weight';
   if (Number.isFinite(err) && err >= 2.25 && Number(flags.attack_defense_weight || 0) > 0) return 'bad_attack_defense_weight';
   if (record.stage !== 'group' && (flags.went_to_penalties || actual === 'draw')) return 'knockout_penalty_variance';
-  if (miss && (flags.lineups_missing || flags.suspensions_missing)) return 'missing_lineup_or_suspension_data';
+  if (miss && sourceLimitedAvailability) return 'missing_lineup_or_suspension_data';
   return 'pure_variance';
 }
 
@@ -330,8 +335,7 @@ function comparableFrozenPrediction(record) {
     predicted_advancement_probs: record?.predicted_advancement_probs || {},
     kickoff_utc: record?.kickoff_utc || null,
     venue: record?.venue || null,
-    group: record?.group || null,
-    feature_flags: record?.feature_flags || {}
+    group: record?.group || null
   };
 }
 

@@ -204,6 +204,8 @@ Failure classes currently supported:
 - `pure_variance`
 - `data_quality_or_source_gap`
 
+Source-limited lineup/suspension statuses can feed the failure class audit, but they are derived audit labels only; do not rewrite existing frozen forecast probabilities or invent availability facts.
+
 ## UI Consistency Invariants
 
 The app should use one authoritative match display path for visible match facts. Sim Today, Groups, Bracket, Stats/Data, and explanation views must not contradict each other.

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   appendFrozenPrediction,
+  classifyFailure,
   createPredictionRecord,
   emptyAuditLedger,
   REQUIRED_LEDGER_FIELDS,
@@ -53,6 +54,14 @@ assert.equal(duplicate.changed, false);
 assert.equal(duplicate.skipped, 'already_frozen');
 assert.equal(duplicate.ledger.predictions.length, 1);
 assert.deepEqual(duplicate.ledger.predictions[0].predicted_wdl_probs, prediction.predicted_wdl_probs);
+
+const auditFlagRefresh = appendFrozenPrediction(appended.ledger, {
+  ...prediction,
+  feature_flags: { lineups_source_limited: true, suspensions_source_limited: true }
+});
+assert.equal(auditFlagRefresh.changed, false);
+assert.equal(auditFlagRefresh.skipped, 'already_frozen');
+assert.deepEqual(auditFlagRefresh.ledger.predictions[0].feature_flags, prediction.feature_flags);
 
 assert.throws(() => appendFrozenPrediction(appended.ledger, {
   ...prediction,
@@ -128,5 +137,12 @@ assert.throws(() => createPredictionRecord({
   predictedScorelineDistribution: [{ score: '1-0', probability: 0.12 }],
   predictedAdvancementProbs: { home: 0.45, away: 0.27 }
 }), /predictedAdvancementProbs/);
+
+assert.equal(classifyFailure({
+  ...prediction,
+  predicted_wdl_probs: { home_win: 0.2, draw: 0.32, away_win: 0.48 },
+  actual_result: 'home_win',
+  feature_flags: { lineups_source_limited: true }
+}), 'missing_lineup_or_suspension_data');
 
 console.log('prediction audit tests passed');
