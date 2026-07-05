@@ -20,6 +20,14 @@ The app must remain:
 - Free of tracking, hidden remote scripts, betting, odds, gambling, sportsbook, market-edge, or prediction-market features.
 - A future Prediction Hub can grow from this repo only if it preserves the current simulator's frozen-audit, no-leakage, source-backed, static/offline, and raw-vs-calibrated governance.
 
+## OmniOS Transfer Contract
+
+- Product truth: static/offline World Cup simulator, not a betting, odds, market, or official FIFA product.
+- Execution truth: preserve the guarded BASE_DATA update path, PR-based automation, branch checks, and documented local gates before publishing.
+- Evidence truth: use `docs/EVIDENCE_RECEIPT.md`, prediction audits, calibration/backtest receipts, source notes, and tests; public claims must stay within `PASS` or `PASS_WITH_LIMITATIONS`.
+- Operations truth: live Pages or current main repository ZIP are the only distribution paths; GitHub Releases stay absent.
+- Transfer truth: update this handoff and the evidence receipt whenever source, workflow, prediction, or public-surface guarantees change.
+
 ## Current State Snapshot
 
 Verify these values before relying on them; they describe the repo at the audit above.

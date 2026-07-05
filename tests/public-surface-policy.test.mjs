@@ -10,6 +10,7 @@ const assert = (condition, message) => {
 
 const policy = read('docs/REPO_ZIP_POLICY.md');
 const evidence = read('docs/EVIDENCE_RECEIPT.md');
+const handoff = read('docs/AI_MAINTAINER_HANDOFF.md');
 const readme = read('README.md');
 
 for (const phrase of [
@@ -34,6 +35,9 @@ assert(existsSync(join(root, 'docs', 'REPO_ZIP_POLICY.md')), 'repository ZIP pol
 assert(existsSync(join(root, 'docs', 'EVIDENCE_RECEIPT.md')), 'evidence receipt doc missing.');
 for (const phrase of ['PASS_WITH_LIMITATIONS', 'NO_GO', 'Source-backed match data', 'No betting/odds/markets', 'Frozen predictions/no future leakage']) {
   assert(evidence.includes(phrase), `evidence receipt missing: ${phrase}`);
+}
+for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
+  assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }
 
 const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
