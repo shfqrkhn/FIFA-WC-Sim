@@ -150,6 +150,7 @@ const todayHighlightOk = vm.runInContext(`(() => {
     const groupsHtml = $('#groupsView')?.innerHTML || '';
     const group65 = DATA.matches.find(m => m.no === 65);
     const groupSchedule = matchFullScheduleLabel(group65);
+    const groupDate = matchDateLabel(group65);
     const runTodayRows = todayMatches(date, sampleRun);
     const syntheticOrder = todayMatches(date, {
       matches: [
@@ -161,6 +162,10 @@ const todayHighlightOk = vm.runInContext(`(() => {
       ko: []
     }).map(m => m.no).join(',');
     const bracketHtml = matchCard({ no: 999, round: 'R32', date: key, venue: 'Smoke Venue', teamA: 'Argentina', teamB: 'Portugal' });
+    const dateOnlyToday = { no: 997, round: 'R32', stage: 'R32', date: key, venue: 'Smoke Venue', teamA: 'Argentina', teamB: 'Portugal' };
+    const dateOnlySchedule = matchFullScheduleLabel(dateOnlyToday);
+    renderTodayMatches(date, { matches: [], ko: [dateOnlyToday] });
+    const todayDateOnlyHtml = $('#todayView')?.innerHTML || '';
     const penaltyToday = { no: 998, round: 'R32', stage: 'R32', date: key, kickoffUtc: key + 'T16:00:00Z', venue: 'Smoke Venue', teamA: 'Portugal', teamB: 'Croatia', scoreA: 2, scoreB: 2, played: true, winner: 'Portugal', loser: 'Croatia', pens: { winner: 'Portugal', score: '6-4' } };
     renderTodayMatches(date, { matches: [], ko: [penaltyToday] });
     const todayPenaltyHtml = $('#todayView')?.innerHTML || '';
@@ -176,7 +181,12 @@ const todayHighlightOk = vm.runInContext(`(() => {
       todayHtml.includes('Today') &&
       localTime &&
       todayHtml.includes(localTime) &&
-      !matchTimeLabel({ date: key }) &&
+      groupDate &&
+      todayHtml.includes(groupDate) &&
+      matchTimeLabel({ date: key }) === 'time TBD' &&
+      dateOnlySchedule.includes(formatDateKey(key)) &&
+      dateOnlySchedule.includes('time TBD') &&
+      todayDateOnlyHtml.includes(dateOnlySchedule) &&
       runTodayRows.every(m => runTodayHtml.includes('M' + m.no) && runTodayHtml.includes(m.scoreA + '–' + m.scoreB)) &&
       todayPenaltyHtml.includes('Portugal on penalties 6-4') &&
       bracketPenaltyHtml.includes('Portugal on penalties 6-4') &&
@@ -187,7 +197,8 @@ const todayHighlightOk = vm.runInContext(`(() => {
       (groupsHtml.match(/todayMatch/g) || []).length >= runTodayRows.length &&
       bracketHtml.includes('todayMatch') &&
       bracketHtml.includes('Today') &&
-      bracketHtml.includes(formatDateKey(key));
+      bracketHtml.includes(formatDateKey(key)) &&
+      bracketHtml.includes('time TBD');
   } finally {
     globalThis.Date = RealDate;
   }

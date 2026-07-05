@@ -219,7 +219,7 @@ function padDatePart(n){return String(n).padStart(2,'0');}
 function localDateKey(date=new Date()){return date.getFullYear()+'-'+padDatePart(date.getMonth()+1)+'-'+padDatePart(date.getDate());}
 function matchDateValue(m){return m&&(m.kickoffUtc||m.kickoff||m.kickoffLocal||m.date||m.utc||m.time);}
 function matchDateKey(m){const raw=matchDateValue(m); if(!raw)return ''; const s=String(raw); if(!s.includes('T'))return s.slice(0,10); const d=new Date(s); return Number.isFinite(d.getTime())?localDateKey(d):s.slice(0,10);}
-function matchTimeLabel(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw||!s.includes('T'))return ''; const d=new Date(s); return Number.isFinite(d.getTime())?d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'';}
+function matchTimeLabel(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw)return ''; if(!s.includes('T'))return s.slice(0,10)?'time TBD':''; const d=new Date(s); return Number.isFinite(d.getTime())?d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'time TBD';}
 function isTodayMatch(m,date=new Date()){return matchDateKey(m)===localDateKey(date);}
 function matchKickoffSortValue(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw||!s.includes('T'))return Number.POSITIVE_INFINITY; const d=new Date(s); return Number.isFinite(d.getTime())?d.getTime():Number.POSITIVE_INFINITY;}
 function todayMatchSort(a,b){const ta=matchKickoffSortValue(a), tb=matchKickoffSortValue(b); return ta-tb||((a.no||0)-(b.no||0));}
@@ -231,7 +231,7 @@ function matchStageLabel(m){return m?.group?'Group '+m.group:(m?.round||m?.stage
 function matchDateLabel(m){const raw=matchDateValue(m); if(!raw)return ''; const key=matchDateKey(m); return key?formatDateKey(key):'';}
 function matchDateTimeLabel(m){return [matchDateLabel(m),matchTimeLabel(m)].filter(Boolean).join(' · ');}
 function matchTimeVenueLabel(m){return [matchDateTimeLabel(m),m?.venue].filter(Boolean).join(' · ');}
-function matchFullMetaLabel(m){return ['M'+(m?.no??''),matchTimeLabel(m),matchStageLabel(m),m?.venue].filter(Boolean).join(' · ');}
+function matchFullMetaLabel(m){return matchFullScheduleLabel(m);}
 function matchFullScheduleLabel(m){return ['M'+(m?.no??''),matchDateTimeLabel(m),matchStageLabel(m),m?.venue].filter(Boolean).join(' · ');}
 function matchDecisionDetail(m){if(!m)return ''; if(m.pens&&m.pens.winner&&m.pens.score)return `${m.pens.winner} on penalties ${m.pens.score}`; if(!isGroupStage(m)&&Number.isFinite(m.scoreA)&&Number.isFinite(m.scoreB)&&m.scoreA===m.scoreB&&m.winner)return `${m.winner} advances`; if(!isGroupStage(m)&&m.aet)return 'After extra time'; return '';}
 function matchDecisionHtml(m){const detail=matchDecisionDetail(m); return detail?`<div class="small">${esc(detail)}</div>`:'';}
