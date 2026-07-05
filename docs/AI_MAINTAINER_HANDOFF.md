@@ -28,6 +28,12 @@ The app must remain:
 - Operations truth: live Pages or current main repository ZIP are the only distribution paths; GitHub Releases stay absent.
 - Transfer truth: update this handoff and the evidence receipt whenever source, workflow, prediction, or public-surface guarantees change.
 
+## Doctrine Delta Decision
+
+- After incidents, rescue runs, maturity passes, or repeated failures, classify reusable lessons as `promote`, `reject`, `quarantine`, or `keep_local`.
+- Promote only source-backed, reusable, non-secret lessons that strengthen a gate, checklist, source rule, or failure guard without weakening prediction integrity.
+- Keep private, project-specific, speculative, or unverified lessons out of public repos unless the user explicitly approves publication.
+
 ## Current State Snapshot
 
 Verify these values before relying on them; they describe the repo at the audit above.
