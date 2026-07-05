@@ -13,6 +13,7 @@ const evidence = read('docs/EVIDENCE_RECEIPT.md');
 const handoff = read('docs/AI_MAINTAINER_HANDOFF.md');
 const readme = read('README.md');
 const codeqlWorkflow = read('.github/workflows/codeql.yml');
+const codeqlConfig = read('.github/codeql/codeql-config.yml');
 const pkg = JSON.parse(read('package.json'));
 
 assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
@@ -52,8 +53,11 @@ for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub
 for (const phrase of ['Runtime app code scanning', '.github/workflows/codeql.yml', 'CodeQL JavaScript analysis', 'PASS_WITH_LIMITATIONS']) {
   assert(evidence.includes(phrase), `evidence receipt missing code scanning term: ${phrase}`);
 }
-for (const phrase of ['github/codeql-action/init@v4', 'github/codeql-action/analyze@v4', 'languages: javascript-typescript', 'security-events: write']) {
+for (const phrase of ['github/codeql-action/init@v4', 'github/codeql-action/analyze@v4', 'languages: javascript-typescript', 'security-events: write', 'config-file: ./.github/codeql/codeql-config.yml']) {
   assert(codeqlWorkflow.includes(phrase), `CodeQL workflow missing: ${phrase}`);
+}
+for (const phrase of ['paths-ignore:', 'tests/**', 'node_modules/**', 'test-results/**', 'playwright-report/**']) {
+  assert(codeqlConfig.includes(phrase), `CodeQL config missing: ${phrase}`);
 }
 for (const phrase of ['Input Accessibility Evidence', 'keyboard-only', 'mouse/pointer-only', 'touch-only', 'focus/label review', 'tap-target/no-overflow', 'Input accessibility']) {
   assert(evidence.includes(phrase), `evidence receipt missing input accessibility term: ${phrase}`);

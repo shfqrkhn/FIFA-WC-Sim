@@ -4,12 +4,10 @@ import vm from 'node:vm';
 
 const htmlPath = process.env.SIM_HTML || 'docs/index.html';
 const html = fs.readFileSync(htmlPath, 'utf8');
-const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
-if (!scriptMatch) throw new Error('No inline simulator script found.');
-const script = scriptMatch[1]
-  .replace(/render\(\);\s*$/m, '')
-  .replace(/document\.querySelector/g, 'document.querySelector')
-  .replace(/document\.querySelectorAll/g, 'document.querySelectorAll');
+const scriptStart = html.indexOf('<script>');
+const scriptEnd = html.indexOf('</script>', scriptStart);
+if (scriptStart < 0 || scriptEnd < 0) throw new Error('No inline simulator script found.');
+const script = html.slice(scriptStart + '<script>'.length, scriptEnd).replace(/render\(\);\s*$/m, '');
 
 function createElementStub(selector = '') {
   const listeners = {};

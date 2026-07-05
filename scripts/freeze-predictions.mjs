@@ -49,9 +49,10 @@ function createElementStub(selector = '') {
 }
 
 async function simulatorSandbox(html) {
-  const scriptMatch = html.match(/<script>([\s\S]*?)<\/script>/);
-  if (!scriptMatch) throw new Error('No inline simulator script found.');
-  const script = scriptMatch[1].replace(/render\(\);\s*$/m, '');
+  const scriptStart = html.indexOf('<script>');
+  const scriptEnd = html.indexOf('</script>', scriptStart);
+  if (scriptStart < 0 || scriptEnd < 0) throw new Error('No inline simulator script found.');
+  const script = html.slice(scriptStart + '<script>'.length, scriptEnd).replace(/render\(\);\s*$/m, '');
   const elements = new Map();
   const documentStub = {
     styleSheets: [],

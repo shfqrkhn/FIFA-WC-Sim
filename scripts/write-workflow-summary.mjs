@@ -11,7 +11,11 @@ function readJson(path) {
 }
 
 function row(label, value) {
-  return `| ${label} | ${String(value ?? 'n/a').replace(/\|/g, '\\|')} |`;
+  const safeValue = String(value ?? 'n/a')
+    .split('|').join('\\|')
+    .split('\r').join(' ')
+    .split('\n').join(' ');
+  return `| ${label} | ${safeValue} |`;
 }
 
 const { data } = readArtifact('docs/index.html');
