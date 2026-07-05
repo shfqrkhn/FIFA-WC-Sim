@@ -50,6 +50,7 @@ for (const phrase of ['Currentness Watchdog', 'stale, missing, inaccessible', 'd
 for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub Releases', 'no protected tracked paths', 'no open secret/dependabot/code-scanning alerts', 'code-scanning not-applicable/no-analysis state', 'remaining risks']) {
   assert(evidence.includes(phrase), `evidence receipt missing safe-to-publish term: ${phrase}`);
 }
+assert(evidence.includes("git rev-list --left-right --count 'HEAD...@{u}'"), 'evidence receipt must preserve the PowerShell-safe upstream delta command.');
 for (const phrase of ['Runtime app code scanning', '.github/workflows/codeql.yml', 'CodeQL JavaScript analysis', 'PASS_WITH_LIMITATIONS']) {
   assert(evidence.includes(phrase), `evidence receipt missing code scanning term: ${phrase}`);
 }
