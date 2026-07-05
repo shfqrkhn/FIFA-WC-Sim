@@ -127,6 +127,18 @@ const footerLatestOk = vm.runInContext(`(() => {
 if (!footerLatestOk) {
   throw new Error('Last data update footer did not use the latest embedded timestamp.');
 }
+const dataQualityHealthOk = vm.runInContext(`(() => {
+  renderMaintenance();
+  const html = $('#maintenanceView')?.innerHTML || '';
+  return html.includes('data-quality-audit="true"') &&
+    html.includes('Source coverage') &&
+    html.includes('lineups') &&
+    html.includes('neutral_unless_verified') &&
+    html.includes('referees');
+})()`, sandbox, { timeout: 1000 });
+if (!dataQualityHealthOk) {
+  throw new Error('Data quality source coverage did not render in the Health tab.');
+}
 const todayHighlightOk = vm.runInContext(`(() => {
   const RealDate = Date;
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
