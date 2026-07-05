@@ -56,6 +56,7 @@ const steps = [
   ['apply manual verified overrides', () => runPythonScript('scripts/apply_manual_overrides.py')],
   ['freeze pre-match predictions', () => runNode('scripts/freeze-predictions.mjs', nowArgs)],
   ['apply scoreboard', () => runPythonScript('scripts/apply_scoreboard.py', [...scoreboardArgs, ...fetchArgs])],
+  ['freeze newly scheduled pre-match predictions', () => runNode('scripts/freeze-predictions.mjs', nowArgs)],
   ['enrich predictions', () => runPythonScript('scripts/enrich_predictions.py')],
   ['enrich rest/travel', () => runPythonScript('scripts/enrich_rest_travel.py')],
   ['enrich weather', () => runPythonScript('scripts/enrich_weather.py', fetchArgs)],

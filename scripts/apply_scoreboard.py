@@ -11,6 +11,7 @@ HTML_PATH = os.environ.get('FIFA_WC_HTML_PATH', 'docs/index.html')
 STOP_DATE = datetime.date(2026, 7, 20)
 NO_FETCH = '--no-fetch' in sys.argv
 FETCH_FAILURES = []
+SCHEDULE_LOOKAHEAD_DAYS = 3
 
 TEAM = {
     'MEX': 'Mexico', 'RSA': 'South Africa', 'KOR': 'South Korea', 'CZE': 'Czechia',
@@ -511,6 +512,16 @@ def has_full_kickoff(match):
     return False
 
 
+def fetch_window_end_day(data, today):
+    cap = min(today + datetime.timedelta(days=SCHEDULE_LOOKAHEAD_DAYS), STOP_DATE)
+    missing_days = []
+    for match in all_matches(data):
+        day = match_day(match)
+        if day and today <= day <= cap and not match.get('played') and not has_full_kickoff(match):
+            missing_days.append(day)
+    return max([today] + missing_days)
+
+
 def apply_event_schedule_to_match(match, event):
     kickoff = event_kickoff_utc(event)
     if not kickoff or has_full_kickoff(match):
@@ -611,7 +622,8 @@ if not events and not NO_FETCH:
     stale_day = earliest_stale_unplayed_day(all_matches(data), today)
     start_day = stale_day or latest_played_day(all_matches(data))
     start_day = datetime.date.fromisoformat(start_day) if start_day else datetime.date(2026, 6, 11)
-    for offset in range((min(today, STOP_DATE) - start_day).days + 1):
+    end_day = fetch_window_end_day(data, min(today, STOP_DATE))
+    for offset in range((end_day - start_day).days + 1):
         events.extend(fetch_day(start_day + datetime.timedelta(days=offset)))
 
 for event in events:

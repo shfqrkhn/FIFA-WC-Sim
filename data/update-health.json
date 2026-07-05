@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-04T23:44:01Z",
+  "generatedAt": "2026-07-05T12:09:28Z",
   "scoreboard": {
     "playedMatches": 90,
     "totalMatches": 104,
@@ -37,40 +37,52 @@
       "lastUpdated": "2026-07-04T23:44:01Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-04T23:44:01Z",
+      "generatedAt": "2026-07-05T12:09:24Z",
       "updatedThrough": "2026-07-04",
       "scoreboard": {
-        "fetchedFinals": 2,
-        "appliedChanges": 2,
-        "kickoffUpdates": 0,
+        "fetchedFinals": 0,
+        "appliedChanges": 0,
+        "kickoffUpdates": 4,
         "teamSlotUpdates": 0,
-        "changes": [
+        "changes": [],
+        "scheduleChanges": [
           {
-            "match": 90,
+            "match": 93,
             "teams": [
-              "Canada",
-              "Morocco"
+              "Portugal",
+              "Spain"
             ],
-            "score": [
-              0,
-              3
-            ],
-            "event": "760502"
+            "kickoffUtc": "2026-07-06T19:00:00Z",
+            "event": "760506"
           },
           {
-            "match": 89,
+            "match": 94,
             "teams": [
-              "Paraguay",
-              "France"
+              "United States",
+              "Belgium"
             ],
-            "score": [
-              0,
-              1
+            "kickoffUtc": "2026-07-07T00:00:00Z",
+            "event": "760507"
+          },
+          {
+            "match": 95,
+            "teams": [
+              "Argentina",
+              "Egypt"
             ],
-            "event": "760503"
+            "kickoffUtc": "2026-07-07T16:00:00Z",
+            "event": "760509"
+          },
+          {
+            "match": 96,
+            "teams": [
+              "Switzerland",
+              "Colombia"
+            ],
+            "kickoffUtc": "2026-07-07T20:00:00Z",
+            "event": "760508"
           }
         ],
-        "scheduleChanges": [],
         "fetchFailures": []
       }
     }
@@ -81,7 +93,7 @@
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 21,
+    "frozenPredictions": 27,
     "settledPredictions": 21,
     "calibrationStatus": "insufficient_sample",
     "resolvedPredictions": 21,
