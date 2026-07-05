@@ -36,6 +36,9 @@ assert(existsSync(join(root, 'docs', 'EVIDENCE_RECEIPT.md')), 'evidence receipt 
 for (const phrase of ['PASS_WITH_LIMITATIONS', 'NO_GO', 'Source-backed match data', 'No betting/odds/markets', 'Frozen predictions/no future leakage']) {
   assert(evidence.includes(phrase), `evidence receipt missing: ${phrase}`);
 }
+for (const phrase of ['Claim Firewall Invariant', 'Claim Boundaries', 'must map', 'NOT_RUN', 'BLOCKED', 'current repo state']) {
+  assert(evidence.includes(phrase), `evidence receipt missing claim firewall term: ${phrase}`);
+}
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }
