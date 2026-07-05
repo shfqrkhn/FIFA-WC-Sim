@@ -51,6 +51,7 @@ for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub
   assert(evidence.includes(phrase), `evidence receipt missing safe-to-publish term: ${phrase}`);
 }
 assert(evidence.includes("git rev-list --left-right --count 'HEAD...@{u}'"), 'evidence receipt must preserve the PowerShell-safe upstream delta command.');
+assert(evidence.includes('gh release list --limit 5'), 'evidence receipt must require a GitHub Releases absence check.');
 for (const phrase of ['Runtime app code scanning', '.github/workflows/codeql.yml', 'CodeQL JavaScript analysis', 'PASS_WITH_LIMITATIONS']) {
   assert(evidence.includes(phrase), `evidence receipt missing code scanning term: ${phrase}`);
 }
