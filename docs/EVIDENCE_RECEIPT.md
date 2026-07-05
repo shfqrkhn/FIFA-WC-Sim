@@ -34,6 +34,12 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 - Accessibility claims require current evidence from responsive UI smoke, static checks, focus/label review, and tap-target/no-overflow checks where applicable.
 - If a workflow lacks direct input-mode coverage, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN`; do not claim full accessibility from responsive rendering alone.
 
+## Recovery And Data Safety Evidence
+
+- User-controlled import, export, reset, browser-storage, corrupt-cache, and malformed saved-data claims must remain fail-closed and tied to current tests or explicit manual evidence.
+- Recovery claims may cover local state repair and guarded workflow recovery only within tested paths; they must not imply hidden upload, remote backup, or automatic reconstruction of missing source data.
+- If a storage, import/export, or recovery path is not covered in the current pass, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN` before public use.
+
 ## Claim Boundaries
 
 | Area | Class | Evidence | Limit |
@@ -45,6 +51,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
 | Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
 | Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
+| Recovery/data safety | `PASS_WITH_LIMITATIONS` | README, corrupt-cache/storage-failure/malformed saved-data checks, UI smoke | Does not recover missing source data or replace source-backed BASE_DATA workflows. |
 
 ## Required Before Public-Facing Change
 

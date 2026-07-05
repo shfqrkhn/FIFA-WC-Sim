@@ -48,6 +48,9 @@ for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub
 for (const phrase of ['Input Accessibility Evidence', 'keyboard-only', 'mouse/pointer-only', 'touch-only', 'focus/label review', 'tap-target/no-overflow', 'Input accessibility']) {
   assert(evidence.includes(phrase), `evidence receipt missing input accessibility term: ${phrase}`);
 }
+for (const phrase of ['Recovery And Data Safety Evidence', 'import, export, reset', 'corrupt-cache', 'malformed saved-data', 'fail-closed', 'Recovery/data safety']) {
+  assert(evidence.includes(phrase), `evidence receipt missing recovery/data safety term: ${phrase}`);
+}
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }
