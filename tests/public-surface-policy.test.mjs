@@ -51,6 +51,9 @@ for (const phrase of ['Input Accessibility Evidence', 'keyboard-only', 'mouse/po
 for (const phrase of ['Recovery And Data Safety Evidence', 'import, export, reset', 'corrupt-cache', 'malformed saved-data', 'fail-closed', 'Recovery/data safety']) {
   assert(evidence.includes(phrase), `evidence receipt missing recovery/data safety term: ${phrase}`);
 }
+for (const phrase of ['Source Gap Disclosure Evidence', 'outside products', 'source-backed manual override', 'Unknown kickoff times', 'scorer rows', 'referee assignments', 'provenance, freshness, and failure behavior']) {
+  assert(evidence.includes(phrase), `evidence receipt missing source gap disclosure term: ${phrase}`);
+}
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }

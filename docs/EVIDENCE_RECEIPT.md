@@ -40,13 +40,19 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 - Recovery claims may cover local state repair and guarded workflow recovery only within tested paths; they must not imply hidden upload, remote backup, or automatic reconstruction of missing source data.
 - If a storage, import/export, or recovery path is not covered in the current pass, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN` before public use.
 
+## Source Gap Disclosure Evidence
+
+- Match facts visible in outside products, previews, search cards, broadcasts, or articles are not evidence for this app until they are embedded through a guarded update, source-backed manual override, or documented source note.
+- Unknown kickoff times, scorer rows, discipline ledgers, availability, injuries, lineups, goalkeeper changes, and referee assignments must remain neutral, unavailable, or explicitly source-gap labeled rather than inferred from memory, search snippets, screenshots, or unofficial aggregation.
+- Any future adapter for these fields must record provenance, freshness, and failure behavior before the public UI, README, or model can claim coverage.
+
 ## Claim Boundaries
 
 | Area | Class | Evidence | Limit |
 | --- | --- | --- | --- |
 | Static/offline app | `PASS` | README, `docs/index.html`, local-file behavior, `npm run ui:smoke` | Browser storage availability can still vary by device. |
 | No betting/odds/markets | `PASS` | README, validator, public-surface tests | Do not add market-derived inputs. |
-| Source-backed match data | `PASS_WITH_LIMITATIONS` | BASE_DATA automation, source notes, validator | Unknown scorer, discipline, lineup, injury, and referee data remain neutral unless verified. |
+| Source-backed match data | `PASS_WITH_LIMITATIONS` | BASE_DATA automation, source notes, validator, source gap disclosure | Unknown kickoff, scorer, discipline, lineup, injury, availability, goalkeeper, and referee data remain neutral unless verified. |
 | Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Requires continued freeze-before-kickoff discipline. |
 | Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
 | Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
