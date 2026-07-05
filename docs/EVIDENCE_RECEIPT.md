@@ -67,5 +67,5 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 - `gh release list --limit 5` returns no releases
 - `npm run qa:full`
 - `git diff --check`
-- protected-path scan for ignored/private artifacts
+- protected-path scan for ignored/private artifacts, exports, backups, logs, and scratch folders
 - live Pages check after runtime or public-surface changes

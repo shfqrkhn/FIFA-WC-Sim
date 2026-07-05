@@ -81,7 +81,8 @@ const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' 
 const forbiddenTracked = tracked.filter((file) =>
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)/.test(file) ||
   /(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)/.test(file) ||
-  /(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i.test(file)
+  /(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i.test(file) ||
+  /(^|\/)(exports?|backups?|logs?|scratch)(\/|$)/i.test(file)
 );
 assert(forbiddenTracked.length === 0, `forbidden tracked paths: ${forbiddenTracked.join(', ')}`);
 
