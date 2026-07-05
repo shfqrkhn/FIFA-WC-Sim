@@ -1,6 +1,6 @@
 # Repository ZIP Policy
 
-Users should run the live GitHub Pages app or download the repository through **Code > Download ZIP**. The repository ZIP must remain safe to inspect, extract, and run locally without requiring a separate GitHub Release.
+Users should run the live GitHub Pages app or download the repository through **Code > Download ZIP**. The generated repository ZIP must remain safe to inspect, extract, and run locally without requiring a separate GitHub Release.
 
 ## Allowed
 
@@ -28,4 +28,4 @@ npm run qa:full
 git diff --check
 ```
 
-Repository ZIP review must include `git status --short --ignored` and a protected-path scan proving forbidden local artifacts remain untracked.
+Repository ZIP review must include `git status --short --ignored`, `git archive --format=tar HEAD`, and a protected-path scan proving forbidden local artifacts remain untracked and absent from the generated archive.

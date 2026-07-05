@@ -18,6 +18,52 @@ const pkg = JSON.parse(read('package.json'));
 
 assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
 
+const forbiddenPathPattern =
+  /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;
+const forbiddenLoosePathPattern = /(^|\/)(exports?|backups?|logs?|scratch)(\/|$)/i;
+
+function gitArchiveEntries() {
+  const archive = execFileSync('git', ['archive', '--format=tar', 'HEAD'], {
+    cwd: root,
+    maxBuffer: 128 * 1024 * 1024
+  });
+  const entries = [];
+  for (let offset = 0; offset + 512 <= archive.length;) {
+    const header = archive.subarray(offset, offset + 512);
+    if (header.every((byte) => byte === 0)) break;
+    const name = header.toString('utf8', 0, 100).replace(/\0.*$/, '');
+    const prefix = header.toString('utf8', 345, 500).replace(/\0.*$/, '');
+    const sizeRaw = header.toString('utf8', 124, 136).replace(/\0.*$/, '').trim();
+    const size = sizeRaw ? parseInt(sizeRaw, 8) : 0;
+    const fullName = [prefix, name].filter(Boolean).join('/');
+    if (fullName) entries.push(fullName.replace(/\\/g, '/'));
+    offset += 512 + Math.ceil(size / 512) * 512;
+  }
+  return entries;
+}
+
+const archiveEntries = gitArchiveEntries();
+const requiredArchiveEntries = [
+  'README.md',
+  'docs/index.html',
+  'docs/REPO_ZIP_POLICY.md',
+  'docs/EVIDENCE_RECEIPT.md',
+  'data/latest-update.json',
+  'data/update-health.json',
+  'data/prediction-audit.json',
+  'data/calibration-state.json',
+  'data/backtest-audit.json',
+  'package.json',
+  'scripts/validate_base_data.py',
+  'tests/public-surface-policy.test.mjs'
+];
+const forbiddenArchiveEntries = archiveEntries.filter((file) => forbiddenPathPattern.test(file) || forbiddenLoosePathPattern.test(file));
+
+assert(forbiddenArchiveEntries.length === 0, `forbidden generated archive paths: ${forbiddenArchiveEntries.join(', ')}`);
+for (const file of requiredArchiveEntries) {
+  assert(archiveEntries.includes(file), `generated repository archive must include public/runtime path: ${file}`);
+}
+
 for (const phrase of [
   'Repository ZIP Policy',
   'source-backed generated data',
@@ -27,7 +73,8 @@ for (const phrase of [
   'Invented match',
   'betting',
   'npm run qa:full',
-  'protected-path scan'
+  'protected-path scan',
+  'git archive'
 ]) {
   assert(policy.includes(phrase), `repository ZIP policy missing: ${phrase}`);
 }
@@ -52,6 +99,7 @@ for (const phrase of ['Safe-To-Publish Receipt', 'clean synced tree', 'no GitHub
 }
 assert(evidence.includes("git rev-list --left-right --count 'HEAD...@{u}'"), 'evidence receipt must preserve the PowerShell-safe upstream delta command.');
 assert(evidence.includes('gh release list --limit 5'), 'evidence receipt must require a GitHub Releases absence check.');
+assert(evidence.includes('git archive'), 'evidence receipt must tie repository ZIP safety to generated archive evidence.');
 for (const phrase of ['Runtime app code scanning', '.github/workflows/codeql.yml', 'CodeQL JavaScript analysis', 'PASS_WITH_LIMITATIONS']) {
   assert(evidence.includes(phrase), `evidence receipt missing code scanning term: ${phrase}`);
 }
@@ -78,12 +126,7 @@ for (const phrase of ['Doctrine Delta Decision', 'promote', 'reject', 'quarantin
 }
 
 const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
-const forbiddenTracked = tracked.filter((file) =>
-  /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)/.test(file) ||
-  /(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)/.test(file) ||
-  /(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i.test(file) ||
-  /(^|\/)(exports?|backups?|logs?|scratch)(\/|$)/i.test(file)
-);
+const forbiddenTracked = tracked.filter((file) => forbiddenPathPattern.test(file) || forbiddenLoosePathPattern.test(file));
 assert(forbiddenTracked.length === 0, `forbidden tracked paths: ${forbiddenTracked.join(', ')}`);
 
 console.log('public surface policy tests passed');

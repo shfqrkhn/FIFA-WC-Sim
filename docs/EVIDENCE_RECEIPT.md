@@ -56,7 +56,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Source-backed match data | `PASS_WITH_LIMITATIONS` | BASE_DATA automation, source notes, validator, source gap disclosure | Unknown kickoff, scorer, discipline, lineup, injury, availability, goalkeeper, and referee data remain neutral unless verified. |
 | Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Requires continued freeze-before-kickoff discipline. |
 | Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
-| Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
+| Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, `git archive`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
 | Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
 | Recovery/data safety | `PASS_WITH_LIMITATIONS` | README, corrupt-cache/storage-failure/malformed saved-data checks, UI smoke | Does not recover missing source data or replace source-backed BASE_DATA workflows. |
 
