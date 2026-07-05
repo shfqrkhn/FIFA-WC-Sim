@@ -1,0 +1,33 @@
+# Evidence Receipt
+
+This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of chat history.
+
+## Evidence Classes
+
+- `PASS`: directly covered by current files, tests, or checks.
+- `PASS_WITH_LIMITATIONS`: true only within the stated scope.
+- `NOT_RUN`: not checked in the current pass.
+- `BLOCKED`: cannot be checked until an external condition changes.
+- `NO_GO`: failed or unsafe; do not publish until fixed.
+
+## Claim Boundaries
+
+| Area | Class | Evidence | Limit |
+| --- | --- | --- | --- |
+| Static/offline app | `PASS` | README, `docs/index.html`, local-file behavior, `npm run ui:smoke` | Browser storage availability can still vary by device. |
+| No betting/odds/markets | `PASS` | README, validator, public-surface tests | Do not add market-derived inputs. |
+| Source-backed match data | `PASS_WITH_LIMITATIONS` | BASE_DATA automation, source notes, validator | Unknown scorer, discipline, lineup, injury, and referee data remain neutral unless verified. |
+| Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Requires continued freeze-before-kickoff discipline. |
+| Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
+| Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
+
+## Required Before Public-Facing Change
+
+- `git status --short --ignored`
+- `git rev-list --left-right --count HEAD..."@{u}"`
+- `npm test`
+- `npm run qa`
+- `npm run ui:smoke`
+- `git diff --check`
+- protected-path scan for ignored/private artifacts
+- live Pages check after runtime or public-surface changes

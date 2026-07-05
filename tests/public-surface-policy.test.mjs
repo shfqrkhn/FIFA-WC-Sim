@@ -9,6 +9,7 @@ const assert = (condition, message) => {
 };
 
 const policy = read('docs/REPO_ZIP_POLICY.md');
+const evidence = read('docs/EVIDENCE_RECEIPT.md');
 const readme = read('README.md');
 
 for (const phrase of [
@@ -30,6 +31,10 @@ assert(readme.includes('betting') && readme.includes('These are not used'), 'REA
 assert(readme.includes('[Download current main ZIP](https://github.com/shfqrkhn/FIFA-WC-Sim/archive/refs/heads/main.zip)'), 'README must link the repository ZIP.');
 assert(!readme.includes('/releases/latest'), 'README must not link GitHub Releases.');
 assert(existsSync(join(root, 'docs', 'REPO_ZIP_POLICY.md')), 'repository ZIP policy doc missing.');
+assert(existsSync(join(root, 'docs', 'EVIDENCE_RECEIPT.md')), 'evidence receipt doc missing.');
+for (const phrase of ['PASS_WITH_LIMITATIONS', 'NO_GO', 'Source-backed match data', 'No betting/odds/markets', 'Frozen predictions/no future leakage']) {
+  assert(evidence.includes(phrase), `evidence receipt missing: ${phrase}`);
+}
 
 const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean);
 const forbiddenTracked = tracked.filter((file) =>
