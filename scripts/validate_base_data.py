@@ -633,8 +633,8 @@ if os.path.exists(README):
         fail('README must prevent direct-file launch confusion')
     if 'offline/prediction-hub/' not in readme:
         fail('README must document the private prediction-hub guardrail')
-    if 'npm run qa' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
-        fail('README must document QA wrapper, UI smoke, and manual override schema')
+    if 'npm run qa:full' not in readme or 'npm run qa' not in readme or 'npm run ui:smoke' not in readme or 'manual-overrides.example.json' not in readme:
+        fail('README must document full QA wrapper, focused QA, UI smoke, and manual override schema')
     if 'match-window' not in readme or 'active-match lock' not in readme:
         fail('README must document match-window automation and active-match lock')
     if 'benchmark metrics' not in readme or 'must remain untracked' not in readme:

@@ -233,8 +233,7 @@ Specific rules:
 Run the full gate after material changes:
 
 ```bash
-npm run qa
-npm run ui:smoke
+npm run qa:full
 ```
 
 Useful focused checks:
@@ -271,7 +270,7 @@ Minimum expected structural invariants:
 6. Inspect `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`.
 7. If changing embedded data, use guarded scripts instead of manual JSON edits whenever possible.
 8. If changing UI/model logic, add or update targeted tests first when practical.
-9. Run focused checks, then `npm run qa`; run `npm run ui:smoke` for UI-visible changes.
+9. Run focused checks, then `npm run qa:full`; use `npm run qa` or `npm run ui:smoke` only when a narrower check is intentionally sufficient.
 10. Review `git diff --check` and `git diff`.
 11. Commit and push only when the user asks or the active task explicitly requires it.
 
@@ -315,7 +314,7 @@ Preserve: static/offline app, autonomous guarded updates, one authoritative matc
 
 Patch only material issues affecting correctness, data freshness, automation reliability, no-leakage, UI clarity, docs accuracy, or maintainability. Prefer shared helpers and existing patterns.
 
-Run relevant targeted tests plus: python scripts/validate_base_data.py, node scripts/run-sim.mjs, node scripts/validate-calibration.mjs, node scripts/backtest-audit.mjs --no-write, node tests/run-all.mjs, npm run qa, and npm run ui:smoke for UI changes.
+Run relevant targeted tests plus: python scripts/validate_base_data.py, node scripts/run-sim.mjs, node scripts/validate-calibration.mjs, node scripts/backtest-audit.mjs --no-write, node tests/run-all.mjs, and npm run qa:full for public-facing changes.
 
 Do not commit ignored/private/offline files. Commit/push to main only if explicitly requested or required by the task after checks pass.
 ```

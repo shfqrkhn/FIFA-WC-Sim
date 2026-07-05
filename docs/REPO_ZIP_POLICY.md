@@ -24,9 +24,7 @@ Users should run the live GitHub Pages app or download the repository through **
 Before pushing public ZIP/download-facing changes, run:
 
 ```bash
-npm test
-npm run qa
-npm run ui:smoke
+npm run qa:full
 git diff --check
 ```
 

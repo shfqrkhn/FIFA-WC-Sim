@@ -63,9 +63,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 
 - `git status --short --ignored`
 - `git rev-list --left-right --count HEAD..."@{u}"`
-- `npm test`
-- `npm run qa`
-- `npm run ui:smoke`
+- `npm run qa:full`
 - `git diff --check`
 - protected-path scan for ignored/private artifacts
 - live Pages check after runtime or public-surface changes

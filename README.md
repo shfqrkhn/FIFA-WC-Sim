@@ -173,6 +173,12 @@ Recommended full local gate:
 
 ```bash
 npm install
+npm run qa:full
+```
+
+Focused data/refinement gate:
+
+```bash
 npm run qa
 ```
 

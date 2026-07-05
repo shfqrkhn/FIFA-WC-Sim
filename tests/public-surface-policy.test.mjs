@@ -12,6 +12,9 @@ const policy = read('docs/REPO_ZIP_POLICY.md');
 const evidence = read('docs/EVIDENCE_RECEIPT.md');
 const handoff = read('docs/AI_MAINTAINER_HANDOFF.md');
 const readme = read('README.md');
+const pkg = JSON.parse(read('package.json'));
+
+assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
 
 for (const phrase of [
   'Repository ZIP Policy',
@@ -21,7 +24,7 @@ for (const phrase of [
   'data/scoreboards/',
   'Invented match',
   'betting',
-  'npm run ui:smoke',
+  'npm run qa:full',
   'protected-path scan'
 ]) {
   assert(policy.includes(phrase), `repository ZIP policy missing: ${phrase}`);
