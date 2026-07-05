@@ -28,6 +28,12 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 - If any proof is missing, stale, or contradicted by GitHub/repo/source state, record the repo as `PASS_WITH_LIMITATIONS`, `NOT_RUN`, `BLOCKED`, or `NO_GO` instead of safe.
 - The final status table must name remaining risks rather than implying safety from silence.
 
+## Input Accessibility Evidence
+
+- Critical tournament workflows must remain usable by keyboard-only, mouse/pointer-only, and touch-only users.
+- Accessibility claims require current evidence from responsive UI smoke, static checks, focus/label review, and tap-target/no-overflow checks where applicable.
+- If a workflow lacks direct input-mode coverage, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN`; do not claim full accessibility from responsive rendering alone.
+
 ## Claim Boundaries
 
 | Area | Class | Evidence | Limit |
@@ -38,6 +44,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Requires continued freeze-before-kickoff discipline. |
 | Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
 | Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
+| Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
 
 ## Required Before Public-Facing Change
 
