@@ -535,7 +535,7 @@ REQUIRED_SCRIPT_MARKERS = {
         'documentStub',
         'addEventListener',
         'localStorageStub',
-        'Initial page load did not run Monte Carlo predictions into Groups and Bracket views.',
+        'Initial page load must compute Monte Carlo predictions without mixing aggregate MC text into scored sample-path bracket cards.',
         'Initial Monte Carlo representative did not inform the sample path, Groups, and Bracket views.',
         'Last data update footer was not rendered.',
         'Footer metadata did not render app version, data version, copyright, and legal notice.',

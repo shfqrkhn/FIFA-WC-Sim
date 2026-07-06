@@ -88,8 +88,8 @@ const initialGroupsHtml = elements.get('#groupsView')?.innerHTML || '';
 const initialBracketHtml = elements.get('#bracketView')?.innerHTML || '';
 const initialUnplayedGroupMatches = vm.runInContext('DATA.matches.filter(m => !m.played).length', sandbox, { timeout: 1000 });
 const initialGroupsMcOk = initialUnplayedGroupMatches === 0 || initialGroupsHtml.includes('MC:');
-if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsMcOk || !initialBracketHtml.includes('MC:')) {
-  throw new Error('Initial page load did not run Monte Carlo predictions into Groups and Bracket views.');
+if (!initialMc?.predictions?.groups || !initialMc?.predictions?.knockout || !initialGroupsMcOk || initialBracketHtml.includes('MC:')) {
+  throw new Error('Initial page load must compute Monte Carlo predictions without mixing aggregate MC text into scored sample-path bracket cards.');
 }
 const initialRepresentativeOk = vm.runInContext('MC?.representative && LAST === MC.representative && LAST.champion === MC.rows[0].team', sandbox, { timeout: 1000 });
 if (!initialRepresentativeOk) {
@@ -249,17 +249,19 @@ const todayMcPredictionOk = vm.runInContext(`(() => {
   const candidate = DATA.knockout.find(m => !m.played && m.kickoffUtc);
   if (!candidate) return true;
   const date = new Date(candidate.kickoffUtc);
+  const text = formatKnockoutMCPrediction(candidate.no, candidate.teamA, candidate.teamB);
+  renderTodayMatches(date);
+  const unsampledTodayHtml = $('#todayView')?.innerHTML || '';
   const run = MC.representative || simulate('today-mc-smoke');
   const row = todayMatches(date, run).find(m => m.no === candidate.no);
-  if (!row) return false;
-  const text = formatKnockoutMCPrediction(row.no, row.teamA, row.teamB);
+  if (!row || !matchHasDisplayedResult(row)) return false;
   renderTodayMatches(date, run);
-  const todayHtml = $('#todayView')?.innerHTML || '';
+  const sampleTodayHtml = $('#todayView')?.innerHTML || '';
   const bracketHtml = matchCard(row);
-  return !!text && todayHtml.includes(text) && bracketHtml.includes(text);
+  return !!text && unsampledTodayHtml.includes(text) && !sampleTodayHtml.includes(text) && !bracketHtml.includes(text);
 })()`, sandbox, { timeout: 5000 });
 if (!todayMcPredictionOk) {
-  throw new Error('Today match cards did not include the same Monte Carlo prediction summary as Bracket cards.');
+  throw new Error('Today match cards must show Monte Carlo summaries only before a scored sample or final result is displayed.');
 }
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
@@ -424,8 +426,8 @@ const groupsHtml = elements.get('#groupsView')?.innerHTML || '';
 const bracketHtml = elements.get('#bracketView')?.innerHTML || '';
 const unplayedGroupMatches = vm.runInContext('DATA.matches.filter(m => !m.played).length', sandbox, { timeout: 1000 });
 const groupsMcOk = unplayedGroupMatches === 0 || groupsHtml.includes('MC:');
-if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsMcOk || !bracketHtml.includes('MC:')) {
-  throw new Error('Monte Carlo predictions were not reflected in Groups and Bracket views.');
+if (!mc?.predictions?.groups || !mc?.predictions?.knockout || !groupsMcOk || bracketHtml.includes('MC:')) {
+  throw new Error('Monte Carlo predictions must compute while scored sample-path bracket cards stay free of aggregate MC text.');
 }
 const playedKnockoutMcHiddenOk = vm.runInContext(`(() => {
   const played = DATA.knockout.find(m => m.played);
