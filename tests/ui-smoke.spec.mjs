@@ -62,10 +62,14 @@ async function expectNoMcOutcomeContradictions(page) {
       const winner = match.scoreA === match.scoreB ? (match.winner || 'Draw') : match.scoreA > match.scoreB ? match.teamA : match.teamB;
       if (text.includes('Pre-match MC:')) bad.push(`M${match.no}: scored result still shows pre-match text`);
       if (text.includes('MC outcome frequency')) bad.push(`M${match.no}: displayed result uses ambiguous MC outcome label`);
-      if (text.includes('Displayed outcome frequency') && winner !== 'Draw' && !text.includes(winner)) {
+      if (text.includes('Displayed outcome frequency')) bad.push(`M${match.no}: displayed result uses old ambiguous outcome-frequency label`);
+      if (text.includes('Displayed result:') && !text.includes('Overall MC')) {
+        bad.push(`M${match.no}: displayed result lacks Overall MC context`);
+      }
+      if (text.includes('Displayed result:') && winner !== 'Draw' && !text.includes(winner)) {
         bad.push(`M${match.no}: MC text does not name displayed winner ${winner}`);
       }
-      if (text.includes('Displayed outcome frequency') && winner === 'Draw' && !text.toLowerCase().includes('draw')) {
+      if (text.includes('Displayed result:') && winner === 'Draw' && !text.toLowerCase().includes('draw')) {
         bad.push(`M${match.no}: MC text does not describe displayed draw`);
       }
     }
