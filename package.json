@@ -10,6 +10,7 @@
     "smoke": "node scripts/run-sim.mjs",
     "backtest": "node scripts/backtest-audit.mjs",
     "ui:smoke": "playwright test",
+    "ui:smoke:live": "node scripts/run-live-ui-smoke.mjs",
     "qa:full": "npm test && npm run qa && npm run ui:smoke"
   },
   "devDependencies": {
