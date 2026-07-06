@@ -262,11 +262,36 @@ const todayMcPredictionOk = vm.runInContext(`(() => {
     unsampledTodayHtml.includes(text) &&
     !sampleTodayHtml.includes(text) &&
     !bracketHtml.includes(text) &&
-    sampleTodayHtml.includes('MC outcome frequency') &&
-    bracketHtml.includes('MC outcome frequency');
+    sampleTodayHtml.includes('Displayed outcome frequency') &&
+    bracketHtml.includes('Displayed outcome frequency');
 })()`, sandbox, { timeout: 5000 });
 if (!todayMcPredictionOk) {
-  throw new Error('Today match cards must switch from pre-match MC summaries to aligned outcome-frequency text after a score is displayed.');
+  throw new Error('Today match cards must switch from pre-match MC summaries to aligned displayed-outcome frequency text after a score is displayed.');
+}
+const displayedUnderdogExplanationOk = vm.runInContext(`(() => {
+  const groupOk = LAST.matches.every(m => {
+    const text = formatDisplayedGroupMC(m);
+    if (!text) return true;
+    const p = MC.predictions.groups[String(m.no)];
+    const outcome = displayOutcome(m);
+    const fav = topCount(p?.outcomes || {});
+    return !fav || fav[0] === outcome || text.includes('model most common: ' + fav[0]);
+  });
+  const bracketOk = LAST.ko.every(m => {
+    const text = formatDisplayedKnockoutMC(m);
+    if (!text) return true;
+    const p = MC.predictions.knockout[String(m.no)];
+    const winner = m.winner || displayOutcome(m);
+    const pair = m.teamA && m.teamB ? m.teamA + ' vs ' + m.teamB : '';
+    const rev = m.teamA && m.teamB ? m.teamB + ' vs ' + m.teamA : '';
+    const bucket = (pair && p?.pairingWinners?.[pair]) || (rev && p?.pairingWinners?.[rev]) || p?.winners || {};
+    const fav = topCount(bucket);
+    return !fav || fav[0] === winner || text.includes('model favored ' + fav[0]);
+  });
+  return groupOk && bracketOk;
+})()`, sandbox, { timeout: 5000 });
+if (!displayedUnderdogExplanationOk) {
+  throw new Error('Displayed lower-probability outcomes must identify the model-favored alternative.');
 }
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
