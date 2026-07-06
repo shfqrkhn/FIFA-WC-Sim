@@ -63,6 +63,18 @@ async function expectNoMcOutcomeContradictions(page) {
       if (text.includes('Pre-match MC:')) bad.push(`M${match.no}: scored result still shows pre-match text`);
       if (text.includes('MC outcome frequency')) bad.push(`M${match.no}: displayed result uses ambiguous MC outcome label`);
       if (text.includes('Displayed outcome frequency')) bad.push(`M${match.no}: displayed result uses old ambiguous outcome-frequency label`);
+      if (text.includes('MC projection:')) {
+        const state = window.matchDisplayState?.(match);
+        if (!state?.projection) bad.push(`M${match.no}: MC projection text without projection state`);
+        const score = Number.isFinite(state?.scoreA) && Number.isFinite(state?.scoreB) ? `${state.scoreA}–${state.scoreB}` : '';
+        if (score && !text.includes(score)) bad.push(`M${match.no}: MC projection text omits projected score ${score}`);
+        if (state?.winner && state.winner !== 'Draw' && !text.includes(state.winner)) {
+          bad.push(`M${match.no}: MC projection text omits projected winner ${state.winner}`);
+        }
+        if (state?.fav && state.fav[0] !== state.winner) {
+          bad.push(`M${match.no}: MC projection winner ${state.winner} differs from favored bucket ${state.fav[0]}`);
+        }
+      }
       if (text.includes('Displayed result:') && !text.includes('Overall MC')) {
         bad.push(`M${match.no}: displayed result lacks Overall MC context`);
       }

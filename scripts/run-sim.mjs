@@ -262,44 +262,39 @@ const todayMcPredictionOk = vm.runInContext(`(() => {
     unsampledTodayHtml.includes(text) &&
     !sampleTodayHtml.includes(text) &&
     !bracketHtml.includes(text) &&
-    sampleTodayHtml.includes('Displayed result:') &&
+    sampleTodayHtml.includes('MC projection:') &&
     sampleTodayHtml.includes('Overall MC') &&
-    bracketHtml.includes('Displayed result:') &&
+    bracketHtml.includes('MC projection:') &&
     bracketHtml.includes('Overall MC');
 })()`, sandbox, { timeout: 5000 });
 if (!todayMcPredictionOk) {
-  throw new Error('Today match cards must switch from pre-match MC summaries to aligned displayed-result and Overall MC text after a score is displayed.');
+  throw new Error('Today match cards must switch from pre-match MC summaries to aligned MC projection and Overall MC text after a score is displayed.');
 }
-const displayedUnderdogExplanationOk = vm.runInContext(`(() => {
+const displayedProjectionOk = vm.runInContext(`(() => {
+  function projectedTextOk(m, text) {
+    if (!text) return true;
+    const d = matchDisplayState(m);
+    if (!d.projection) return text.includes('Displayed result:') && text.includes('Overall MC');
+    const score = scoreTextFromState(d);
+    return text.includes('MC projection:') &&
+      text.includes('Overall MC') &&
+      text.includes(score) &&
+      !text.includes('Displayed outcome frequency') &&
+      !text.includes('Displayed result:') &&
+      (!d.fav || d.fav[0] === d.winner);
+  }
   const groupOk = LAST.matches.every(m => {
     const text = formatDisplayedGroupMC(m);
-    if (!text) return true;
-    const p = MC.predictions.groups[String(m.no)];
-    const outcome = displayOutcome(m);
-    const fav = topCount(p?.outcomes || {});
-    return text.includes('Displayed result:') &&
-      text.includes('Overall MC:') &&
-      !text.includes('Displayed outcome frequency') &&
-      (!fav || fav[0] === outcome || text.includes(fav[0] + ' was most common at'));
+    return projectedTextOk(m, text);
   });
   const bracketOk = LAST.ko.every(m => {
     const text = formatDisplayedKnockoutMC(m);
-    if (!text) return true;
-    const p = MC.predictions.knockout[String(m.no)];
-    const winner = m.winner || displayOutcome(m);
-    const pair = m.teamA && m.teamB ? m.teamA + ' vs ' + m.teamB : '';
-    const rev = m.teamA && m.teamB ? m.teamB + ' vs ' + m.teamA : '';
-    const bucket = (pair && p?.pairingWinners?.[pair]) || (rev && p?.pairingWinners?.[rev]) || p?.winners || {};
-    const fav = topCount(bucket);
-    return text.includes('Displayed result:') &&
-      text.includes('Overall MC') &&
-      !text.includes('Displayed outcome frequency') &&
-      (!fav || fav[0] === winner || text.includes(fav[0] + ' was favored at'));
+    return projectedTextOk(m, text);
   });
   return groupOk && bracketOk;
 })()`, sandbox, { timeout: 5000 });
-if (!displayedUnderdogExplanationOk) {
-  throw new Error('Displayed lower-probability outcomes must identify the model-favored alternative.');
+if (!displayedProjectionOk) {
+  throw new Error('Displayed MC projections must use the model-favored outcome and its common scoreline.');
 }
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
