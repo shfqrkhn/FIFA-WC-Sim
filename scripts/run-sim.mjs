@@ -428,22 +428,31 @@ const controlsLockOk = vm.runInContext(`(() => {
 if (!controlsLockOk) {
   throw new Error('Monte Carlo controls were not locked during simulation.');
 }
-const chaosControlsOk = html.includes('id="chaos"') && vm.runInContext(`(() => {
+const chaosControlsOk = html.includes('id="chaos"') && html.includes('Match style preset') && html.includes('<option value="custom">Custom</option>') && vm.runInContext(`(() => {
   $('#chaos').value = '1.23';
   const custom = Math.abs(activeOpts().chaos - 1.23) < 1e-9;
   $('#chaos').value = '9';
   const clampedHigh = Math.abs(activeOpts().chaos - 1.35) < 1e-9;
+  $('#mode').value = 'balanced';
+  $('#chaos').value = '1.35';
+  syncModeToChaos();
+  const manualCustom = $('#mode').value === 'custom' && activeOpts().mode === 'custom';
   $('#mode').value = 'conservative';
   setChaosPresetFromMode();
   const preset = Math.abs(Number($('#chaos').value) - 0.9) < 1e-9;
+  $('#mode').value = 'custom';
+  $('#chaos').value = '1.31';
+  setChaosPresetFromMode();
+  const customPreservesManual = Math.abs(Number($('#chaos').value) - 1.31) < 1e-9;
+  $('#mode').value = 'conservative';
   $('#chaos').value = 'bad';
   const fallback = Math.abs(activeOpts().chaos - 0.9) < 1e-9;
   $('#mode').value = 'balanced';
   $('#chaos').value = '1';
-  return custom && clampedHigh && preset && fallback;
+  return custom && clampedHigh && manualCustom && preset && customPreservesManual && fallback;
 })()`, sandbox, { timeout: 1000 });
 if (!chaosControlsOk) {
-  throw new Error('Chaos multiplier control did not clamp, preset, and feed active Monte Carlo options.');
+  throw new Error('Chaos multiplier control did not clamp, preset, custom-label, and feed active Monte Carlo options.');
 }
 const scenarioNameOk = html.includes('placeholder="YYYYMMDD"') && !html.includes('value="20260625"') && vm.runInContext(`(() => {
   const prior = $('#seed').value;
