@@ -445,6 +445,25 @@ const chaosControlsOk = html.includes('id="chaos"') && vm.runInContext(`(() => {
 if (!chaosControlsOk) {
   throw new Error('Chaos multiplier control did not clamp, preset, and feed active Monte Carlo options.');
 }
+const scenarioNameOk = html.includes('placeholder="YYYYMMDD"') && !html.includes('value="20260625"') && vm.runInContext(`(() => {
+  const prior = $('#seed').value;
+  const fixed = new Date(2026, 6, 6, 12);
+  const formatsDate = defaultScenarioName(fixed) === '20260706';
+  $('#seed').value = '20260625';
+  initScenarioName(fixed);
+  const replacesStaleDefault = $('#seed').value === '20260706';
+  $('#seed').value = '';
+  initScenarioName(fixed);
+  const fillsBlank = $('#seed').value === '20260706';
+  $('#seed').value = 'custom-scenario';
+  initScenarioName(fixed);
+  const preservesCustom = $('#seed').value === 'custom-scenario';
+  $('#seed').value = prior;
+  return formatsDate && replacesStaleDefault && fillsBlank && preservesCustom;
+})()`, sandbox, { timeout: 1000 });
+if (!scenarioNameOk) {
+  throw new Error('Scenario name did not initialize from the current local date while preserving custom values.');
+}
 const collapsedControlsOk =
   /<div class="toolbar primaryControls">\s*<button class="btn gold" id="mcBtn"/.test(html) &&
   html.includes('<details class="advancedControls" id="predictionSettings">') &&

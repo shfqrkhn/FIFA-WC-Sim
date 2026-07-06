@@ -68,7 +68,7 @@ button,input,select,textarea{font:inherit;color:inherit} button{cursor:pointer;b
   <details class="advancedControls" id="predictionSettings">
     <summary>Prediction settings</summary>
     <div class="toolbar settingsControls" aria-label="Prediction settings">
-    <div class="control"><label>Scenario name</label><input id="seed" value="20260625" /></div>
+    <div class="control"><label>Scenario name</label><input id="seed" placeholder="YYYYMMDD" /></div>
     <div class="control"><label>Prediction runs</label><input id="runs" type="number" min="50" max="20000" step="50" value="2000" /></div>
     <div class="control"><label>Match style</label><select id="mode"><option value="balanced">Balanced</option><option value="conservative">Steadier</option><option value="chaos">More upsets</option></select></div>
     <div class="control"><label>Chaos multiplier</label><input id="chaos" type="number" min="0.75" max="1.35" step="0.01" value="1" title="Lower steadies scorelines; higher increases variance and upset paths." /></div>
@@ -225,6 +225,8 @@ function dataUpdateStamp(){const q=DATA.dataQuality||{}, s=DATA.currentStats||{}
 function formatUpdateStamp(raw){const s=String(raw||'unknown'); const d=new Date(s); return Number.isFinite(d.getTime())&&/\dT\d/.test(s)?d.toLocaleString(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}):s;}
 function padDatePart(n){return String(n).padStart(2,'0');}
 function localDateKey(date=new Date()){return date.getFullYear()+'-'+padDatePart(date.getMonth()+1)+'-'+padDatePart(date.getDate());}
+function defaultScenarioName(date=new Date()){return localDateKey(date).replace(/-/g,'');}
+function initScenarioName(date=new Date()){const el=$('#seed'); if(!el)return; const v=String(el.value||'').trim(); if(!v||v==='20260625')el.value=defaultScenarioName(date);}
 function matchDateValue(m){return m&&(m.kickoffUtc||m.kickoff||m.kickoffLocal||m.date||m.utc||m.time);}
 function matchDateKey(m){const raw=matchDateValue(m); if(!raw)return ''; const s=String(raw); if(!s.includes('T'))return s.slice(0,10); const d=new Date(s); return Number.isFinite(d.getTime())?localDateKey(d):s.slice(0,10);}
 function matchTimeLabel(m){const raw=matchDateValue(m), s=String(raw||''); if(!raw)return ''; if(!s.includes('T'))return s.slice(0,10)?'time TBD':''; const d=new Date(s); return Number.isFinite(d.getTime())?d.toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'time TBD';}
@@ -350,6 +352,7 @@ function handleMonteCarloClick(){return runMonteCarloFlow({selectSim:true});}
 bind('#mcBtn','click',handleMonteCarloClick); bind('#applyData','click',applyPatch); bind('#importDataFile','change',e=>importDataFile(e.target&&e.target.files&&e.target.files[0])); bind('#exportData','click',()=>{const blob=new Blob([JSON.stringify(DATA,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='world-cup-2026-sim-data.json'; a.click(); URL.revokeObjectURL(a.href); setStatus('Exported JSON.');}); bind('#resetData','click',()=>{resetAppState(); refresh('Reset embedded baseline and cleared local caches.');}); bind('#refreshExplain','click',()=>{renderTransparency(LAST); setStatus('Refreshed match explanation.');}); bind('#explainMatch','change',()=>renderTransparency(LAST)); bind('#mode','change',()=>{setChaosPresetFromMode(); refresh('Settings changed. Run predictions to refresh the board.');}); bind('#chaos','change',()=>{normalizeChaosInput(); refresh('Settings changed. Run predictions to refresh the board.');}); ['seed','homeAdv','weather','runs'].forEach(id=>bind('#'+id,'change',()=>refresh('Settings changed. Run predictions to refresh the board.')));
 document.addEventListener('click',e=>{const target=e.target; if(target&&target.classList&&target.classList.contains('skip')){const href=target.getAttribute?target.getAttribute('href'):target.href; if(activateSectionTarget(href,{panelFocus:true})){e.preventDefault&&e.preventDefault(); return;}}});
 setupA11y();
+initScenarioName();
 if(typeof location!=='undefined'&&location.hash)activateSectionTarget(location.hash,{silent:true,panelFocus:false});
 async function bootstrapApp(){refresh(); await runMonteCarloFlow({initial:true});}
 const bootstrapReady=bootstrapApp();
