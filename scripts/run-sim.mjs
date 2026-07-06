@@ -14,7 +14,7 @@ function createElementStub(selector = '') {
   const classes = new Set();
   const attributes = {};
   return {
-    value: selector === '#mode' ? 'balanced' : selector === '#seed' ? 'automation-smoke' : selector === '#runs' ? '200' : '',
+    value: selector === '#mode' ? 'balanced' : selector === '#seed' ? 'automation-smoke' : selector === '#runs' ? '200' : selector === '#chaos' ? '1' : '',
     innerHTML: '',
     textContent: '',
     onclick: null,
@@ -258,10 +258,15 @@ const todayMcPredictionOk = vm.runInContext(`(() => {
   renderTodayMatches(date, run);
   const sampleTodayHtml = $('#todayView')?.innerHTML || '';
   const bracketHtml = matchCard(row);
-  return !!text && unsampledTodayHtml.includes(text) && !sampleTodayHtml.includes(text) && !bracketHtml.includes(text);
+  return !!text &&
+    unsampledTodayHtml.includes(text) &&
+    !sampleTodayHtml.includes(text) &&
+    !bracketHtml.includes(text) &&
+    sampleTodayHtml.includes('MC outcome frequency') &&
+    bracketHtml.includes('MC outcome frequency');
 })()`, sandbox, { timeout: 5000 });
 if (!todayMcPredictionOk) {
-  throw new Error('Today match cards must show Monte Carlo summaries only before a scored sample or final result is displayed.');
+  throw new Error('Today match cards must switch from pre-match MC summaries to aligned outcome-frequency text after a score is displayed.');
 }
 const statsSnapshotOk = vm.runInContext(`(() => {
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
@@ -388,7 +393,7 @@ if (!busyOk) {
   throw new Error('Monte Carlo loading state did not toggle accessibly.');
 }
 const controlsLockOk = vm.runInContext(`(() => {
-  const ids = ['seed','runs','mode','homeAdv','weather','mcBtn'];
+  const ids = ['seed','runs','mode','chaos','homeAdv','weather','mcBtn'];
   setMonteCarloControlsDisabled(true);
   const locked = ids.every(id => $('#'+id).disabled === true && $('#'+id).getAttribute('aria-disabled') === 'true');
   setMonteCarloControlsDisabled(false);
@@ -397,6 +402,23 @@ const controlsLockOk = vm.runInContext(`(() => {
 })()`, sandbox, { timeout: 1000 });
 if (!controlsLockOk) {
   throw new Error('Monte Carlo controls were not locked during simulation.');
+}
+const chaosControlsOk = html.includes('id="chaos"') && vm.runInContext(`(() => {
+  $('#chaos').value = '1.23';
+  const custom = Math.abs(activeOpts().chaos - 1.23) < 1e-9;
+  $('#chaos').value = '9';
+  const clampedHigh = Math.abs(activeOpts().chaos - 1.35) < 1e-9;
+  $('#mode').value = 'conservative';
+  setChaosPresetFromMode();
+  const preset = Math.abs(Number($('#chaos').value) - 0.9) < 1e-9;
+  $('#chaos').value = 'bad';
+  const fallback = Math.abs(activeOpts().chaos - 0.9) < 1e-9;
+  $('#mode').value = 'balanced';
+  $('#chaos').value = '1';
+  return custom && clampedHigh && preset && fallback;
+})()`, sandbox, { timeout: 1000 });
+if (!chaosControlsOk) {
+  throw new Error('Chaos multiplier control did not clamp, preset, and feed active Monte Carlo options.');
 }
 const collapsedControlsOk =
   /<div class="toolbar primaryControls">\s*<button class="btn gold" id="mcBtn"/.test(html) &&
@@ -470,7 +492,7 @@ const displayedBracketPredictionOk = vm.runInContext(`(() => {
   return LAST.ko.every(m => {
     const text = formatKnockoutMCPrediction(m.no, m.teamA, m.teamB);
     if (!text || text.includes('this matchup was not sampled')) return true;
-    const winner = text.match(/^MC: (.+?) wins /)?.[1];
+    const winner = text.match(/^Pre-match MC: (.+?) wins /)?.[1];
     return !winner || winner === m.teamA || winner === m.teamB;
   });
 })()`, sandbox, { timeout: 5000 });
