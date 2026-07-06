@@ -115,7 +115,7 @@ for (const phrase of ['Input Accessibility Evidence', 'keyboard only', 'mouse/po
 for (const phrase of ['Single Input Directive Evidence', 'keyboard only', 'mouse/pointer only', 'touch only', 'platform-limited input only', 'No critical workflow may require', 'Single input operation']) {
   assert(evidence.includes(phrase), `evidence receipt missing single input directive term: ${phrase}`);
 }
-for (const phrase of ['Design Language Evidence', 'modern minimalist', 'Uiverse', 'Open Props', 'Design language/UI safety', 'browser JS popups', 'component overlap']) {
+for (const phrase of ['Design Language Evidence', 'Signature Ecosystem Evidence', 'shared `shfqrkhn` ecosystem', 'Signature ecosystem fit', 'modern minimalist', 'Uiverse', 'Open Props', 'Design language/UI safety', 'browser JS popups', 'component overlap']) {
   assert(evidence.includes(phrase), `evidence receipt missing design language term: ${phrase}`);
 }
 for (const phrase of ['Recovery And Data Safety Evidence', 'import, export, reset', 'corrupt-cache', 'malformed saved-data', 'fail-closed', 'Recovery/data safety']) {
@@ -130,7 +130,7 @@ for (const phrase of ['Source Gap Disclosure Evidence', 'outside products', 'sou
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
 }
-for (const phrase of ['Design truth', 'modern minimalist', 'MIT UI libraries/resources', 'browser JS popups', 'arbitrary component copy-paste']) {
+for (const phrase of ['Ecosystem truth', 'shared signature design system', 'Design truth', 'modern minimalist', 'MIT UI libraries/resources', 'browser JS popups', 'arbitrary component copy-paste']) {
   assert(handoff.includes(phrase), `handoff missing design truth term: ${phrase}`);
 }
 for (const phrase of ['Reliability truth', 'self-checking', 'crash-recoverable', 'state-explicit', 'TDD/SDD-backed', 'remove complexity']) {

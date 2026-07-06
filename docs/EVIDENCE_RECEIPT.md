@@ -45,6 +45,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 ## Design Language Evidence
 
 - UI changes must preserve a modern minimalist, utilitarian, professional, joyful, responsive, tournament-contextual design language with local CSS/tokens, semantic native controls, visible focus, reduced-motion-safe transitions, no horizontal overflow, and no component overlap.
+- Signature Ecosystem Evidence: FIFA-WC-Sim must look and feel like part of the shared `shfqrkhn` ecosystem while staying contextual to source-backed tournament simulation and dense match comparison.
 - MIT UI libraries/resources such as Uiverse, Open Props, Primer, Radix Colors, Pico CSS, Heroicons, Bootstrap Icons, Floating UI, or A11y Dialog are inspiration sources only unless a source-backed, license-checked, tested need justifies a dependency.
 - Reject browser JS popups, blocking overlays, arbitrary component copy-paste, mixed visual systems, unbounded animation, external CDNs, or styling that makes match facts harder to compare.
 
@@ -81,6 +82,7 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
 | Single input operation | `PASS_WITH_LIMITATIONS` | input accessibility evidence, UI smoke, static controls, no browser popup policy | Does not certify every OS assistive technology or unusual HID/browser pairing. |
 | Design language/UI safety | `PASS_WITH_LIMITATIONS` | handoff/evidence docs, public-surface tests, UI smoke, visual/manual checks where run | Does not certify every viewport or assistive technology; contextual tournament surfaces may differ from other repos. |
+| Signature ecosystem fit | `PASS_WITH_LIMITATIONS` | shared signature design system reference, design evidence, public-surface tests, UI smoke | Does not require identical UI components; tournament data density and match comparison remain domain-specific. |
 | Recovery/data safety | `PASS_WITH_LIMITATIONS` | README, corrupt-cache/storage-failure/malformed saved-data checks, UI smoke | Does not recover missing source data or replace source-backed BASE_DATA workflows. |
 | Mission-critical reliability | `PASS_WITH_LIMITATIONS` | mission-critical reliability evidence, tests, QA, UI smoke, workflow evidence | Does not certify official data completeness, external source availability, or regulated-grade infrastructure. |
 
