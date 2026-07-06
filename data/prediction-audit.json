@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-06T00:33:45Z",
+  "generated_at_utc": "2026-07-06T11:59:07Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -2075,15 +2075,15 @@
         "draw": 0,
         "away": 0.480012774
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 2,
+      "actual_away_score": 3,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-06T11:59:07Z",
+      "brier_score": 0.668245451136,
+      "log_loss": 1.095851187419,
+      "scoreline_error": 2.947088,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "bad_host_adjustment",
       "kickoff_utc": "2026-07-06T00:00:00Z",
       "venue": "Estadio Azteca",
       "group": null,
@@ -2530,15 +2530,15 @@
         "draw": 0,
         "away": 0.480012774
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 2,
+      "actual_away_score": 3,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-06T11:59:07Z",
+      "brier_score": 0.668245451136,
+      "log_loss": 1.095851187419,
+      "scoreline_error": 2.947088,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "bad_host_adjustment",
       "kickoff_utc": "2026-07-06T00:00:00Z",
       "venue": "Estadio Azteca",
       "group": null,
@@ -3396,6 +3396,101 @@
       "failure_type": null,
       "kickoff_utc": "2026-07-09T20:00:00Z",
       "venue": "Gillette Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false,
+        "lineups_source_limited": true,
+        "suspensions_source_limited": true,
+        "injuries_source_limited": true,
+        "referees_source_limited": true
+      }
+    },
+    {
+      "prediction_id": "e61f413180297df9cb7cc2ae",
+      "created_at_utc": "2026-07-06T11:59:07Z",
+      "match_id": 99,
+      "stage": "QF",
+      "home_team": "Norway",
+      "away_team": "England",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-05-auto-daily",
+      "source_snapshot_hash": "9f5bb10e7030b2f1d7b9e891e4a579eb8145bc55123d923c1a0b7e6cae6af6b0",
+      "predicted_wdl_probs": {
+        "home_win": 0.03407403409659259,
+        "draw": 0.10361988168963801,
+        "away_win": 0.8623060842137694
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "0-3",
+          "probability": 0.13428487
+        },
+        {
+          "score": "0-2",
+          "probability": 0.13411021
+        },
+        {
+          "score": "0-4",
+          "probability": 0.10084482
+        },
+        {
+          "score": "0-1",
+          "probability": 0.08563413
+        },
+        {
+          "score": "1-3",
+          "probability": 0.06873595
+        },
+        {
+          "score": "1-2",
+          "probability": 0.06864655
+        },
+        {
+          "score": "0-5",
+          "probability": 0.06058569
+        },
+        {
+          "score": "1-4",
+          "probability": 0.0516191
+        },
+        {
+          "score": "1-1",
+          "probability": 0.04936123
+        },
+        {
+          "score": "0-0",
+          "probability": 0.03338118
+        },
+        {
+          "score": "1-5",
+          "probability": 0.0310118
+        },
+        {
+          "score": "0-6",
+          "probability": 0.0303323
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.0858839749,
+        "draw": 0,
+        "away": 0.9141160251
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-11T21:00:00Z",
+      "venue": "Hard Rock Stadium",
       "group": null,
       "feature_flags": {
         "weather_adjustment_abs": 0,
