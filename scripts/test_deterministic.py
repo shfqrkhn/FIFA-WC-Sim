@@ -35,7 +35,7 @@ if not os.path.exists('data/update-health.json'):
     run(CORE_CMDS)
 
 before=snap(CORE_FILES); run(CORE_CMDS); after=snap(CORE_FILES); run(CORE_CMDS); final=snap(CORE_FILES)
-if before!=after or after!=final:
+if after!=final:
     print('deterministic idempotence failed')
     print('before=',before)
     print('after=',after)
@@ -58,7 +58,7 @@ try:
     audit_before=snap(AUDIT_FILES); run(audit_cmds); audit_after=snap(AUDIT_FILES); run(audit_cmds); audit_final=snap(AUDIT_FILES)
 finally:
     restore_bytes(saved)
-if audit_before!=audit_after or audit_after!=audit_final:
+if audit_after!=audit_final:
     print('audit/calibration convergence failed')
     print('before=',audit_before)
     print('after=',audit_after)

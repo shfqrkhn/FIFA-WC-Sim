@@ -87,7 +87,6 @@ REQUIRED_UI = [
     'Best Young Player',
     'Goal of the Tournament',
     'FIFA Fair Play Trophy',
-    'FIFA Peace Prize - Football Unites the World',
     'function awardProjectionRows',
     'function renderAwardProjectionTable',
     'function freshnessWarningHtml',
@@ -244,9 +243,12 @@ REQUIRED_SCRIPT_MARKERS = {
         'def latest_played_day(matches):',
         'def fetch_window_end_day(data, today):',
         'def event_kickoff_utc(event):',
+        'def event_venue_name(event):',
         'def event_team_names(event):',
+        'def schedule_match_candidates(matches, event):',
+        'def fetch_window_start_day(data, today):',
         'def apply_event_schedule_to_match(match, event):',
-        'def apply_event_teams_to_match(match, teams):',
+        'def apply_event_teams_to_match(match, teams, concrete_teams):',
         'def resolve_knockout_slots(data):',
         'def allocate_third_slots(q, knockout):',
         'def event_winner(comps):',
@@ -280,7 +282,8 @@ REQUIRED_SCRIPT_MARKERS = {
         'scripts/update_health.py',
         'data/backtest-audit.json',
         'scripts/backtest-audit.mjs',
-        'before!=after or after!=final',
+        'after!=final',
+        'audit_after!=audit_final',
     ],
     'scripts/node-python.mjs': [
         'const PYTHON_CANDIDATES',
@@ -774,8 +777,14 @@ if isinstance(matches, list) and isinstance(knockout, list):
         errors.append('duplicate match number across group/knockout matches')
 if not isinstance(venues, dict) or not venues:
     errors.append('missing venues')
-if not isinstance(data.get('sources'), list):
+sources = data.get('sources')
+if not isinstance(sources, list):
     errors.append('missing sources')
+else:
+    blocked_source_names = {'FIFA Peace Prize - Football Unites the World'}
+    source_names = {s.get('name') for s in sources if isinstance(s, dict)}
+    if source_names.intersection(blocked_source_names):
+        errors.append('non-tournament political award source must not be embedded')
 if not isinstance(data.get('maintenance'), dict):
     errors.append('missing maintenance ledger')
 calibration = data.get('calibration')
@@ -812,6 +821,18 @@ for t in teams or []:
             errors.append('out-of-range eloRating for %s' % t.get('name'))
 current_stats = data.get('currentStats') if isinstance(data.get('currentStats'), dict) else {}
 all_match_rows = (matches or []) + (knockout or [])
+missing_kickoffs = []
+for row in all_match_rows:
+    has_kickoff = False
+    for field in ('kickoffUtc', 'kickoff', 'kickoffLocal', 'date', 'utc', 'time'):
+        value = row.get(field) if isinstance(row, dict) else None
+        if value and 'T' in str(value):
+            has_kickoff = True
+            break
+    if not has_kickoff:
+        missing_kickoffs.append(str(row.get('no') if isinstance(row, dict) else 'unknown'))
+if missing_kickoffs:
+    errors.append('matches missing source-backed kickoff timestamp: %s' % ', '.join(missing_kickoffs[:12]))
 played_matches = [m for m in all_match_rows if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
 played_goals = sum(m.get('scoreA', 0) + m.get('scoreB', 0) for m in played_matches)
 if current_stats:

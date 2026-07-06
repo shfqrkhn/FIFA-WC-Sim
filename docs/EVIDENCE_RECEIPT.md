@@ -31,15 +31,35 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 
 ## Input Accessibility Evidence
 
-- Critical tournament workflows must remain usable by keyboard-only, mouse/pointer-only, and touch-only users.
-- Accessibility claims require current evidence from responsive UI smoke, static checks, focus/label review, and tap-target/no-overflow checks where applicable.
-- If a workflow lacks direct input-mode coverage, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN`; do not claim full accessibility from responsive rendering alone.
+- Critical tournament workflows must remain usable with one available input mode: keyboard only, mouse/pointer only, touch only, or platform-limited input only.
+- Accessibility claims require current evidence from responsive UI smoke, static checks, focus/label review, platform text-entry support, and tap-target/no-overflow checks where applicable.
+- If keyboard-only, mouse-only, touch-only, or platform-limited operation lacks direct coverage, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN`; do not claim full accessibility from responsive rendering alone.
+
+## Single Input Directive Evidence
+
+- After initial setup, every critical workflow must be fully operable with one available input mode: keyboard only, mouse/pointer only, touch only, or platform-limited input only.
+- No critical workflow may require a combined keyboard-plus-pointer, keyboard-plus-touch, hover-plus-keyboard, drag-plus-keyboard, or browser-popup path.
+- Controls must expose visible focus, click/tap alternatives, platform text-entry support where text is unavoidable, and nonblocking status/recovery paths for degraded HID conditions.
+- If keyboard-only, mouse-only, touch-only, or platform-limited operation is not directly covered in the current pass, downgrade the affected claim to `PASS_WITH_LIMITATIONS` or `NOT_RUN`.
+
+## Design Language Evidence
+
+- UI changes must preserve a modern minimalist, utilitarian, professional, joyful, responsive, tournament-contextual design language with local CSS/tokens, semantic native controls, visible focus, reduced-motion-safe transitions, no horizontal overflow, and no component overlap.
+- MIT UI libraries/resources such as Uiverse, Open Props, Primer, Radix Colors, Pico CSS, Heroicons, Bootstrap Icons, Floating UI, or A11y Dialog are inspiration sources only unless a source-backed, license-checked, tested need justifies a dependency.
+- Reject browser JS popups, blocking overlays, arbitrary component copy-paste, mixed visual systems, unbounded animation, external CDNs, or styling that makes match facts harder to compare.
 
 ## Recovery And Data Safety Evidence
 
 - User-controlled import, export, reset, browser-storage, corrupt-cache, and malformed saved-data claims must remain fail-closed and tied to current tests or explicit manual evidence.
 - Recovery claims may cover local state repair and guarded workflow recovery only within tested paths; they must not imply hidden upload, remote backup, or automatic reconstruction of missing source data.
 - If a storage, import/export, or recovery path is not covered in the current pass, label it `PASS_WITH_LIMITATIONS` or `NOT_RUN` before public use.
+
+## Mission-Critical Reliability Evidence
+
+- Critical prediction, source-data, simulation, import/export/reset, and workflow automation paths must stay self-checking, crash-recoverable, state-explicit, modular, maintainable, simple, one-input accessible, and TDD/SDD-backed.
+- Runtime and automation failures must fail closed with visible status, preserved frozen predictions, no invented match data, no browser popup APIs, and no hidden upload.
+- New complexity is acceptable only when it directly improves resilience, usability, source provenance, state clarity, or maintainability and is covered by current tests or explicit evidence.
+- Autonomous AI-assisted development must start from current files, add or update tests before broad data/UI/workflow changes, keep claims inside evidence boundaries, and leave a reproducible recovery path.
 
 ## Source Gap Disclosure Evidence
 
@@ -59,7 +79,10 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
 | Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, `git archive`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
 | Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
+| Single input operation | `PASS_WITH_LIMITATIONS` | input accessibility evidence, UI smoke, static controls, no browser popup policy | Does not certify every OS assistive technology or unusual HID/browser pairing. |
+| Design language/UI safety | `PASS_WITH_LIMITATIONS` | handoff/evidence docs, public-surface tests, UI smoke, visual/manual checks where run | Does not certify every viewport or assistive technology; contextual tournament surfaces may differ from other repos. |
 | Recovery/data safety | `PASS_WITH_LIMITATIONS` | README, corrupt-cache/storage-failure/malformed saved-data checks, UI smoke | Does not recover missing source data or replace source-backed BASE_DATA workflows. |
+| Mission-critical reliability | `PASS_WITH_LIMITATIONS` | mission-critical reliability evidence, tests, QA, UI smoke, workflow evidence | Does not certify official data completeness, external source availability, or regulated-grade infrastructure. |
 
 ## Required Before Public-Facing Change
 

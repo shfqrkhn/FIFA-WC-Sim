@@ -109,17 +109,35 @@ for (const phrase of ['github/codeql-action/init@v4', 'github/codeql-action/anal
 for (const phrase of ['paths-ignore:', 'tests/**', 'node_modules/**', 'test-results/**', 'playwright-report/**']) {
   assert(codeqlConfig.includes(phrase), `CodeQL config missing: ${phrase}`);
 }
-for (const phrase of ['Input Accessibility Evidence', 'keyboard-only', 'mouse/pointer-only', 'touch-only', 'focus/label review', 'tap-target/no-overflow', 'Input accessibility']) {
+for (const phrase of ['Input Accessibility Evidence', 'keyboard only', 'mouse/pointer only', 'touch only', 'platform-limited input only', 'focus/label review', 'platform text-entry support', 'Input accessibility']) {
   assert(evidence.includes(phrase), `evidence receipt missing input accessibility term: ${phrase}`);
+}
+for (const phrase of ['Single Input Directive Evidence', 'keyboard only', 'mouse/pointer only', 'touch only', 'platform-limited input only', 'No critical workflow may require', 'Single input operation']) {
+  assert(evidence.includes(phrase), `evidence receipt missing single input directive term: ${phrase}`);
+}
+for (const phrase of ['Design Language Evidence', 'modern minimalist', 'Uiverse', 'Open Props', 'Design language/UI safety', 'browser JS popups', 'component overlap']) {
+  assert(evidence.includes(phrase), `evidence receipt missing design language term: ${phrase}`);
 }
 for (const phrase of ['Recovery And Data Safety Evidence', 'import, export, reset', 'corrupt-cache', 'malformed saved-data', 'fail-closed', 'Recovery/data safety']) {
   assert(evidence.includes(phrase), `evidence receipt missing recovery/data safety term: ${phrase}`);
+}
+for (const phrase of ['Mission-Critical Reliability Evidence', 'self-checking', 'crash-recoverable', 'state-explicit', 'TDD/SDD', 'Autonomous AI-assisted development', 'Mission-critical reliability']) {
+  assert(evidence.includes(phrase), `evidence receipt missing mission-critical reliability term: ${phrase}`);
 }
 for (const phrase of ['Source Gap Disclosure Evidence', 'outside products', 'source-backed manual override', 'Unknown kickoff times', 'scorer rows', 'referee assignments', 'provenance, freshness, and failure behavior']) {
   assert(evidence.includes(phrase), `evidence receipt missing source gap disclosure term: ${phrase}`);
 }
 for (const phrase of ['OmniOS Transfer Contract', 'Product truth', 'Execution truth', 'Evidence truth', 'Operations truth', 'Transfer truth', 'GitHub Releases stay absent']) {
   assert(handoff.includes(phrase), `handoff missing OmniOS transfer contract term: ${phrase}`);
+}
+for (const phrase of ['Design truth', 'modern minimalist', 'MIT UI libraries/resources', 'browser JS popups', 'arbitrary component copy-paste']) {
+  assert(handoff.includes(phrase), `handoff missing design truth term: ${phrase}`);
+}
+for (const phrase of ['Reliability truth', 'self-checking', 'crash-recoverable', 'state-explicit', 'TDD/SDD-backed', 'remove complexity']) {
+  assert(handoff.includes(phrase), `handoff missing reliability truth term: ${phrase}`);
+}
+for (const phrase of ['Single input truth', 'keyboard only', 'mouse/pointer only', 'touch only', 'platform-limited input only', 'combined input-mode path']) {
+  assert(handoff.includes(phrase), `handoff missing single input truth term: ${phrase}`);
 }
 for (const phrase of ['Doctrine Delta Decision', 'promote', 'reject', 'quarantine', 'keep_local', 'source-backed, reusable, non-secret', 'explicitly approves publication']) {
   assert(handoff.includes(phrase), `handoff missing doctrine delta term: ${phrase}`);

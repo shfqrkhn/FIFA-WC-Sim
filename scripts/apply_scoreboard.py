@@ -11,7 +11,7 @@ HTML_PATH = os.environ.get('FIFA_WC_HTML_PATH', 'docs/index.html')
 STOP_DATE = datetime.date(2026, 7, 20)
 NO_FETCH = '--no-fetch' in sys.argv
 FETCH_FAILURES = []
-SCHEDULE_LOOKAHEAD_DAYS = 3
+SCHEDULE_LOOKAHEAD_DAYS = 21
 
 TEAM = {
     'MEX': 'Mexico', 'RSA': 'South Africa', 'KOR': 'South Korea', 'CZE': 'Czechia',
@@ -160,6 +160,29 @@ def event_team_names(event):
         return None
     teams = [competitor_name(c) for c in comps[:2]]
     return teams if all(teams) else None
+
+
+def event_venue_name(event):
+    comp, _ = event_state(event)
+    venue = comp.get('venue') or event.get('venue') or {}
+    return venue.get('fullName') or venue.get('displayName') or venue.get('name')
+
+
+def normalize_venue_name(value):
+    text = ''.join(ch.lower() if ch.isalnum() else ' ' for ch in str(value or ''))
+    text = ' '.join(text.split())
+    for prefix in ('geha field at ',):
+        if text.startswith(prefix):
+            text = text[len(prefix):]
+    return text
+
+
+def venue_names_match(left, right):
+    left = normalize_venue_name(left)
+    right = normalize_venue_name(right)
+    if not left or not right:
+        return False
+    return left == right or (len(left) > 6 and left in right) or (len(right) > 6 and right in left)
 
 
 def event_teams_scores(event):
@@ -490,7 +513,10 @@ def find_match_for_event(idx, teams, event, matches=None):
     candidates = idx.get(key(teams[0], teams[1])) or []
     if not candidates:
         partial = partial_match_candidates(matches or [], teams, event_day(event))
-        return partial[0] if len(partial) == 1 else None
+        if len(partial) == 1:
+            return partial[0]
+        schedule_only = schedule_match_candidates(matches or [], event)
+        return schedule_only[0] if len(schedule_only) == 1 else None
     day = event_day(event)
     if day:
         dated = [m for m in candidates if match_day(m) == day]
@@ -512,6 +538,38 @@ def has_full_kickoff(match):
     return False
 
 
+def schedule_match_candidates(matches, event):
+    day = event_day(event)
+    venue = event_venue_name(event)
+    if not day or not venue:
+        return []
+    candidates = []
+    for match in matches:
+        if has_full_kickoff(match):
+            continue
+        match_date = match_day(match)
+        if not match_date or abs((match_date - day).days) > 1:
+            continue
+        if venue_names_match(match.get('venue'), venue):
+            candidates.append(match)
+    return candidates
+
+
+def fetch_window_start_day(data, today):
+    missing_days = []
+    for match in all_matches(data):
+        day = match_day(match)
+        if day and not has_full_kickoff(match):
+            missing_days.append(day)
+    if missing_days:
+        return min(missing_days)
+    stale_day = earliest_stale_unplayed_day(all_matches(data), today)
+    if stale_day:
+        return datetime.date.fromisoformat(stale_day)
+    latest = latest_played_day(all_matches(data))
+    return datetime.date.fromisoformat(latest) if latest else datetime.date(2026, 6, 11)
+
+
 def fetch_window_end_day(data, today):
     cap = min(today + datetime.timedelta(days=SCHEDULE_LOOKAHEAD_DAYS), STOP_DATE)
     missing_days = []
@@ -530,22 +588,36 @@ def apply_event_schedule_to_match(match, event):
     return True
 
 
-def apply_event_teams_to_match(match, teams):
+def apply_event_teams_to_match(match, teams, concrete_teams):
     team_a = match.get('teamA')
     team_b = match.get('teamB')
     changes = {}
     if team_a and not team_b and team_a in teams:
-        other = next((team for team in teams if team != team_a), None)
+        other = next((team for team in teams if team != team_a and team in concrete_teams), None)
         if other:
             changes['teamB'] = other
     elif team_b and not team_a and team_b in teams:
-        other = next((team for team in teams if team != team_b), None)
+        other = next((team for team in teams if team != team_b and team in concrete_teams), None)
         if other:
             changes['teamA'] = other
     if not changes:
         return False
     match.update(changes)
     return True
+
+
+def prune_unresolved_scoreboard_placeholders(data):
+    concrete_teams = set(team_meta(data))
+    changed = False
+    for match in data.get('knockout') or []:
+        if match.get('played'):
+            continue
+        for field in ('teamA', 'teamB'):
+            value = match.get(field)
+            if value and value not in concrete_teams:
+                del match[field]
+                changed = True
+    return changed
 
 
 def apply_event_to_match(match, event_id, comps, teams, scores):
@@ -607,9 +679,11 @@ def refresh_current_stats(data, played, goals, stamp, updated_to):
 
 html, start, end, data = load_base_data()
 stamp = utc_stamp()
+placeholder_pruned = prune_unresolved_scoreboard_placeholders(data)
 resolved_slots = resolve_knockout_slots(data)
 idx = match_index(data)
 events = read_events_from_args()
+concrete_teams = set(team_meta(data))
 changes = []
 schedule_changes = []
 fetched = 0
@@ -619,9 +693,7 @@ team_applied = 0
 
 if not events and not NO_FETCH:
     today = datetime.datetime.now(datetime.timezone.utc).date()
-    stale_day = earliest_stale_unplayed_day(all_matches(data), today)
-    start_day = stale_day or latest_played_day(all_matches(data))
-    start_day = datetime.date.fromisoformat(start_day) if start_day else datetime.date(2026, 6, 11)
+    start_day = fetch_window_start_day(data, today)
     end_day = fetch_window_end_day(data, min(today, STOP_DATE))
     for offset in range((end_day - start_day).days + 1):
         events.extend(fetch_day(start_day + datetime.timedelta(days=offset)))
@@ -633,7 +705,7 @@ for event in events:
     team_changed = False
     kickoff_changed = False
     if match and teams_only:
-        team_changed = apply_event_teams_to_match(match, teams_only)
+        team_changed = apply_event_teams_to_match(match, teams_only, concrete_teams)
         kickoff_changed = apply_event_schedule_to_match(match, event)
         if team_changed:
             team_applied += 1
@@ -676,7 +748,7 @@ updated_to = latest_played_day(played) or stamp[:10]
 stats_changed = refresh_current_stats(data, played, goals, stamp, updated_to)
 source_note = f'Automated scoreboard update at {stamp}; applied {applied} completed result(s), refreshed {schedule_applied} kickoff timestamp(s), resolved knockout slots from completed group standings, and used neutral values for unavailable inputs.'
 
-if applied or schedule_applied or team_applied or resolved_slots or post_score_slots or stats_changed or FETCH_FAILURES:
+if applied or schedule_applied or team_applied or placeholder_pruned or resolved_slots or post_score_slots or stats_changed or FETCH_FAILURES:
     data['version'] = f'{updated_to}-auto-daily'
     data['generatedAt'] = stamp
     data['sourceNote'] = source_note
@@ -708,6 +780,7 @@ print(json.dumps({
     'appliedChanges': applied,
     'kickoffUpdates': schedule_applied,
     'teamSlotUpdates': team_applied,
+    'placeholderSlotPruned': placeholder_pruned,
     'scheduleChanges': schedule_changes,
     'changes': changes,
     'resolvedKnockoutSlots': bool(resolved_slots or post_score_slots),

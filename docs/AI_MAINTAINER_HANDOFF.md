@@ -26,6 +26,9 @@ The app must remain:
 - Execution truth: preserve the guarded BASE_DATA update path, PR-based automation, branch checks, and documented local gates before publishing.
 - Evidence truth: use `docs/EVIDENCE_RECEIPT.md`, prediction audits, calibration/backtest receipts, source notes, and tests; public claims must stay within `PASS` or `PASS_WITH_LIMITATIONS`.
 - Operations truth: live Pages or current main repository ZIP are the only distribution paths; GitHub Releases stay absent.
+- Reliability truth: keep prediction, source-data, simulation, import/export/reset, and automation paths self-checking, crash-recoverable, state-explicit, modular, maintainable, simple, one-input accessible, and TDD/SDD-backed; remove complexity that does not improve resilience or usability.
+- Design truth: keep UI changes modern minimalist, utilitarian, professional, joyful, responsive, and contextual to tournament simulation; use local CSS/tokens and native controls first, treat MIT UI libraries/resources as inspiration only unless a source-backed need justifies a dependency, and reject browser JS popups, blocking overlays, overlapping components, inaccessible controls, unbounded motion, or arbitrary component copy-paste.
+- Single input truth: after setup, critical workflows must remain fully operable by keyboard only, mouse/pointer only, touch only, or platform-limited input only; never require a combined input-mode path for core tournament use.
 - Transfer truth: update this handoff and the evidence receipt whenever source, workflow, prediction, or public-surface guarantees change.
 
 ## Doctrine Delta Decision

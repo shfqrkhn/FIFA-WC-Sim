@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-05T22:55:09Z",
+  "generatedAt": "2026-07-06T00:33:51Z",
   "scoreboard": {
     "playedMatches": 91,
     "totalMatches": 104,
@@ -7,8 +7,8 @@
     "totalGroupMatches": 72,
     "playedKnockoutMatches": 19,
     "totalKnockoutMatches": 32,
-    "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-07-05",
+    "overdueUnplayedMatches": 1,
+    "nextScheduledMatchDay": "2026-07-06",
     "currentStats": {
       "updatedTo": "2026-07-05",
       "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-05",
@@ -37,28 +37,88 @@
       "lastUpdated": "2026-07-05T22:55:07Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-05T22:55:07Z",
+      "generatedAt": "2026-07-06T00:31:45Z",
       "updatedThrough": "2026-07-05",
       "scoreboard": {
-        "fetchedFinals": 1,
-        "appliedChanges": 1,
-        "kickoffUpdates": 0,
-        "teamSlotUpdates": 0,
-        "changes": [
+        "fetchedFinals": 19,
+        "appliedChanges": 0,
+        "kickoffUpdates": 8,
+        "teamSlotUpdates": 1,
+        "changes": [],
+        "scheduleChanges": [
           {
-            "match": 91,
+            "match": 73,
             "teams": [
-              "Brazil",
-              "Norway"
+              "South Africa",
+              "Canada"
             ],
-            "score": [
-              1,
-              2
+            "kickoffUtc": "2026-06-28T19:00:00Z",
+            "event": "760486"
+          },
+          {
+            "match": 98,
+            "teams": [
+              null,
+              null
             ],
-            "event": "760504"
+            "kickoffUtc": "2026-07-10T19:00:00Z",
+            "event": "760511"
+          },
+          {
+            "match": 99,
+            "teams": [
+              "Norway",
+              "Round of 16 4 Winner"
+            ],
+            "kickoffUtc": "2026-07-11T21:00:00Z",
+            "event": "760512"
+          },
+          {
+            "match": 100,
+            "teams": [
+              null,
+              null
+            ],
+            "kickoffUtc": "2026-07-12T01:00:00Z",
+            "event": "760513"
+          },
+          {
+            "match": 101,
+            "teams": [
+              null,
+              null
+            ],
+            "kickoffUtc": "2026-07-14T19:00:00Z",
+            "event": "760514"
+          },
+          {
+            "match": 102,
+            "teams": [
+              null,
+              null
+            ],
+            "kickoffUtc": "2026-07-15T19:00:00Z",
+            "event": "760515"
+          },
+          {
+            "match": 103,
+            "teams": [
+              null,
+              null
+            ],
+            "kickoffUtc": "2026-07-18T21:00:00Z",
+            "event": "760516"
+          },
+          {
+            "match": 104,
+            "teams": [
+              null,
+              null
+            ],
+            "kickoffUtc": "2026-07-19T19:00:00Z",
+            "event": "760517"
           }
         ],
-        "scheduleChanges": [],
         "fetchFailures": []
       }
     }
@@ -69,7 +129,7 @@
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 32,
+    "frozenPredictions": 37,
     "settledPredictions": 22,
     "calibrationStatus": "insufficient_sample",
     "resolvedPredictions": 22,
@@ -96,14 +156,14 @@
       "source": "scoreboard updater"
     },
     "fixtures": {
-      "status": "partial",
+      "status": "current",
       "coveredMatches": 104,
       "totalMatches": 104,
       "coveredGroupMatches": 72,
       "totalGroupMatches": 72,
       "coveredKnockoutMatches": 32,
       "totalKnockoutMatches": 32,
-      "source": "embedded schedule; automated pass cross-matches scoreboard events by teams and fills missing kickoffUtc timestamps without overwriting existing venue fields"
+      "source": "embedded schedule plus ESPN scoreboard event timestamps; automated pass cross-matches scoreboard events by teams or date/venue and fills missing kickoffUtc timestamps without overwriting existing venue fields"
     },
     "weather": {
       "status": "missing",
@@ -168,7 +228,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-05T22:55:09Z"
+    "updatedAt": "2026-07-06T00:32:50Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

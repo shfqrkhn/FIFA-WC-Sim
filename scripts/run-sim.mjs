@@ -137,6 +137,13 @@ const dataQualityHealthOk = vm.runInContext(`(() => {
 if (!dataQualityHealthOk) {
   throw new Error('Data quality source coverage did not render in the Health tab.');
 }
+const embeddedKickoffTimesOk = vm.runInContext(`(() => {
+  const rows = DATA.matches.concat(DATA.knockout);
+  return rows.every(m => ['kickoffUtc', 'kickoff', 'kickoffLocal', 'date', 'utc', 'time'].some(field => String(m[field] || '').includes('T')));
+})()`, sandbox, { timeout: 1000 });
+if (!embeddedKickoffTimesOk) {
+  throw new Error('Embedded match schedule contains date-only rows that would render as time TBD.');
+}
 const todayHighlightOk = vm.runInContext(`(() => {
   const RealDate = Date;
   const key = matchDateKey(DATA.matches.find(m => m.no === 65));
@@ -278,7 +285,6 @@ const statsSnapshotOk = vm.runInContext(`(() => {
     html.includes('Silver Ball') &&
     html.includes('Bronze Boot') &&
     html.includes('Goal of the Tournament') &&
-    html.includes('FIFA Peace Prize - Football Unites the World') &&
     html.includes('Not refreshed by automated scoreboard updater') &&
     html.includes('Matches left') &&
     html.includes('Calendar days to final') &&

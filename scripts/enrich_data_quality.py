@@ -17,6 +17,13 @@ def save_data(html, start, end, data):
 def status(ok, partial=False):
     return 'current' if ok else 'partial' if partial else 'missing'
 
+def has_full_kickoff(match):
+    for field in ('kickoffUtc', 'kickoff', 'kickoffLocal', 'date', 'utc', 'time'):
+        value = match.get(field)
+        if value and 'T' in str(value):
+            return True
+    return False
+
 def stable(q):
     return {k:v for k,v in (q or {}).items() if k != 'updatedAt'}
 
@@ -31,6 +38,17 @@ def upsert_source(data, item):
             return
     sources.append(item)
     data['sources'] = sources
+
+def prune_sources(data, names):
+    sources = data.get('sources')
+    if not isinstance(sources, list):
+        return False
+    blocked = set(names)
+    kept = [source for source in sources if not (isinstance(source, dict) and source.get('name') in blocked)]
+    if len(kept) != len(sources):
+        data['sources'] = kept
+        return True
+    return False
 
 def append_unique(rows, item, key):
     if not isinstance(rows, list):
@@ -61,9 +79,12 @@ unplayed = [m for m in all_match_rows if not m.get('played')]
 weather = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
 rest = data.get('restTravel') if isinstance(data.get('restTravel'), dict) else {}
 model_inputs = data.get('modelInputs') if isinstance(data.get('modelInputs'), dict) else {}
+kickoff_rows = [m for m in all_match_rows if has_full_kickoff(m)]
+kickoff_group = [m for m in matches if has_full_kickoff(m)]
+kickoff_knockout = [m for m in knockout if has_full_kickoff(m)]
 quality_core = {
     'scores': {'status': status(bool(played)), 'playedMatches': len(played), 'totalMatches': len(all_match_rows), 'playedGroupMatches': len(played_group), 'totalGroupMatches': len(matches), 'playedKnockoutMatches': len(played_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'scoreboard updater'},
-    'fixtures': {'status': 'partial', 'coveredMatches': len(all_match_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(matches), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule; automated pass cross-matches scoreboard events by teams and fills missing kickoffUtc timestamps without overwriting existing venue fields'},
+    'fixtures': {'status': status(len(kickoff_rows) == len(all_match_rows), bool(kickoff_rows)), 'coveredMatches': len(kickoff_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(kickoff_group), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(kickoff_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule plus ESPN scoreboard event timestamps; automated pass cross-matches scoreboard events by teams or date/venue and fills missing kickoffUtc timestamps without overwriting existing venue fields'},
     'weather': {'status': status(len(weather) >= len(unplayed), bool(weather)), 'coveredUnplayedMatches': len([m for m in unplayed if str(m.get('no')) in weather]), 'totalUnplayedMatches': len(unplayed), 'source': 'open-meteo'},
     'restTravel': {'status': status(len(rest) >= len(all_match_rows), bool(rest)), 'coveredMatches': len(rest), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len([m for m in matches if str(m.get('no')) in rest]), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len([m for m in knockout if str(m.get('no')) in rest]), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
@@ -82,6 +103,7 @@ quality_changed = stable(data.get('dataQuality')) != quality_core
 source_note_changed = data.get('sourceNote') != source_note
 sources_before = json.dumps(data.get('sources'), sort_keys=True)
 maintenance_before = json.dumps(data.get('maintenance'), sort_keys=True)
+pruned_sources = prune_sources(data, {'FIFA Peace Prize - Football Unites the World'})
 upsert_source(data, {
     'name': 'ESPN public soccer scoreboard API',
     'url': 'https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard',
@@ -121,14 +143,6 @@ upsert_source(data, {
     'tier': 'internal automation',
     'confidence': 'high',
     'maintenanceNote': 'Requires exact trigger WC_DATA_RESCUE, refuses dirty candidate artifacts, restores candidate files on validation failure, and commits only when explicitly requested.'
-})
-upsert_source(data, {
-    'name': 'FIFA Peace Prize - Football Unites the World',
-    'url': 'https://inside.fifa.com/campaigns/football-unites-the-world/news/president-trump-peace-prize-football-unites-the-world',
-    'use': 'Source for the non-model FIFA Peace Prize note in award projections',
-    'tier': 'official FIFA page',
-    'confidence': 'high',
-    'maintenanceNote': 'FIFA says Donald J. Trump received the inaugural FIFA Peace Prize - Football Unites the World on 5 Dec 2025; this is displayed as an already-awarded note, not a tournament prediction.'
 })
 maintenance = data.get('maintenance') if isinstance(data.get('maintenance'), dict) else {}
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
@@ -191,7 +205,7 @@ maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'risk': 'Golden Ball/Boot/Glove/coach projections use team progression and embedded star assumptions only; official player award feeds remain unavailable.'
 }, 'version')
 data['maintenance'] = maintenance
-sources_changed = json.dumps(data.get('sources'), sort_keys=True) != sources_before
+sources_changed = pruned_sources or json.dumps(data.get('sources'), sort_keys=True) != sources_before
 maintenance_changed = json.dumps(data.get('maintenance'), sort_keys=True) != maintenance_before
 if quality_changed or source_note_changed or sources_changed or maintenance_changed:
     now = utc_stamp()

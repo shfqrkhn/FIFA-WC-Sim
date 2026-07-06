@@ -1,26 +1,86 @@
 {
-  "generatedAt": "2026-07-05T22:55:07Z",
+  "generatedAt": "2026-07-06T00:31:45Z",
   "updatedThrough": "2026-07-05",
   "scoreboard": {
-    "fetchedFinals": 1,
-    "appliedChanges": 1,
-    "kickoffUpdates": 0,
-    "teamSlotUpdates": 0,
-    "changes": [
+    "fetchedFinals": 19,
+    "appliedChanges": 0,
+    "kickoffUpdates": 8,
+    "teamSlotUpdates": 1,
+    "changes": [],
+    "scheduleChanges": [
       {
-        "match": 91,
+        "match": 73,
         "teams": [
-          "Brazil",
-          "Norway"
+          "South Africa",
+          "Canada"
         ],
-        "score": [
-          1,
-          2
+        "kickoffUtc": "2026-06-28T19:00:00Z",
+        "event": "760486"
+      },
+      {
+        "match": 98,
+        "teams": [
+          null,
+          null
         ],
-        "event": "760504"
+        "kickoffUtc": "2026-07-10T19:00:00Z",
+        "event": "760511"
+      },
+      {
+        "match": 99,
+        "teams": [
+          "Norway",
+          "Round of 16 4 Winner"
+        ],
+        "kickoffUtc": "2026-07-11T21:00:00Z",
+        "event": "760512"
+      },
+      {
+        "match": 100,
+        "teams": [
+          null,
+          null
+        ],
+        "kickoffUtc": "2026-07-12T01:00:00Z",
+        "event": "760513"
+      },
+      {
+        "match": 101,
+        "teams": [
+          null,
+          null
+        ],
+        "kickoffUtc": "2026-07-14T19:00:00Z",
+        "event": "760514"
+      },
+      {
+        "match": 102,
+        "teams": [
+          null,
+          null
+        ],
+        "kickoffUtc": "2026-07-15T19:00:00Z",
+        "event": "760515"
+      },
+      {
+        "match": 103,
+        "teams": [
+          null,
+          null
+        ],
+        "kickoffUtc": "2026-07-18T21:00:00Z",
+        "event": "760516"
+      },
+      {
+        "match": 104,
+        "teams": [
+          null,
+          null
+        ],
+        "kickoffUtc": "2026-07-19T19:00:00Z",
+        "event": "760517"
       }
     ],
-    "scheduleChanges": [],
     "fetchFailures": []
   }
 }

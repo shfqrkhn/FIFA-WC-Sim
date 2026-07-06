@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-05T22:55:05Z",
+  "generated_at_utc": "2026-07-06T00:33:45Z",
   "source_note": "Prospective backtest from frozen pre-match predictions only. Records are eligible only if frozen before kickoff and scored after final result; no external market data is used.",
   "sample_status": "insufficient_sample",
   "resolved_predictions": 22,
-  "unresolved_predictions": 10,
+  "unresolved_predictions": 15,
   "rejected_predictions": 0,
   "min_resolved_predictions": 30,
   "leakage_guards": [
