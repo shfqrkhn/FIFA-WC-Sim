@@ -1,23 +1,35 @@
 {
-  "generatedAt": "2026-07-06T11:59:10Z",
-  "updatedThrough": "2026-07-05",
+  "generatedAt": "2026-07-07T13:54:11Z",
+  "updatedThrough": "2026-07-06",
   "scoreboard": {
     "fetchedFinals": 2,
-    "appliedChanges": 1,
+    "appliedChanges": 2,
     "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 92,
+        "match": 93,
         "teams": [
-          "Mexico",
-          "England"
+          "Portugal",
+          "Spain"
         ],
         "score": [
-          2,
-          3
+          0,
+          1
         ],
-        "event": "760505"
+        "event": "760506"
+      },
+      {
+        "match": 94,
+        "teams": [
+          "United States",
+          "Belgium"
+        ],
+        "score": [
+          1,
+          4
+        ],
+        "event": "760507"
       }
     ],
     "scheduleChanges": [],

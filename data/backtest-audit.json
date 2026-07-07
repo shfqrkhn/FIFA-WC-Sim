@@ -1,10 +1,10 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-06T14:44:11Z",
+  "generated_at_utc": "2026-07-07T13:54:14Z",
   "source_note": "Prospective backtest from frozen pre-match predictions only. Records are eligible only if frozen before kickoff and scored after final result; no external market data is used.",
-  "sample_status": "insufficient_sample",
-  "resolved_predictions": 24,
-  "unresolved_predictions": 20,
+  "sample_status": "sufficient_for_calibration_review",
+  "resolved_predictions": 32,
+  "unresolved_predictions": 17,
   "rejected_predictions": 0,
   "min_resolved_predictions": 30,
   "leakage_guards": [
@@ -15,45 +15,45 @@
     "keeps raw model and calibrated output separate"
   ],
   "overall": {
-    "count": 24,
+    "count": 32,
     "metrics": {
       "raw_model": {
-        "brier_score": 0.335688679889,
-        "log_loss": 0.613659992564,
-        "count": 24
+        "brier_score": 0.380834829851,
+        "log_loss": 0.681309292097,
+        "count": 32
       },
       "uniform_wdl": {
         "brier_score": 0.666666666667,
         "log_loss": 1.098612288668,
-        "count": 24
+        "count": 32
       },
       "rank_prior": {
-        "brier_score": 0.430047635528,
-        "log_loss": 0.766522273352,
-        "count": 24
+        "brier_score": 0.446844019081,
+        "log_loss": 0.78875520197,
+        "count": 32
       }
     },
     "favorite_accuracy": {
-      "correct": 16,
-      "count": 24,
-      "rate": 0.666667,
-      "average_confidence": 0.71976
+      "correct": 24,
+      "count": 32,
+      "rate": 0.75,
+      "average_confidence": 0.643642
     },
     "scoreline_error": {
-      "mean_absolute_error": 2.483394,
-      "count": 24
+      "mean_absolute_error": 2.369013,
+      "count": 32
     }
   },
   "comparisons": {
     "raw_vs_uniform_wdl": {
-      "brier_delta": -0.330977986778,
-      "log_loss_delta": -0.484952296104,
-      "compared_count": 24
+      "brier_delta": -0.285831836816,
+      "log_loss_delta": -0.417302996571,
+      "compared_count": 32
     },
     "raw_vs_rank_prior": {
-      "brier_delta": -0.094358955639,
-      "log_loss_delta": -0.152862280788,
-      "compared_count": 24
+      "brier_delta": -0.06600918923,
+      "log_loss_delta": -0.107445909873,
+      "compared_count": 32
     }
   },
   "by_stage": {
@@ -88,50 +88,50 @@
       }
     },
     "knockout": {
-      "count": 18,
+      "count": 26,
       "metrics": {
         "raw_model": {
-          "brier_score": 0.346110789927,
-          "log_loss": 0.647725954119,
-          "count": 18
+          "brier_score": 0.398468479099,
+          "log_loss": 0.720504796142,
+          "count": 26
         },
         "uniform_wdl": {
           "brier_score": 0.666666666667,
           "log_loss": 1.098612288668,
-          "count": 18
+          "count": 26
         },
         "rank_prior": {
-          "brier_score": 0.42326426778,
-          "log_loss": 0.759661974241,
-          "count": 18
+          "brier_score": 0.446023929922,
+          "log_loss": 0.789136439959,
+          "count": 26
         }
       },
       "favorite_accuracy": {
-        "correct": 12,
-        "count": 18,
-        "rate": 0.666667,
-        "average_confidence": 0.71007
+        "correct": 20,
+        "count": 26,
+        "rate": 0.769231,
+        "average_confidence": 0.619368
       },
       "scoreline_error": {
-        "mean_absolute_error": 2.249858,
-        "count": 18
+        "mean_absolute_error": 2.180938,
+        "count": 26
       }
     }
   },
   "by_confidence_bucket": {
     "0.3-0.4": {
-      "count": 5,
-      "average_confidence": 0.374125,
-      "observed_favorite_hit_rate": 0,
-      "brier_score": 0.699608853717,
-      "log_loss": 1.14634396367
+      "count": 9,
+      "average_confidence": 0.37316,
+      "observed_favorite_hit_rate": 0.444444,
+      "brier_score": 0.65207992798,
+      "log_loss": 1.076407138459
     },
     "0.4-0.5": {
-      "count": 2,
-      "average_confidence": 0.458895,
-      "observed_favorite_hit_rate": 0,
-      "brier_score": 0.79645103811,
-      "log_loss": 1.269412664675
+      "count": 6,
+      "average_confidence": 0.458713,
+      "observed_favorite_hit_rate": 0.666667,
+      "brier_score": 0.558735538478,
+      "log_loss": 0.94282307119
     },
     "0.5-0.6": {
       "count": 2,
@@ -170,15 +170,15 @@
     }
   },
   "by_failure_type": {
-    "bad_attack_defense_weight": 10,
+    "bad_attack_defense_weight": 14,
     "bad_host_adjustment": 2,
     "knockout_penalty_variance": 2,
     "missing_lineup_or_suspension_data": 1,
     "overconfident_favorite": 1,
-    "pure_variance": 8
+    "pure_variance": 12
   },
   "by_actual_result": {
-    "away_win": 8,
+    "away_win": 16,
     "draw": 4,
     "home_win": 12
   },
@@ -230,10 +230,16 @@
       "count": 2,
       "brier_score": 0.668245451136,
       "log_loss": 1.095851187419
+    },
+    {
+      "date": "2026-07-07",
+      "count": 8,
+      "brier_score": 0.516273279735,
+      "log_loss": 0.884257190696
     }
   ],
   "limitations": [
-    "Sample is below the calibration threshold; treat accuracy numbers as directional only.",
+    "Sample has reached the calibration threshold, but domain drift and source gaps still matter.",
     "This is not a historical replay. It does not reconstruct older matchdays from archival inputs.",
     "Unavailable lineups, injuries, suspensions, referee assignments, and incomplete discipline ledgers remain neutral unless source-backed records are embedded.",
     "Metrics are educational/informational model diagnostics, not guarantees or advice."
