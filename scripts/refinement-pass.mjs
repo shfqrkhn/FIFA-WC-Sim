@@ -33,8 +33,42 @@ function triggerValue() {
   return argValue('--trigger') ?? process.env.REFINEMENT_TRIGGER ?? '';
 }
 
+function normalizeForHash(file, content) {
+  try {
+    if (file.endsWith('index.html')) {
+      const volatileKeys = ['generatedAt', 'updatedAt', 'generated_at_utc', 'lastUpdated', 'eloRatingUpdatedAt'];
+      return volatileKeys.reduce((value, key) => {
+        return value.replace(
+          new RegExp(`"${key}"\\s*:\\s*"(?:[^"]*)"`, 'g'),
+          `"${key}":"<redacted>"`
+        );
+      }, content);
+    }
+    if (!file.endsWith('.json')) return content;
+    const sanitize = (value) => {
+      if (!value || typeof value !== 'object') return value;
+      if (Array.isArray(value)) return value.map(sanitize);
+      const clean = {};
+      for (const [k, v] of Object.entries(value)) {
+        if (k === 'generatedAt' || k === 'generated_at_utc' || k === 'updatedAt' || k === 'lastUpdated') continue;
+        clean[k] = sanitize(v);
+      }
+      return clean;
+    };
+    const data = JSON.parse(content);
+    if (data && typeof data === 'object') {
+      return JSON.stringify(sanitize(data));
+    }
+  } catch (_) {
+    // keep raw content for non-JSON or parse failures
+  }
+  return content;
+}
+
 function sha(file) {
-  return fs.existsSync(file) ? crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex') : null;
+  if (!fs.existsSync(file)) return null;
+  const raw = fs.readFileSync(file, 'utf8');
+  return crypto.createHash('sha256').update(normalizeForHash(file, raw)).digest('hex');
 }
 
 function snapshot(files = candidateFiles) {

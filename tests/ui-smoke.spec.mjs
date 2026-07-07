@@ -59,7 +59,12 @@ async function expectNoMcOutcomeContradictions(page) {
       const probe = document.createElement('div');
       probe.innerHTML = window.matchMCHtml(match);
       const text = probe.textContent || '';
-      const winner = match.scoreA === match.scoreB ? (match.winner || 'Draw') : match.scoreA > match.scoreB ? match.teamA : match.teamB;
+      const scoreA = Number.isFinite(match.scoreA) ? match.scoreA : null;
+      const scoreB = Number.isFinite(match.scoreB) ? match.scoreB : null;
+      const fallback = typeof window.displayOutcome === 'function' ? (window.displayOutcome(match) || 'TBD') : (match.winner || 'TBD');
+      const winner = typeof window.scoreWinner === 'function'
+        ? window.scoreWinner(match, scoreA, scoreB, fallback)
+        : (match.scoreA === match.scoreB ? (match.winner || 'Draw') : match.scoreA > match.scoreB ? match.teamA : match.teamB);
       if (text.includes('Pre-match MC:')) bad.push(`M${match.no}: scored result still shows pre-match text`);
       if (text.includes('MC outcome frequency')) bad.push(`M${match.no}: displayed result uses ambiguous MC outcome label`);
       if (text.includes('Displayed outcome frequency')) bad.push(`M${match.no}: displayed result uses old ambiguous outcome-frequency label`);
@@ -83,6 +88,12 @@ async function expectNoMcOutcomeContradictions(page) {
       }
       if (text.includes('Displayed result:') && winner === 'Draw' && !text.toLowerCase().includes('draw')) {
         bad.push(`M${match.no}: MC text does not describe displayed draw`);
+      }
+      if (text.includes('Displayed result:') && winner !== 'Draw' && winner !== 'TBD' && winner !== 'Unresolved draw' && !text.toLowerCase().includes(String(winner).toLowerCase())) {
+        bad.push(`M${match.no}: MC text does not name projected winner ${winner}`);
+      }
+      if (text.includes('MC projection:') && scoreA === scoreB && winner === 'Draw' && !text.toLowerCase().includes('draw') && !/pens/i.test(text)) {
+        bad.push(`M${match.no}: MC projection tied score does not include draw or penalty outcome`);
       }
     }
     return bad;
