@@ -621,6 +621,29 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
   candidate.raw_validation_metrics = rawMetrics;
   candidate.validation_metrics = candidateMetrics;
 
+  const isSameRollbackContext = () => {
+    const prev = previousState || {};
+    return prev?.calibration_status === 'validation_worsened_rollback' &&
+      !prev?.active &&
+      !prev?.use_calibrated_probabilities &&
+      Number(prev.resolved_predictions || 0) === eligible.length &&
+      stableJson(prev.raw_validation_metrics || null) === stableJson(rawMetrics) &&
+      stableJson(prev.validation_metrics || null) === stableJson(candidateMetrics || null) &&
+      stableJson(prev.benchmark_metrics || null) === stableJson(benchmarks);
+  };
+
+  if (isSameRollbackContext()) {
+    return {
+      ...previousState,
+      generated_at_utc: asOfUtc,
+      resolved_predictions: eligible.length,
+      raw_validation_metrics: rawMetrics,
+      validation_metrics: candidate.validation_metrics,
+      benchmark_metrics: benchmarks,
+      last_update_decision: previousState.last_update_decision
+    };
+  }
+
   const improvesOrTies = candidateMetrics.brier_score <= rawMetrics.brier_score + 1e-12 &&
     candidateMetrics.log_loss <= rawMetrics.log_loss + 1e-12;
   if (improvesOrTies) {
