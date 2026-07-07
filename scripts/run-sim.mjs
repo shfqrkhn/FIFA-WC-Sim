@@ -276,6 +276,16 @@ const displayedProjectionOk = vm.runInContext(`(() => {
     const d = matchDisplayState(m);
     if (!d.projection) return text.includes('Displayed result:') && text.includes('Overall MC');
     const score = scoreTextFromState(d);
+    const scoreMatch = text.match(/most probable score for\s+([^:]+):\s*([0-9]+[–-][0-9]+)/i);
+    if (scoreMatch) {
+      const target = String(scoreMatch[1]).trim();
+      const scoreText = scoreMatch[2].replace('-', '–');
+      const [scoreA, scoreB] = scoreText.split('–').map(v => Number(v));
+      const winnerFromScore = scoreWinner(m, scoreA, scoreB, d.winner);
+      if (!Number.isFinite(scoreA) || !Number.isFinite(scoreB) || winnerFromScore !== d.winner) return false;
+      if (d.winner && d.winner !== 'Draw' && d.winner !== 'TBD' && target !== d.winner) return false;
+      if (!text.includes(scoreText)) return false;
+    }
     return text.includes('MC projection:') &&
       text.includes('Overall MC') &&
       text.includes(score) &&
