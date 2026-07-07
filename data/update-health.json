@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T13:13:05Z",
+  "generatedAt": "2026-07-07T15:24:04Z",
   "scoreboard": {
     "playedMatches": 94,
     "totalMatches": 104,
@@ -81,7 +81,7 @@
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 49,
+    "frozenPredictions": 54,
     "settledPredictions": 32,
     "calibrationStatus": "validation_worsened_rollback",
     "resolvedPredictions": 32,
