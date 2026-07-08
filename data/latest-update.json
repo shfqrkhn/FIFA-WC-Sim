@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-07T13:13:02Z",
-  "updatedThrough": "2026-07-06",
+  "generatedAt": "2026-07-08T12:15:22Z",
+  "updatedThrough": "2026-07-07",
   "scoreboard": {
     "fetchedFinals": 2,
     "appliedChanges": 2,
@@ -8,28 +8,28 @@
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 93,
+        "match": 95,
         "teams": [
-          "Portugal",
-          "Spain"
+          "Argentina",
+          "Egypt"
+        ],
+        "score": [
+          3,
+          2
+        ],
+        "event": "760509"
+      },
+      {
+        "match": 96,
+        "teams": [
+          "Switzerland",
+          "Colombia"
         ],
         "score": [
           0,
-          1
+          0
         ],
-        "event": "760506"
-      },
-      {
-        "match": 94,
-        "teams": [
-          "United States",
-          "Belgium"
-        ],
-        "score": [
-          1,
-          4
-        ],
-        "event": "760507"
+        "event": "760508"
       }
     ],
     "scheduleChanges": [],

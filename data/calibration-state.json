@@ -1,42 +1,42 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-07T20:36:20Z",
+  "generated_at_utc": "2026-07-08T12:15:20Z",
   "calibration_status": "validation_worsened_rollback",
   "active": false,
-  "resolved_predictions": 32,
+  "resolved_predictions": 44,
   "min_resolved_predictions": 30,
   "use_calibrated_probabilities": false,
   "method": "conservative_bucket_calibration",
   "bucket_adjustments": [],
   "raw_validation_metrics": {
-    "brier_score": 0.546667714016,
-    "log_loss": 0.92657599004,
-    "count": 10
+    "brier_score": 0.424981387515,
+    "log_loss": 0.719008329998,
+    "count": 14
   },
   "validation_metrics": {
-    "brier_score": 0.655820985779,
-    "log_loss": 1.083551097579,
-    "count": 10
+    "brier_score": 0.47694796661,
+    "log_loss": 0.763016668665,
+    "count": 14
   },
   "benchmark_metrics": {
     "raw_model": {
-      "brier_score": 0.380834829851,
-      "log_loss": 0.681309292097,
-      "count": 32
+      "brier_score": 0.385252646337,
+      "log_loss": 0.679319130754,
+      "count": 44
     },
     "uniform_wdl": {
       "brier_score": 0.666666666667,
       "log_loss": 1.098612288668,
-      "count": 32
+      "count": 44
     },
     "rank_prior": {
-      "brier_score": 0.446844019081,
-      "log_loss": 0.78875520197,
-      "count": 32
+      "brier_score": 0.470122786272,
+      "log_loss": 0.824506246575,
+      "count": 44
     }
   },
   "last_update_decision": "raw_model_only_validation_worsened",
-  "rollback_count": 1,
+  "rollback_count": 2,
   "notes": [
     "Calibration is disabled until enough frozen predictions have resolved.",
     "Base model output and calibrated output remain separate.",
