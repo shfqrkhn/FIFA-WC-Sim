@@ -36,10 +36,56 @@ async function loadApp(page) {
 }
 
 async function expectNoHorizontalScroll(page) {
-  await expect.poll(async () => page.evaluate(() => {
-    const root = document.documentElement;
-    return Math.max(root.scrollWidth, document.body.scrollWidth) <= window.innerWidth + 2;
-  }), { message: 'document has no horizontal overflow' }).toBe(true);
+  await expect
+    .poll(async () => {
+      return await page.evaluate(() => {
+        const root = document.scrollingElement || document.documentElement;
+        const viewportWidth = window.innerWidth;
+        const rootScrollWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+        const candidateSelectors = ['body *'];
+        const offenders = [];
+
+        const nodes = [...document.querySelectorAll(candidateSelectors)];
+        for (const node of nodes) {
+          const style = getComputedStyle(node);
+          if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) {
+            continue;
+          }
+          const rect = node.getBoundingClientRect();
+          if (rect.width === 0 || rect.height === 0) continue;
+
+          const isFixed = style.position === 'fixed';
+          const isVisible = rect.right > 0 && rect.left < viewportWidth;
+          if (!isVisible && isFixed) continue;
+
+          if (rect.left < -2 || rect.right > viewportWidth + 2) {
+            offenders.push({
+              tag: node.tagName,
+              id: node.id,
+              cls: (node.className || '').toString().slice(0, 120),
+              left: Math.round(rect.left * 100) / 100,
+              right: Math.round(rect.right * 100) / 100,
+              position: style.position,
+            });
+          }
+        }
+
+        return {
+          viewportWidth,
+          rootClientWidth: root.clientWidth,
+          rootScrollWidth,
+          offenders: offenders.slice(0, 8),
+          hasOverflow: rootScrollWidth > root.clientWidth + 2 || offenders.length > 0,
+        };
+      });
+    }, { message: 'document has no horizontal overflow' })
+    .toEqual({
+      viewportWidth: expect.any(Number),
+      rootClientWidth: expect.any(Number),
+      rootScrollWidth: expect.any(Number),
+      offenders: expect.any(Array),
+      hasOverflow: false,
+    });
 }
 
 async function expectNoBrokenVisibleImages(page) {
