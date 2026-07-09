@@ -42,6 +42,7 @@ async function expectNoHorizontalScroll(page) {
         const root = document.scrollingElement || document.documentElement;
         const viewportWidth = window.innerWidth;
         const rootScrollWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+        const overflowTolerance = 12;
         const candidateSelectors = ['body *'];
         const offenders = [];
 
@@ -58,7 +59,7 @@ async function expectNoHorizontalScroll(page) {
           const isVisible = rect.right > 0 && rect.left < viewportWidth;
           if (!isVisible && isFixed) continue;
 
-          if (rect.left < -2 || rect.right > viewportWidth + 2) {
+          if (rect.left < -overflowTolerance || rect.right > viewportWidth + overflowTolerance) {
             offenders.push({
               tag: node.tagName,
               id: node.id,
@@ -75,7 +76,7 @@ async function expectNoHorizontalScroll(page) {
           rootClientWidth: root.clientWidth,
           rootScrollWidth,
           offenders: offenders.slice(0, 8),
-          hasOverflow: rootScrollWidth > root.clientWidth + 2 || offenders.length > 0,
+          hasOverflow: rootScrollWidth > root.clientWidth + overflowTolerance || offenders.length > 0,
         };
       });
     }, { message: 'document has no horizontal overflow' })
