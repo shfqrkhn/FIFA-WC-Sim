@@ -1,35 +1,23 @@
 {
-  "generatedAt": "2026-07-09T13:24:38Z",
-  "updatedThrough": "2026-07-07",
+  "generatedAt": "2026-07-10T17:42:06Z",
+  "updatedThrough": "2026-07-09",
   "scoreboard": {
-    "fetchedFinals": 2,
-    "appliedChanges": 2,
+    "fetchedFinals": 1,
+    "appliedChanges": 1,
     "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 95,
+        "match": 97,
         "teams": [
-          "Argentina",
-          "Egypt"
+          "France",
+          "Morocco"
         ],
         "score": [
-          3,
-          2
-        ],
-        "event": "760509"
-      },
-      {
-        "match": 96,
-        "teams": [
-          "Switzerland",
-          "Colombia"
-        ],
-        "score": [
-          0,
+          2,
           0
         ],
-        "event": "760508"
+        "event": "760510"
       }
     ],
     "scheduleChanges": [],
