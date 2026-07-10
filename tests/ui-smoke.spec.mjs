@@ -179,6 +179,15 @@ for (const viewport of viewports) {
       await page.locator(`[data-tab="${tab}"]`).click();
       await expect(page.locator(`#${tab}`)).toBeVisible();
       await expect(page.locator(`#${tab}`)).not.toBeEmpty();
+      if (tab === 'bracket' && viewport.width <= 760) {
+        const bracketLayout = await page.locator('.bracket').evaluate(node => {
+          const columns = getComputedStyle(node).gridTemplateColumns.trim().split(/\s+/);
+          const widths = Array.from(node.querySelectorAll('.match'), match => match.getBoundingClientRect().width);
+          return { columns: columns.length, narrowestMatch: Math.min(...widths) };
+        });
+        expect(bracketLayout.columns).toBe(1);
+        expect(bracketLayout.narrowestMatch).toBeGreaterThan(200);
+      }
       await expectNoHorizontalScroll(page);
       await expectNoBrokenVisibleImages(page);
     }
