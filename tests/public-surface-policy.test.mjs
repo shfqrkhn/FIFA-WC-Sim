@@ -12,11 +12,14 @@ const policy = read('docs/REPO_ZIP_POLICY.md');
 const evidence = read('docs/EVIDENCE_RECEIPT.md');
 const handoff = read('docs/AI_MAINTAINER_HANDOFF.md');
 const readme = read('README.md');
+const html = read('docs/index.html');
 const codeqlWorkflow = read('.github/workflows/codeql.yml');
 const codeqlConfig = read('.github/codeql/codeql-config.yml');
 const pkg = JSON.parse(read('package.json'));
 
 assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
+assert(html.includes('function matchFinalOverdue(m,date=new Date())'), 'freshness checks must use the final-result grace helper.');
+assert(html.includes('kickoff+4*60*60*1000'), 'freshness checks must allow a four-hour match completion window.');
 
 const forbiddenPathPattern =
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;
