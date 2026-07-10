@@ -28,6 +28,12 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '24'
+      - name: Reconcile immutable audit records from automation branches
+        run: |
+          git fetch origin '+refs/heads/automation/*:refs/remotes/origin/automation/*'
+          node scripts/reconcile-prediction-audits.mjs \
+            --source-ref origin/automation/daily-base-data-update \
+            --source-ref origin/automation/match-window-base-data-update
       - run: node --check scripts/match-window-update.mjs
       - run: node scripts/match-window-update.mjs
       - run: python3 scripts/validate_base_data.py

@@ -1,4 +1,5 @@
 import './prediction-audit.test.mjs';
+import './reconcile-prediction-audits.test.mjs';
 import './scoring.test.mjs';
 import './calibration.test.mjs';
 import './backtest-audit.test.mjs';

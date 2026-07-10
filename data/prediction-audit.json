@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-10T19:19:58Z",
+  "generated_at_utc": "2026-07-10T17:42:04Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -5771,6 +5771,101 @@
       "failure_type": null,
       "kickoff_utc": "2026-07-12T01:00:00Z",
       "venue": "Arrowhead Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false,
+        "lineups_source_limited": true,
+        "suspensions_source_limited": true,
+        "injuries_source_limited": true,
+        "referees_source_limited": true
+      }
+    },
+    {
+      "prediction_id": "1042a9d680e7507c0af821b0",
+      "created_at_utc": "2026-07-10T17:42:04Z",
+      "match_id": 98,
+      "stage": "QF",
+      "home_team": "Spain",
+      "away_team": "Belgium",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-09-auto-daily",
+      "source_snapshot_hash": "588c82a3be8e4315f7865e97fdf3c110b84e972477c0295170c4e1793fcacec8",
+      "predicted_wdl_probs": {
+        "home_win": 0.5166027599483398,
+        "draw": 0.26837018107316296,
+        "away_win": 0.21502705897849728
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.12784306
+        },
+        {
+          "score": "1-0",
+          "probability": 0.11430733
+        },
+        {
+          "score": "2-0",
+          "probability": 0.09950415
+        },
+        {
+          "score": "2-1",
+          "probability": 0.0951599
+        },
+        {
+          "score": "0-0",
+          "probability": 0.08645555
+        },
+        {
+          "score": "0-1",
+          "probability": 0.06415472
+        },
+        {
+          "score": "1-2",
+          "probability": 0.05660257
+        },
+        {
+          "score": "3-0",
+          "probability": 0.05332741
+        },
+        {
+          "score": "3-1",
+          "probability": 0.05099919
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04550266
+        },
+        {
+          "score": "0-2",
+          "probability": 0.0352051
+        },
+        {
+          "score": "3-2",
+          "probability": 0.02438631
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.6507878505,
+        "draw": 0,
+        "away": 0.3492121495
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-10T19:00:00Z",
+      "venue": "SoFi Stadium",
       "group": null,
       "feature_flags": {
         "weather_adjustment_abs": 0,

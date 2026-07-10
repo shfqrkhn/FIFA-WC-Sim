@@ -130,6 +130,8 @@ Match-window workflow:
 - Publish path: opens or updates `automation/match-window-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
 - Repository setting required: GitHub Actions workflow permissions must allow Actions to create pull requests; otherwise validation and branch push can pass while `gh pr create` fails.
 - Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
+- Immutable audit reconciliation: both scheduled workflows fetch the daily and match-window automation branches and run `scripts/reconcile-prediction-audits.mjs` before updating, preserving distinct pre-kickoff forecasts while deduplicating equivalent records.
+- Human publication gate: branch protection intentionally requires one approving review. Actions validates and proposes changes but does not self-approve or merge; a maintainer must review and merge the bot PR before Pages updates.
 
 BASE_DATA PR check:
 
