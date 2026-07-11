@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-07-10T19:35:36Z",
+  "generatedAt": "2026-07-11T12:33:37Z",
   "scoreboard": {
-    "playedMatches": 97,
+    "playedMatches": 98,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 25,
+    "playedKnockoutMatches": 26,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-07-10",
+    "nextScheduledMatchDay": "2026-07-11",
     "currentStats": {
-      "updatedTo": "2026-07-09",
-      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-09",
-      "matchesPlayed": 97,
-      "goalsScored": 282,
+      "updatedTo": "2026-07-10",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-10",
+      "matchesPlayed": 98,
+      "goalsScored": 285,
       "goalsPerMatch": 2.91,
       "attendance": null,
       "attendancePerMatch": null,
@@ -34,11 +34,11 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-07-10T19:05:55Z"
+      "lastUpdated": "2026-07-11T12:33:35Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-10T19:05:55Z",
-      "updatedThrough": "2026-07-09",
+      "generatedAt": "2026-07-11T12:33:35Z",
+      "updatedThrough": "2026-07-10",
       "scoreboard": {
         "fetchedFinals": 1,
         "appliedChanges": 1,
@@ -46,16 +46,16 @@
         "teamSlotUpdates": 0,
         "changes": [
           {
-            "match": 97,
+            "match": 98,
             "teams": [
-              "France",
-              "Morocco"
+              "Spain",
+              "Belgium"
             ],
             "score": [
               2,
-              0
+              1
             ],
-            "event": "760510"
+            "event": "760511"
           }
         ],
         "scheduleChanges": [],
@@ -65,33 +65,33 @@
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 7,
+    "totalUnplayedMatches": 6,
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 67,
-    "settledPredictions": 50,
+    "frozenPredictions": 70,
+    "settledPredictions": 55,
     "calibrationStatus": "validation_worsened_rollback",
-    "resolvedPredictions": 50,
+    "resolvedPredictions": 55,
     "minimumResolvedPredictions": 30
   },
   "backtestAudit": {
     "sampleStatus": "sufficient_for_calibration_review",
-    "resolvedPredictions": 50,
+    "resolvedPredictions": 55,
     "rawModel": {
-      "brier_score": 0.385838091982,
-      "log_loss": 0.683268577836,
-      "count": 50
+      "brier_score": 0.382329152826,
+      "log_loss": 0.680616693218,
+      "count": 55
     }
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 97,
+      "playedMatches": 98,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 25,
+      "playedKnockoutMatches": 26,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -108,7 +108,7 @@
     "weather": {
       "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 7,
+      "totalUnplayedMatches": 6,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -168,7 +168,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-10T19:05:57Z"
+    "updatedAt": "2026-07-11T12:33:37Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-10T19:05:55Z",
-  "updatedThrough": "2026-07-09",
+  "generatedAt": "2026-07-11T12:33:35Z",
+  "updatedThrough": "2026-07-10",
   "scoreboard": {
     "fetchedFinals": 1,
     "appliedChanges": 1,
@@ -8,16 +8,16 @@
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 97,
+        "match": 98,
         "teams": [
-          "France",
-          "Morocco"
+          "Spain",
+          "Belgium"
         ],
         "score": [
           2,
-          0
+          1
         ],
-        "event": "760510"
+        "event": "760511"
       }
     ],
     "scheduleChanges": [],
