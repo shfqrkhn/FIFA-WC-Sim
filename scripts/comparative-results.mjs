@@ -15,7 +15,14 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
   const allMatches = [...(data.matches || []), ...(data.knockout || [])];
   const matchMap = new Map(allMatches.map(match => [Number(match.no), match]));
   const eligible = calibrationEligiblePredictions(ledger.predictions || [], matchMap, { asOfUtc: backtest.generated_at_utc });
-  const rows = eligible.map(row => {
+  const selected = new Map();
+  for (const row of eligible) {
+    const prior = selected.get(Number(row.match_id));
+    if (!prior || Date.parse(row.created_at_utc) > Date.parse(prior.created_at_utc) || (Date.parse(row.created_at_utc) === Date.parse(prior.created_at_utc) && String(row.prediction_id) > String(prior.prediction_id))) selected.set(Number(row.match_id), row);
+  }
+  const canonical = [...selected.values()];
+  const matchBacktest = buildBacktestAuditReport({ ledger: { ...ledger, predictions: canonical }, data, calibrationState, asOfUtc: backtest.generated_at_utc });
+  const rows = canonical.map(row => {
     const match = matchMap.get(Number(row.match_id)) || {};
     const predicted = favorite(row.predicted_wdl_probs);
     return {
@@ -43,20 +50,21 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
     generated_at_utc: backtest.generated_at_utc,
     source_note: 'Settled-only comparison of immutable pre-kickoff simulator forecasts against embedded ESPN completed finals. No market data is used.',
     settled_only: true,
-    denominators: { frozen: (ledger.predictions || []).length, settled_eligible: rows.length, unresolved: backtest.unresolved_predictions, rejected: backtest.rejected_predictions },
+    denominators: { frozen: (ledger.predictions || []).length, settled_eligible_forecasts: eligible.length, settled_matches: rows.length, excluded_duplicate_snapshots: eligible.length - rows.length, unresolved: backtest.unresolved_predictions, rejected: backtest.rejected_predictions },
+    selection_rule: 'One row per settled match: latest eligible immutable pre-kickoff forecast. Earlier snapshots remain preserved in the audit ledger and are excluded from match-level metrics.',
     summary: {
       outcome_accuracy: { correct: rows.filter(row => row.outcome_correct).length, count: rows.length, rate: rows.length ? round(rows.filter(row => row.outcome_correct).length / rows.length) : null },
       exact_score_accuracy: { correct: exactScore, count: rows.length, rate: rows.length ? round(exactScore / rows.length) : null },
-      mean_scoreline_error: backtest.overall.scoreline_error.mean_absolute_error,
-      raw_model: backtest.overall.metrics.raw_model,
-      uniform_wdl: backtest.overall.metrics.uniform_wdl,
-      rank_prior: backtest.overall.metrics.rank_prior,
+      mean_scoreline_error: matchBacktest.overall.scoreline_error.mean_absolute_error,
+      raw_model: matchBacktest.overall.metrics.raw_model,
+      uniform_wdl: matchBacktest.overall.metrics.uniform_wdl,
+      rank_prior: matchBacktest.overall.metrics.rank_prior,
       calibration: { status: calibrationState.calibration_status || 'insufficient_sample', active: !!calibrationState.active, raw_validation_metrics: calibrationState.raw_validation_metrics || null, validation_metrics: calibrationState.validation_metrics || null }
     },
-    reliability: backtest.by_confidence_bucket,
-    by_stage: backtest.by_stage,
-    by_failure_class: backtest.by_failure_type,
-    comparisons: backtest.comparisons,
+    reliability: matchBacktest.by_confidence_bucket,
+    by_stage: matchBacktest.by_stage,
+    by_failure_class: matchBacktest.by_failure_type,
+    comparisons: matchBacktest.comparisons,
     rows,
     limitations: [...backtest.limitations, 'Rows are comparisons of frozen forecasts with embedded completed results; they are not a claim of official completeness or prediction certainty.']
   };
@@ -77,7 +85,7 @@ export function runComparativeResults(argv = args) {
     const changed = writeJsonIfChanged(outPath, report);
     artifact.data.comparativeResults = report;
     writeArtifact(artifact, htmlPath);
-    console.log(`Comparative results: ${report.denominators.settled_eligible} settled forecast(s), ${changed ? 'updated' : 'unchanged'} ${outPath}.`);
+    console.log(`Comparative results: ${report.denominators.settled_matches} settled match(es), ${changed ? 'updated' : 'unchanged'} ${outPath}.`);
   }
   return report;
 }
