@@ -69,6 +69,9 @@ assert.equal(activeState.resolved_predictions, 40);
 assert.equal(activeState.benchmark_metrics.raw_model.count, 40);
 assert.ok(activeState.validation_metrics.brier_score <= activeState.raw_validation_metrics.brier_score + 1e-12);
 
+const repeatedActiveState = updateCalibrationState({ predictions: train }, activeState, { asOfUtc: '2026-07-02T00:00:00Z', teamMap });
+assert.equal(repeatedActiveState, activeState, 'unchanged active calibration must retain its prior state verbatim');
+
 const adjusted = applyCalibrationToWdl({ home_win: 0.8, draw: 0.1, away_win: 0.1 }, activeState);
 assert.equal(adjusted.status, 'active');
 assert.ok(adjusted.probabilities.home_win < 0.8);

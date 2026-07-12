@@ -646,6 +646,20 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
 
   const improvesOrTies = candidateMetrics.brier_score <= rawMetrics.brier_score + 1e-12 &&
     candidateMetrics.log_loss <= rawMetrics.log_loss + 1e-12;
+  const isSameActiveContext = () => {
+    const prev = previousState || {};
+    return prev.calibration_status === 'active' &&
+      prev.active === true &&
+      prev.use_calibrated_probabilities === true &&
+      Number(prev.resolved_predictions || 0) === eligible.length &&
+      stableJson(prev.bucket_adjustments || []) === stableJson(candidate.bucket_adjustments) &&
+      stableJson(prev.raw_validation_metrics || null) === stableJson(rawMetrics) &&
+      stableJson(prev.validation_metrics || null) === stableJson(candidateMetrics) &&
+      stableJson(prev.benchmark_metrics || null) === stableJson(benchmarks);
+  };
+  if (improvesOrTies && isSameActiveContext()) {
+    return previousState;
+  }
   if (improvesOrTies) {
     return { ...candidate, last_update_decision: 'promoted_validated_bucket_calibration' };
   }
