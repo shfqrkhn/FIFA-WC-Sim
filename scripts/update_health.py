@@ -44,6 +44,10 @@ backtest={}
 if os.path.exists('data/backtest-audit.json'):
     try: backtest=json.load(open('data/backtest-audit.json',encoding='utf-8'))
     except Exception: backtest={'error':'backtest-audit unreadable'}
+comparative={}
+if os.path.exists('data/comparative-results.json'):
+    try: comparative=json.load(open('data/comparative-results.json',encoding='utf-8'))
+    except Exception: comparative={'error':'comparative-results unreadable'}
 predictions=audit.get('predictions',[]) if isinstance(audit,dict) else []
 settled=[p for p in predictions if isinstance(p,dict) and p.get('actual_result')]
 health={
@@ -52,6 +56,7 @@ health={
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
     'backtestAudit':{'sampleStatus':backtest.get('sample_status'),'resolvedPredictions':backtest.get('resolved_predictions'),'rawModel':((backtest.get('overall') or {}).get('metrics') or {}).get('raw_model')},
+    'comparativeResults':{'settledOnly':comparative.get('settled_only'),'denominators':comparative.get('denominators'),'outcomeAccuracy':((comparative.get('summary') or {}).get('outcome_accuracy'))},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
 }

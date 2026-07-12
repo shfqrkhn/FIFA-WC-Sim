@@ -25,6 +25,7 @@ const COMMIT_CANDIDATES = [
   'data/prediction-audit.json',
   'data/calibration-state.json',
   'data/backtest-audit.json'
+  ,'data/comparative-results.json'
 ];
 
 function snapshot(paths) {
@@ -64,6 +65,7 @@ const steps = [
   ['score frozen predictions', () => runNode('scripts/score-predictions.mjs', nowArgs)],
   ['update calibration', () => runNode('scripts/update-calibration.mjs', nowArgs)],
   ['update backtest audit', () => runNode('scripts/backtest-audit.mjs')],
+  ['update comparative results', () => runNode('scripts/comparative-results.mjs')],
   ['update health artifact', () => runPythonScript('scripts/update_health.py')],
   ['validate updated data', () => runPythonScript('scripts/validate_base_data.py')],
   ['validate prediction audit calibration', () => runNode('scripts/validate-calibration.mjs')],

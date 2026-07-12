@@ -92,7 +92,9 @@ Pre-match predictions can be frozen into `data/prediction-audit.json` before kic
 
 `scripts/backtest-audit.mjs` builds `data/backtest-audit.json` from the same frozen ledger. It reports sample size, raw model metrics, calibration benchmark metrics, uniform WDL and rank-prior baselines, confidence buckets, stage splits, failure classes, and limitations. This is a prospective backtest only; it does not reconstruct old matchdays with future data.
 
-Current match counts, overdue-match status, audit sample size, calibration status, and backtest scores are generated artifacts. Check the app's **Health** section plus `data/update-health.json` and `data/backtest-audit.json`.
+`scripts/comparative-results.mjs` generates `data/comparative-results.json` and the embedded **Prediction vs actual** cards. It compares only eligible settled immutable pre-kickoff forecasts with embedded ESPN completed finals, including result/exact-score accuracy, scoreline error, confidence reliability, stage and failure-class splits, and raw/uniform/rank-prior metrics.
+
+Current match counts, overdue-match status, audit sample size, calibration status, backtest scores, and comparative statistics are generated artifacts. Check **Stats**, **Data**, **Checks**, and **Health** plus `data/update-health.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
 
 ## Automated Updates
 
@@ -107,7 +109,7 @@ Schedules:
 
 GitHub cron is UTC-only and best-effort; it can be delayed or skipped. The safety run, match-window checks, and manual dispatch are intentional because one morning-only run is not reliable enough.
 
-The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, calibration validation, unit tests, simulation smoke, and base-data validation. If validated generated artifacts changed, it opens or updates `automation/daily-base-data-update` as a bot pull request containing only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`.
+The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, calibration validation, unit tests, simulation smoke, and base-data validation. If validated generated artifacts changed, it opens or updates `automation/daily-base-data-update` as a bot pull request containing only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
 
 The match-window workflow runs `node scripts/match-window-update.mjs`. It no-ops unless the current UTC time is near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window. Its active-match lock refuses full updates during live-match windows; if a later match needs a pre-kickoff audit record during that lock, it uses a freeze-only path.
 

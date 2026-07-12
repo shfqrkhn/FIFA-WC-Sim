@@ -13,6 +13,7 @@ export const COMMIT_CANDIDATES = [
   'data/prediction-audit.json',
   'data/calibration-state.json',
   'data/backtest-audit.json'
+  ,'data/comparative-results.json'
 ];
 
 function usage() {

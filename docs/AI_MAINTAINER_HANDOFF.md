@@ -75,6 +75,7 @@ Verify these values before relying on them; they describe the repo at the audit 
 - `data/prediction-audit.json`: immutable frozen prediction ledger.
 - `data/calibration-state.json`: conservative calibration state, kept separate from base model output.
 - `data/backtest-audit.json`: prospective backtest report from frozen records.
+- `data/comparative-results.json`: settled-only immutable forecast-vs-actual report, embedded into Stats/Data/Checks/Health.
 - `data/manual-overrides.example.json`: source-backed override schema example.
 - `scripts/`: update, enrichment, scoring, calibration, QA, idempotence, and rescue tools.
 - `tests/`: unit, regression, no-leakage, workflow, calibration, backtest, and UI smoke tests.
@@ -177,6 +178,7 @@ Generated artifacts that update workflows may propose by bot pull request after 
 - `data/prediction-audit.json`
 - `data/calibration-state.json`
 - `data/backtest-audit.json`
+- `data/comparative-results.json`
 
 Local-only runtime artifacts such as `data/latest-simulation.json`, `data/scoreboards/`, `data/manual-overrides.json`, `playwright-report/`, and `test-results/` must remain ignored.
 
@@ -275,7 +277,7 @@ Minimum expected structural invariants:
 3. Inspect any tracked dirty files before editing.
 4. Confirm private/ignored files are not tracked.
 5. Read `README.md`, this handoff, workflow files, `package.json`, and relevant scripts/tests.
-6. Inspect `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, and `data/backtest-audit.json`.
+6. Inspect `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
 7. If changing embedded data, use guarded scripts instead of manual JSON edits whenever possible.
 8. If changing UI/model logic, add or update targeted tests first when practical.
 9. Run focused checks, then `npm run qa:full`; use `npm run qa` or `npm run ui:smoke` only when a narrower check is intentionally sufficient.

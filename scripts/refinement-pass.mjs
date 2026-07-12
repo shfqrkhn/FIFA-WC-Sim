@@ -18,6 +18,7 @@ const candidateFiles = [
   'data/prediction-audit.json',
   'data/calibration-state.json',
   'data/backtest-audit.json'
+  ,'data/comparative-results.json'
 ];
 
 function argValue(name) {

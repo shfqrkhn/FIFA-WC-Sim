@@ -47,7 +47,7 @@ jobs:
         run: node scripts/write-workflow-summary.mjs >> "$GITHUB_STEP_SUMMARY" || true
       - name: Open or update validated BASE_DATA PR
         # Candidate artifacts are constrained in scripts/publish-base-data-pr.mjs:
-        # docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json
+        # docs/index.html data/latest-update.json data/update-health.json data/prediction-audit.json data/calibration-state.json data/backtest-audit.json data/comparative-results.json
         env:
           GH_TOKEN: ${{ github.token }}
         run: >

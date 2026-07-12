@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T15:14:48Z",
+  "generatedAt": "2026-07-12T15:38:38Z",
   "scoreboard": {
     "playedMatches": 100,
     "totalMatches": 104,
@@ -94,6 +94,20 @@
       "brier_score": 0.313791192318,
       "log_loss": 0.578749198969,
       "count": 69
+    }
+  },
+  "comparativeResults": {
+    "settledOnly": true,
+    "denominators": {
+      "frozen": 75,
+      "settled_eligible": 69,
+      "unresolved": 6,
+      "rejected": 0
+    },
+    "outcomeAccuracy": {
+      "correct": 55,
+      "count": 69,
+      "rate": 0.797101
     }
   },
   "dataQuality": {
