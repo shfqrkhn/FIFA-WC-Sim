@@ -90,6 +90,8 @@ Pre-match predictions can be frozen into `data/prediction-audit.json` before kic
 
 `scripts/update-calibration.mjs` uses only settled frozen predictions. Calibration remains separate from the base model and is disabled as `insufficient_sample` until at least 30 resolved predictions exist. If validation worsens raw Brier/log-loss performance, calibration rolls back and raw probabilities remain active.
 
+Do not retrofit or deploy a model fit on already-settled tournament outcomes. Those outcomes remain diagnostic evidence only; calibration may change only through the existing chronological held-out gate.
+
 `scripts/backtest-audit.mjs` builds `data/backtest-audit.json` from the same frozen ledger. It reports sample size, raw model metrics, calibration benchmark metrics, uniform WDL and rank-prior baselines, confidence buckets, stage splits, failure classes, and limitations. This is a prospective backtest only; it does not reconstruct old matchdays with future data.
 
 `scripts/comparative-results.mjs` generates `data/comparative-results.json` and the embedded **Prediction vs actual** cards. It compares only eligible settled immutable pre-kickoff forecasts with embedded ESPN completed finals, including result/exact-score accuracy, scoreline error, confidence reliability, stage and failure-class splits, and raw/uniform/rank-prior metrics.

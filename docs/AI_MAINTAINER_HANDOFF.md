@@ -1,8 +1,8 @@
 # AI Maintainer Handoff
 
-Last audited: 2026-07-04
+Last audited: 2026-07-12
 Branch at audit: `main`
-HEAD at audit: `20e2dab1a400ffea3e0846c49e83b5e494025738`
+HEAD at audit: verify current `main` before relying on this snapshot.
 Refresh context: post-parallel update pass reconciliation for a future unified GitHub projects chat.
 
 This document is a public-safe continuation map for a future expert AI agent. Treat it as a starting receipt, not as a substitute for re-reading the current repo.
@@ -44,23 +44,22 @@ Verify these values before relying on them; they describe the repo at the audit 
 
 - App entrypoint: `docs/index.html`.
 - App version: `1.2.2` from `package.json`.
-- Embedded data version: `2026-07-04-accuracy-enriched`.
-- Embedded data generated at: `2026-07-04T09:41:13Z`.
-- Latest update generated at: `2026-07-04T09:41:12Z`.
-- Latest update applied two completed-score changes: match 86, Argentina 3-2 Cape Verde, ESPN event `760500`; match 87, Colombia 1-0 Ghana, ESPN event `760501`.
+- Embedded data version: `2026-07-12-accuracy-enriched`.
+- Embedded data generated at: `2026-07-12T14:39:18Z`.
+- Latest source-backed update settled M99 Norway 1-2 England and M100 Argentina 3-1 Switzerland from ESPN completed-final events `760512` and `760513`.
 - Latest update receipt: `data/latest-update.json`.
 - Health receipt: `data/update-health.json`.
-- Played matches: 88 of 104.
+- Played matches: 100 of 104.
 - Group matches: 72 of 72 played.
-- Knockout matches: 16 of 32 played.
+- Knockout matches: 28 of 32 played.
 - Overdue unplayed matches: 0.
-- Next scheduled match day in embedded data: `2026-07-04`.
-- Frozen prediction records: 21.
-- Settled frozen predictions: 19.
-- Calibration status: `insufficient_sample`.
+- Next scheduled match day in embedded data: `2026-07-14`.
+- Frozen prediction records: 75.
+- Settled frozen predictions: 69; comparative report presents 31 settled matches, one latest eligible pre-kickoff forecast per match.
+- Calibration status: `active`, retained only because the chronological held-out Brier and log-loss gate passed.
 - Calibration threshold: 30 resolved predictions.
-- Backtest status: `insufficient_sample`, prospective frozen-ledger audit only.
-- Raw frozen-ledger benchmark at audit: Brier `0.258181830895`, log loss `0.459226122269`, count `19`.
+- Backtest status: `sufficient_for_calibration_review`, prospective frozen-ledger audit only.
+- Raw frozen-ledger benchmark: Brier `0.313791192318`, log loss `0.578749198969`, count `69`.
 - Ignored local runtime file currently expected after simulation/test runs: `data/latest-simulation.json`.
 
 ## Public Files To Know
@@ -191,6 +190,7 @@ Preserve these rules:
 - Freeze pre-match predictions before kickoff.
 - Never score predictions created after kickoff.
 - Never calibrate using future data.
+- Never retrofit or deploy a fit on already-settled tournament outcomes; use them only for diagnostics and the existing chronological held-out calibration gate.
 - Keep frozen predictions immutable after creation.
 - Keep raw base model output and calibrated output separable.
 - Keep calibration disabled below the threshold.
