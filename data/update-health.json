@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-11T12:53:33Z",
+  "generatedAt": "2026-07-12T12:30:09Z",
   "scoreboard": {
-    "playedMatches": 98,
+    "playedMatches": 100,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 26,
+    "playedKnockoutMatches": 28,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-07-11",
+    "nextScheduledMatchDay": "2026-07-14",
     "currentStats": {
-      "updatedTo": "2026-07-10",
-      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-10",
-      "matchesPlayed": 98,
-      "goalsScored": 285,
-      "goalsPerMatch": 2.91,
+      "updatedTo": "2026-07-11",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-11",
+      "matchesPlayed": 100,
+      "goalsScored": 292,
+      "goalsPerMatch": 2.92,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -34,28 +34,40 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-07-10T21:11:07Z"
+      "lastUpdated": "2026-07-12T12:30:07Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-10T21:11:07Z",
-      "updatedThrough": "2026-07-10",
+      "generatedAt": "2026-07-12T12:30:07Z",
+      "updatedThrough": "2026-07-11",
       "scoreboard": {
-        "fetchedFinals": 1,
-        "appliedChanges": 1,
+        "fetchedFinals": 2,
+        "appliedChanges": 2,
         "kickoffUpdates": 0,
         "teamSlotUpdates": 0,
         "changes": [
           {
-            "match": 98,
+            "match": 99,
             "teams": [
-              "Spain",
-              "Belgium"
+              "Norway",
+              "England"
             ],
             "score": [
-              2,
+              1,
+              2
+            ],
+            "event": "760512"
+          },
+          {
+            "match": 100,
+            "teams": [
+              "Argentina",
+              "Switzerland"
+            ],
+            "score": [
+              3,
               1
             ],
-            "event": "760511"
+            "event": "760513"
           }
         ],
         "scheduleChanges": [],
@@ -65,33 +77,33 @@
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 6,
+    "totalUnplayedMatches": 4,
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 71,
-    "settledPredictions": 55,
-    "calibrationStatus": "validation_worsened_rollback",
-    "resolvedPredictions": 55,
+    "frozenPredictions": 73,
+    "settledPredictions": 69,
+    "calibrationStatus": "active",
+    "resolvedPredictions": 69,
     "minimumResolvedPredictions": 30
   },
   "backtestAudit": {
     "sampleStatus": "sufficient_for_calibration_review",
-    "resolvedPredictions": 55,
+    "resolvedPredictions": 69,
     "rawModel": {
-      "brier_score": 0.382329152826,
-      "log_loss": 0.680616693218,
-      "count": 55
+      "brier_score": 0.313791192318,
+      "log_loss": 0.578749198969,
+      "count": 69
     }
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 98,
+      "playedMatches": 100,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 26,
+      "playedKnockoutMatches": 28,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -108,7 +120,7 @@
     "weather": {
       "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 6,
+      "totalUnplayedMatches": 4,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -168,7 +180,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-10T21:11:09Z"
+    "updatedAt": "2026-07-12T12:30:09Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
