@@ -189,6 +189,13 @@ for (const viewport of viewports) {
         expect(bracketLayout.columns).toBe(1);
         expect(bracketLayout.narrowestMatch).toBeGreaterThan(200);
       }
+      if (tab === 'stats') {
+        await expect(page.locator('#statsView')).toContainText('Prediction vs actual');
+        await expect(page.locator('#statsView')).toContainText('Advancement accuracy');
+        await expect(page.locator('#statsView')).toContainText(/advance (win|loss)/);
+      }
+      if (tab === 'audit') await expect(page.locator('#auditView')).toContainText('knockout advancement');
+      if (tab === 'maintenance') await expect(page.locator('#maintenanceView')).toContainText('Knockout advancement');
       await expectNoHorizontalScroll(page);
       await expectNoBrokenVisibleImages(page);
     }

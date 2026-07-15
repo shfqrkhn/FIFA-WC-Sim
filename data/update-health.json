@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-15T21:42:50Z",
+  "generatedAt": "2026-07-15T22:37:55Z",
   "scoreboard": {
     "playedMatches": 102,
     "totalMatches": 104,
@@ -98,6 +98,11 @@
       "correct": 25,
       "count": 33,
       "rate": 0.757576
+    },
+    "advancementAccuracy": {
+      "correct": 23,
+      "count": 27,
+      "rate": 0.851852
     }
   },
   "dataQuality": {

@@ -339,6 +339,24 @@ const statsSnapshotOk = vm.runInContext(`(() => {
 if (!statsSnapshotOk) {
   throw new Error('Tournament snapshot schedule progress did not render expected remaining-match fields.');
 }
+const comparativeAdvancementOk = vm.runInContext(`(() => {
+  const report = DATA.comparativeResults || {}, summary = report.summary || {}, rows = report.rows || [];
+  const tiedKnockout = rows.find(row => row.actual_outcome === 'draw' && typeof row.advancement_correct === 'boolean');
+  renderStats();
+  renderAudit();
+  renderMaintenance();
+  const stats = $('#statsView')?.innerHTML || '';
+  const checks = $('#auditView')?.textContent || '';
+  const health = $('#maintenanceView')?.innerHTML || '';
+  return Number(summary.advancement_accuracy?.count) > 0 &&
+    tiedKnockout?.actual_advancing_team && tiedKnockout?.predicted_advancing_team &&
+    stats.includes('Advancement accuracy') && stats.includes('advanced') && stats.includes('advance ') &&
+    checks.includes('knockout advancement') &&
+    health.includes('Knockout advancement');
+})()`, sandbox, { timeout: 1000 });
+if (!comparativeAdvancementOk) {
+  throw new Error('Knockout advancement comparison was not separated from field-score WDL across Stats, Checks, and Health.');
+}
 const playedKnockoutFixedOk = vm.runInContext(`(() => {
   const fixed = DATA.knockout.find(m => m.played && Number.isFinite(m.scoreA) && Number.isFinite(m.scoreB));
   if (!fixed) return true;

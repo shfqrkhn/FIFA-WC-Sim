@@ -94,7 +94,7 @@ Do not retrofit or deploy a model fit on already-settled tournament outcomes. Th
 
 `scripts/backtest-audit.mjs` builds `data/backtest-audit.json` from the same frozen ledger. It reports sample size, raw model metrics, calibration benchmark metrics, uniform WDL and rank-prior baselines, confidence buckets, stage splits, failure classes, and limitations. This is a prospective backtest only; it does not reconstruct old matchdays with future data.
 
-`scripts/comparative-results.mjs` generates `data/comparative-results.json` and the embedded **Prediction vs actual** cards. It compares only eligible settled immutable pre-kickoff forecasts with embedded ESPN completed finals, including result/exact-score accuracy, scoreline error, confidence reliability, stage and failure-class splits, and raw/uniform/rank-prior metrics.
+`scripts/comparative-results.mjs` generates `data/comparative-results.json` and the embedded **Prediction vs actual** cards. It compares only eligible settled immutable pre-kickoff forecasts with embedded ESPN completed finals, including field-score W/D/L, knockout advancement, exact-score accuracy, scoreline error, confidence reliability, stage and failure-class splits, and raw/uniform/rank-prior metrics. Knockout advancement is reported separately so a penalty-decided tied score remains a draw for W/D/L scoring while the projected advancing team is still evaluated.
 
 Current match counts, overdue-match status, audit sample size, calibration status, backtest scores, and comparative statistics are generated artifacts. Check **Stats**, **Data**, **Checks**, and **Health** plus `data/update-health.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
 

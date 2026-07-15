@@ -74,7 +74,7 @@ Verify these values before relying on them; they describe the repo at the audit 
 - `data/prediction-audit.json`: immutable frozen prediction ledger.
 - `data/calibration-state.json`: conservative calibration state, kept separate from base model output.
 - `data/backtest-audit.json`: prospective backtest report from frozen records.
-- `data/comparative-results.json`: settled-only immutable forecast-vs-actual report, embedded into Stats/Data/Checks/Health.
+- `data/comparative-results.json`: settled-only immutable forecast-vs-actual report, embedded into Stats/Data/Checks/Health, with field-score W/D/L and knockout advancement evaluated separately.
 - `data/manual-overrides.example.json`: source-backed override schema example.
 - `scripts/`: update, enrichment, scoring, calibration, QA, idempotence, and rescue tools.
 - `tests/`: unit, regression, no-leakage, workflow, calibration, backtest, and UI smoke tests.
