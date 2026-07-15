@@ -132,7 +132,7 @@ Match-window workflow:
 - Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
 - Immutable audit reconciliation: both scheduled workflows fetch the daily and match-window automation branches and run `scripts/reconcile-prediction-audits.mjs` before updating, preserving distinct pre-kickoff forecasts while deduplicating equivalent records.
 - Transactional publication gate: Actions proposes changes through a bot PR, dispatches required BASE_DATA and security checks, requests GitHub auto-merge only after both contexts pass, waits for the merge, explicitly deploys that merged commit with `deploy-pages.yml`, and fails if merge or deployment is not proven.
-- Recovery watchdog: `publication-watchdog.yml` runs after every daily or match-window updater, every 15 minutes on June/July weekends, and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
+- Recovery watchdog: `publication-watchdog.yml` runs after every daily or match-window updater, every 15 minutes throughout June/July, and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
 
 BASE_DATA PR check:
 
