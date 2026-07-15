@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-15T21:15:23Z",
+  "generated_at_utc": "2026-07-15T21:42:48Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -7279,6 +7279,196 @@
         "home": 0.4615712444,
         "draw": 0,
         "away": 0.5384287556
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-19T19:00:00Z",
+      "venue": "MetLife Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false,
+        "lineups_source_limited": true,
+        "suspensions_source_limited": true,
+        "injuries_source_limited": true,
+        "referees_source_limited": true
+      }
+    },
+    {
+      "prediction_id": "606f8e62304e0d3b0a3be655",
+      "created_at_utc": "2026-07-15T21:42:48Z",
+      "match_id": 103,
+      "stage": "3P",
+      "home_team": "France",
+      "away_team": "England",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-15-accuracy-enriched",
+      "source_snapshot_hash": "4fb0b98fa5322230793337cffc94746ddd672da2c1e0d899cd218ded0b517fe6",
+      "predicted_wdl_probs": {
+        "home_win": 0.4124170089,
+        "draw": 0.2886124814,
+        "away_win": 0.2989705097
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.13748585
+        },
+        {
+          "score": "1-0",
+          "probability": 0.10281395
+        },
+        {
+          "score": "0-0",
+          "probability": 0.09297661
+        },
+        {
+          "score": "2-1",
+          "probability": 0.08687293
+        },
+        {
+          "score": "0-1",
+          "probability": 0.08308845
+        },
+        {
+          "score": "2-0",
+          "probability": 0.07711188
+        },
+        {
+          "score": "1-2",
+          "probability": 0.07170797
+        },
+        {
+          "score": "0-2",
+          "probability": 0.05253965
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04893478
+        },
+        {
+          "score": "3-1",
+          "probability": 0.03952241
+        },
+        {
+          "score": "3-0",
+          "probability": 0.03508167
+        },
+        {
+          "score": "1-3",
+          "probability": 0.02692832
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.5567232496,
+        "draw": 0,
+        "away": 0.4432767504
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-18T21:00:00Z",
+      "venue": "Hard Rock Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false,
+        "lineups_source_limited": true,
+        "suspensions_source_limited": true,
+        "injuries_source_limited": true,
+        "referees_source_limited": true
+      }
+    },
+    {
+      "prediction_id": "faf34de21d6830bcdab8f54f",
+      "created_at_utc": "2026-07-15T21:42:48Z",
+      "match_id": 104,
+      "stage": "FINAL",
+      "home_team": "Spain",
+      "away_team": "Argentina",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-15-accuracy-enriched",
+      "source_snapshot_hash": "5d803b26edceea43973f7cbf1c9bf32ffe38d1a1e25cf1952eaff0357512b115",
+      "predicted_wdl_probs": {
+        "home_win": 0.3147917909314792,
+        "draw": 0.29027353072902734,
+        "away_win": 0.3949346783394935
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.13827712
+        },
+        {
+          "score": "0-1",
+          "probability": 0.10023905
+        },
+        {
+          "score": "0-0",
+          "probability": 0.09351172
+        },
+        {
+          "score": "1-0",
+          "probability": 0.08625541
+        },
+        {
+          "score": "1-2",
+          "probability": 0.08493841
+        },
+        {
+          "score": "2-1",
+          "probability": 0.07418778
+        },
+        {
+          "score": "0-2",
+          "probability": 0.07329397
+        },
+        {
+          "score": "2-0",
+          "probability": 0.05591455
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04921641
+        },
+        {
+          "score": "1-3",
+          "probability": 0.0375656
+        },
+        {
+          "score": "0-3",
+          "probability": 0.03241564
+        },
+        {
+          "score": "3-1",
+          "probability": 0.02865807
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.4599285563,
+        "draw": 0,
+        "away": 0.5400714437
       },
       "actual_home_score": null,
       "actual_away_score": null,

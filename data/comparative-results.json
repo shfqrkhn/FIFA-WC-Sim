@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-15T21:15:23Z",
+  "generated_at_utc": "2026-07-15T21:42:48Z",
   "source_note": "Settled-only comparison of immutable pre-kickoff simulator forecasts against embedded ESPN completed finals. No market data is used.",
   "settled_only": true,
   "denominators": {
-    "frozen": 78,
+    "frozen": 80,
     "settled_eligible_forecasts": 76,
     "settled_matches": 33,
     "excluded_duplicate_snapshots": 43,
-    "unresolved": 2,
+    "unresolved": 4,
     "rejected": 0
   },
   "selection_rule": "One row per settled match: latest eligible immutable pre-kickoff forecast. Earlier snapshots remain preserved in the audit ledger and are excluded from match-level metrics.",
