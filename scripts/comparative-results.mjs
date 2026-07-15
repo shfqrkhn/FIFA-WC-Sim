@@ -9,6 +9,13 @@ const getArg = name => { const i = args.indexOf(name); return i < 0 ? null : arg
 const round = (value, digits = 6) => Number.isFinite(Number(value)) ? Number(Number(value).toFixed(digits)) : null;
 const outcomeLabel = value => ({ home_win: 'home win', draw: 'draw', away_win: 'away win' }[value] || 'unresolved');
 const favorite = probs => Object.entries(probs || {}).sort((a, b) => Number(b[1]) - Number(a[1]) || a[0].localeCompare(b[0]))[0]?.[0] || null;
+const predictedAdvancementSide = probs => {
+  const home = Number(probs?.home);
+  const away = Number(probs?.away);
+  if (!Number.isFinite(home) || !Number.isFinite(away) || home + away <= 0) return null;
+  return away > home ? 'away' : 'home';
+};
+const actualAdvancementSide = (row, match) => match?.winner === row.home_team ? 'home' : match?.winner === row.away_team ? 'away' : null;
 
 export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrationState = {}, asOfUtc = null } = {}) {
   const backtest = buildBacktestAuditReport({ ledger, data, calibrationState, asOfUtc });
@@ -25,6 +32,9 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
   const rows = canonical.map(row => {
     const match = matchMap.get(Number(row.match_id)) || {};
     const predicted = favorite(row.predicted_wdl_probs);
+    const predictedAdvance = predictedAdvancementSide(row.predicted_advancement_probs);
+    const actualAdvance = actualAdvancementSide(row, match);
+    const hasAdvancement = !!(predictedAdvance && actualAdvance);
     return {
       prediction_id: row.prediction_id,
       match_id: Number(row.match_id),
@@ -35,6 +45,10 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
       actual_outcome: outcomeLabel(row.actual_result),
       outcome_correct: predicted === row.actual_result,
       predicted_confidence: round(row.predicted_wdl_probs?.[predicted]),
+      predicted_advancing_team: hasAdvancement ? (predictedAdvance === 'home' ? row.home_team : row.away_team) : null,
+      actual_advancing_team: hasAdvancement ? match.winner : null,
+      predicted_advancement_confidence: hasAdvancement ? round(row.predicted_advancement_probs?.[predictedAdvance]) : null,
+      advancement_correct: hasAdvancement ? predictedAdvance === actualAdvance : null,
       scoreline_error: round(row.scoreline_error),
       brier_score: round(row.brier_score, 12),
       log_loss: round(row.log_loss, 12),
@@ -45,6 +59,8 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
     };
   }).sort((a, b) => a.match_id - b.match_id || a.prediction_id.localeCompare(b.prediction_id));
   const exactScore = rows.filter(row => row.scoreline_error === 0).length;
+  const advancementRows = rows.filter(row => typeof row.advancement_correct === 'boolean');
+  const advancementCorrect = advancementRows.filter(row => row.advancement_correct).length;
   const report = {
     schema: 1,
     generated_at_utc: backtest.generated_at_utc,
@@ -55,6 +71,7 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
     summary: {
       outcome_accuracy: { correct: rows.filter(row => row.outcome_correct).length, count: rows.length, rate: rows.length ? round(rows.filter(row => row.outcome_correct).length / rows.length) : null },
       exact_score_accuracy: { correct: exactScore, count: rows.length, rate: rows.length ? round(exactScore / rows.length) : null },
+      advancement_accuracy: { correct: advancementCorrect, count: advancementRows.length, rate: advancementRows.length ? round(advancementCorrect / advancementRows.length) : null },
       mean_scoreline_error: matchBacktest.overall.scoreline_error.mean_absolute_error,
       raw_model: matchBacktest.overall.metrics.raw_model,
       uniform_wdl: matchBacktest.overall.metrics.uniform_wdl,
@@ -66,7 +83,7 @@ export function buildComparativeResultsReport({ ledger = {}, data = {}, calibrat
     by_failure_class: matchBacktest.by_failure_type,
     comparisons: matchBacktest.comparisons,
     rows,
-    limitations: [...backtest.limitations, 'Rows are comparisons of frozen forecasts with embedded completed results; they are not a claim of official completeness or prediction certainty.']
+    limitations: [...backtest.limitations, 'Knockout advancement is evaluated separately from field-score WDL; a penalty-decided tied score remains a draw for WDL scoring.', 'Rows are comparisons of frozen forecasts with embedded completed results; they are not a claim of official completeness or prediction certainty.']
   };
   const check = validateNoMarketFields(report);
   if (!check.ok) throw new Error(`blocked market-like comparative field(s): ${check.fields.join(', ')}`);

@@ -56,7 +56,7 @@ health={
     'weather':{'coveredUnplayedMatches':len([m for m in todo if str(m.get('no')) in w]),'totalUnplayedMatches':len(todo),'failedMatches':failed_weather},
     'predictionAudit':{'frozenPredictions':len(predictions),'settledPredictions':len(settled),'calibrationStatus':calibration.get('calibration_status'),'resolvedPredictions':calibration.get('resolved_predictions'),'minimumResolvedPredictions':calibration.get('min_resolved_predictions')},
     'backtestAudit':{'sampleStatus':backtest.get('sample_status'),'resolvedPredictions':backtest.get('resolved_predictions'),'rawModel':((backtest.get('overall') or {}).get('metrics') or {}).get('raw_model')},
-    'comparativeResults':{'settledOnly':comparative.get('settled_only'),'denominators':comparative.get('denominators'),'outcomeAccuracy':((comparative.get('summary') or {}).get('outcome_accuracy'))},
+    'comparativeResults':{'settledOnly':comparative.get('settled_only'),'denominators':comparative.get('denominators'),'outcomeAccuracy':((comparative.get('summary') or {}).get('outcome_accuracy')),'advancementAccuracy':((comparative.get('summary') or {}).get('advancement_accuracy'))},
     'dataQuality':data.get('dataQuality',{}),
     'principle':'Failed or missing sources degrade to neutral inputs unless validated data is available.'
 }
