@@ -15,6 +15,7 @@ const readme = read('README.md');
 const html = read('docs/index.html');
 const codeqlWorkflow = read('.github/workflows/codeql.yml');
 const codeqlConfig = read('.github/codeql/codeql-config.yml');
+const publicationWatchdog = read('.github/workflows/publication-watchdog.yml');
 const pkg = JSON.parse(read('package.json'));
 
 assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
@@ -23,6 +24,8 @@ assert(html.includes('kickoff+4*60*60*1000'), 'freshness checks must allow a fou
 assert(html.includes('confirm its validated automatic deployment'), 'freshness recovery must explain automatic checked publication.');
 assert(readme.includes('fails unless that exact merged commit deploys successfully'), 'README must document transactional publication.');
 assert(readme.includes('publication watchdog'), 'README must document automatic stranded-PR recovery.');
+assert(publicationWatchdog.includes('workflow_run:'), 'publication watchdog must run after updater workflows, not rely only on cron.');
+assert(publicationWatchdog.includes('Match-window BASE_DATA update'), 'publication watchdog must follow match-window updates.');
 
 const forbiddenPathPattern =
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;
