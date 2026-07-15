@@ -1,6 +1,6 @@
 # AI Maintainer Handoff
 
-Last audited: 2026-07-12
+Last audited: 2026-07-15
 Branch at audit: `main`
 HEAD at audit: verify current `main` before relying on this snapshot.
 Refresh context: post-parallel update pass reconciliation for a future unified GitHub projects chat.
@@ -44,22 +44,22 @@ Verify these values before relying on them; they describe the repo at the audit 
 
 - App entrypoint: `docs/index.html`.
 - App version: `1.2.2` from `package.json`.
-- Embedded data version: `2026-07-12-accuracy-enriched`.
-- Embedded data generated at: `2026-07-12T14:39:18Z`.
-- Latest source-backed update settled M99 Norway 1-2 England and M100 Argentina 3-1 Switzerland from ESPN completed-final events `760512` and `760513`.
+- Embedded data version: `2026-07-15-accuracy-enriched`.
+- Embedded data generated at: `2026-07-15T21:15:26Z`.
+- Latest source-backed update settled M102 England 1-2 Argentina from ESPN completed-final event `760515`; M101 France 0-2 Spain is also embedded from event `760514`.
 - Latest update receipt: `data/latest-update.json`.
 - Health receipt: `data/update-health.json`.
-- Played matches: 100 of 104.
+- Played matches: 102 of 104.
 - Group matches: 72 of 72 played.
-- Knockout matches: 28 of 32 played.
+- Knockout matches: 30 of 32 played.
 - Overdue unplayed matches: 0.
-- Next scheduled match day in embedded data: `2026-07-14`.
-- Frozen prediction records: 75.
-- Settled frozen predictions: 69; comparative report presents 31 settled matches, one latest eligible pre-kickoff forecast per match.
+- Next scheduled match day in embedded data: `2026-07-18`.
+- Frozen prediction records: 80.
+- Settled frozen predictions: 76; comparative report presents 33 settled matches, one latest eligible pre-kickoff forecast per match, with 43 earlier snapshots retained only in the immutable audit.
 - Calibration status: `active`, retained only because the chronological held-out Brier and log-loss gate passed.
 - Calibration threshold: 30 resolved predictions.
 - Backtest status: `sufficient_for_calibration_review`, prospective frozen-ledger audit only.
-- Raw frozen-ledger benchmark: Brier `0.313791192318`, log loss `0.578749198969`, count `69`.
+- Raw frozen-ledger benchmark: Brier `0.331805570014`, log loss `0.606026648862`, count `76`.
 - Ignored local runtime file currently expected after simulation/test runs: `data/latest-simulation.json`.
 
 ## Public Files To Know
@@ -132,7 +132,7 @@ Match-window workflow:
 - Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
 - Immutable audit reconciliation: both scheduled workflows fetch the daily and match-window automation branches and run `scripts/reconcile-prediction-audits.mjs` before updating, preserving distinct pre-kickoff forecasts while deduplicating equivalent records.
 - Transactional publication gate: Actions proposes changes through a bot PR, dispatches required BASE_DATA and security checks, requests GitHub auto-merge only after both contexts pass, waits for the merge, explicitly deploys that merged commit with `deploy-pages.yml`, and fails if merge or deployment is not proven.
-- Recovery watchdog: `publication-watchdog.yml` runs after every daily or match-window updater, every 15 minutes during June/July, and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
+- Recovery watchdog: `publication-watchdog.yml` runs after every daily or match-window updater, every 15 minutes on June/July weekends, and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
 
 BASE_DATA PR check:
 
