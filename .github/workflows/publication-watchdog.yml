@@ -2,6 +2,11 @@ name: BASE_DATA publication watchdog
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Daily BASE_DATA update
+      - Match-window BASE_DATA update
+    types: [completed]
   schedule:
     - cron: '7,22,37,52 * * 6,7 *'
 

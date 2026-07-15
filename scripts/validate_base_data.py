@@ -227,6 +227,10 @@ REQUIRED_PAGES_WORKFLOW_STEPS = [
 ]
 REQUIRED_PUBLICATION_WATCHDOG_WORKFLOW_STEPS = [
     'name: BASE_DATA publication watchdog',
+    'workflow_run:',
+    'Daily BASE_DATA update',
+    'Match-window BASE_DATA update',
+    'types: [completed]',
     "cron: '7,22,37,52 * * 6,7 *'",
     'actions: write',
     'pull-requests: write',
