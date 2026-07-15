@@ -1,66 +1,66 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-12T15:17:26Z",
+  "generated_at_utc": "2026-07-15T18:40:47Z",
   "source_note": "Settled-only comparison of immutable pre-kickoff simulator forecasts against embedded ESPN completed finals. No market data is used.",
   "settled_only": true,
   "denominators": {
-    "frozen": 75,
-    "settled_eligible_forecasts": 69,
-    "settled_matches": 31,
-    "excluded_duplicate_snapshots": 38,
-    "unresolved": 6,
+    "frozen": 76,
+    "settled_eligible_forecasts": 73,
+    "settled_matches": 32,
+    "excluded_duplicate_snapshots": 41,
+    "unresolved": 3,
     "rejected": 0
   },
   "selection_rule": "One row per settled match: latest eligible immutable pre-kickoff forecast. Earlier snapshots remain preserved in the audit ledger and are excluded from match-level metrics.",
   "summary": {
     "outcome_accuracy": {
-      "correct": 23,
-      "count": 31,
-      "rate": 0.741935
+      "correct": 24,
+      "count": 32,
+      "rate": 0.75
     },
     "exact_score_accuracy": {
       "correct": 0,
-      "count": 31,
+      "count": 32,
       "rate": 0
     },
-    "mean_scoreline_error": 2.253659,
+    "mean_scoreline_error": 2.240855,
     "raw_model": {
-      "brier_score": 0.324403417082,
-      "log_loss": 0.5968410126,
-      "count": 31
+      "brier_score": 0.332486132902,
+      "log_loss": 0.608676531982,
+      "count": 32
     },
     "uniform_wdl": {
       "brier_score": 0.666666666667,
       "log_loss": 1.098612288668,
-      "count": 31
+      "count": 32
     },
     "rank_prior": {
-      "brier_score": 0.435837408314,
-      "log_loss": 0.774752883883,
-      "count": 31
+      "brier_score": 0.440375642009,
+      "log_loss": 0.780756239025,
+      "count": 32
     },
     "calibration": {
       "status": "active",
       "active": true,
       "raw_validation_metrics": {
-        "brier_score": 0.149521447189,
-        "log_loss": 0.342606105552,
-        "count": 21
+        "brier_score": 0.198417910309,
+        "log_loss": 0.411203800492,
+        "count": 22
       },
       "validation_metrics": {
-        "brier_score": 0.09373483082,
-        "log_loss": 0.265991390163,
-        "count": 21
+        "brier_score": 0.126922825367,
+        "log_loss": 0.312896779781,
+        "count": 22
       }
     }
   },
   "reliability": {
     "0.3-0.4": {
-      "count": 5,
-      "average_confidence": 0.37367,
-      "observed_favorite_hit_rate": 0.2,
-      "brier_score": 0.684493517651,
-      "log_loss": 1.124970947575
+      "count": 6,
+      "average_confidence": 0.374221,
+      "observed_favorite_hit_rate": 0.333333,
+      "brier_score": 0.667586318595,
+      "log_loss": 1.100072061781
     },
     "0.4-0.5": {
       "count": 5,
@@ -137,33 +137,33 @@
       }
     },
     "knockout": {
-      "count": 25,
+      "count": 26,
       "metrics": {
         "raw_model": {
-          "brier_score": 0.329198873235,
-          "log_loss": 0.617331949728,
-          "count": 25
+          "brier_score": 0.338962390546,
+          "log_loss": 0.631110629847,
+          "count": 26
         },
         "uniform_wdl": {
           "brier_score": 0.666666666667,
           "log_loss": 1.098612288668,
-          "count": 25
+          "count": 26
         },
         "rank_prior": {
-          "brier_score": 0.432342929005,
-          "log_loss": 0.771788815051,
-          "count": 25
+          "brier_score": 0.438062850448,
+          "log_loss": 0.779291562488,
+          "count": 26
         }
       },
       "favorite_accuracy": {
-        "correct": 19,
-        "count": 25,
-        "rate": 0.76,
-        "average_confidence": 0.690107
+        "correct": 20,
+        "count": 26,
+        "rate": 0.769231,
+        "average_confidence": 0.678064
       },
       "scoreline_error": {
-        "mean_absolute_error": 2.030377,
-        "count": 25
+        "mean_absolute_error": 2.023205,
+        "count": 26
       }
     }
   },
@@ -173,18 +173,18 @@
     "knockout_penalty_variance": 3,
     "missing_lineup_or_suspension_data": 1,
     "overconfident_favorite": 1,
-    "pure_variance": 14
+    "pure_variance": 15
   },
   "comparisons": {
     "raw_vs_uniform_wdl": {
-      "brier_delta": -0.342263249585,
-      "log_loss_delta": -0.501771276068,
-      "compared_count": 31
+      "brier_delta": -0.334180533765,
+      "log_loss_delta": -0.489935756686,
+      "compared_count": 32
     },
     "raw_vs_rank_prior": {
-      "brier_delta": -0.111433991232,
-      "log_loss_delta": -0.177911871283,
-      "compared_count": 31
+      "brier_delta": -0.107889509107,
+      "log_loss_delta": -0.172079707043,
+      "compared_count": 32
     }
   },
   "rows": [
@@ -745,6 +745,24 @@
       "failure_class": "pure_variance",
       "frozen_at_utc": "2026-07-10T21:11:08Z",
       "settled_at_utc": "2026-07-12T14:39:14Z"
+    },
+    {
+      "prediction_id": "ccb1be2c5cd240e642e64083",
+      "match_id": 101,
+      "stage": "SF",
+      "teams": "France vs Spain",
+      "actual_score": "0–2",
+      "predicted_outcome": "away win",
+      "actual_outcome": "away win",
+      "outcome_correct": true,
+      "predicted_confidence": 0.376975,
+      "scoreline_error": 1.843918,
+      "brier_score": 0.583050323315,
+      "log_loss": 0.975577632807,
+      "confidence_bucket": "0.3-0.4",
+      "failure_class": "pure_variance",
+      "frozen_at_utc": "2026-07-12T15:14:43Z",
+      "settled_at_utc": "2026-07-15T18:40:47Z"
     }
   ],
   "limitations": [
