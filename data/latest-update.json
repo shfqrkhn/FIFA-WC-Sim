@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-15T18:40:45Z",
-  "updatedThrough": "2026-07-14",
+  "generatedAt": "2026-07-15T21:15:24Z",
+  "updatedThrough": "2026-07-15",
   "scoreboard": {
     "fetchedFinals": 1,
     "appliedChanges": 1,
@@ -8,16 +8,16 @@
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 101,
+        "match": 102,
         "teams": [
-          "France",
-          "Spain"
+          "England",
+          "Argentina"
         ],
         "score": [
-          0,
+          1,
           2
         ],
-        "event": "760514"
+        "event": "760515"
       }
     ],
     "scheduleChanges": [],
