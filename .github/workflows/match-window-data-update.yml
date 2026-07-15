@@ -54,3 +54,4 @@ jobs:
           --title "Match-window World Cup BASE_DATA update"
           --message "Match-window World Cup BASE_DATA update"
           --auto-merge
+          --deploy-workflow deploy-pages.yml

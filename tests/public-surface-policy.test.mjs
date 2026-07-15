@@ -20,8 +20,9 @@ const pkg = JSON.parse(read('package.json'));
 assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke', 'package must expose the full public QA gate.');
 assert(html.includes('function matchFinalOverdue(m,date=new Date())'), 'freshness checks must use the final-result grace helper.');
 assert(html.includes('kickoff+4*60*60*1000'), 'freshness checks must allow a four-hour match completion window.');
-assert(html.includes('merge its validated PR'), 'freshness recovery must explain the human publication gate.');
-assert(readme.includes('request GitHub auto-merge only after both contexts pass'), 'README must document validated auto-merge publication.');
+assert(html.includes('confirm its validated automatic deployment'), 'freshness recovery must explain automatic checked publication.');
+assert(readme.includes('fails unless that exact merged commit deploys successfully'), 'README must document transactional publication.');
+assert(readme.includes('publication watchdog'), 'README must document automatic stranded-PR recovery.');
 
 const forbiddenPathPattern =
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;

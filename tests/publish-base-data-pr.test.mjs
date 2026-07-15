@@ -3,11 +3,13 @@ import {
   buildPullRequestBody,
   autoMergeArgs,
   COMMIT_CANDIDATES,
+  deploymentWorkflowArgs,
   explainGitHubActionsPrPermission,
   parsePublishArgs,
   VALIDATION_STATUS_CONTEXTS,
   VALIDATION_WORKFLOWS,
-  validateAutomationBranch
+  validateAutomationBranch,
+  validateWorkflowFile
 } from '../scripts/publish-base-data-pr.mjs';
 
 assert.ok(COMMIT_CANDIDATES.includes('docs/index.html'));
@@ -32,9 +34,16 @@ assert.equal(parsed.title, 'Match-window World Cup BASE_DATA update');
 assert.equal(parsed.message, 'Match-window World Cup BASE_DATA update');
 assert.equal(parsed.token, 'test-token');
 assert.equal(parsed.autoMerge, false);
+assert.equal(parsed.deployWorkflow, '');
+assert.equal(parsed.recoverOnly, false);
 assert.equal(parsePublishArgs(['--auto-merge'], {}).autoMerge, true);
+assert.equal(parsePublishArgs(['--recover-only'], {}).recoverOnly, true);
+assert.equal(parsePublishArgs(['--deploy-workflow', 'deploy-pages.yml'], {}).deployWorkflow, 'deploy-pages.yml');
 assert.deepEqual(autoMergeArgs(19), ['pr', 'merge', '19', '--auto', '--merge', '--delete-branch=false']);
 assert.throws(() => autoMergeArgs('x'), /invalid/);
+assert.deepEqual(deploymentWorkflowArgs('deploy-pages.yml'), ['workflow', 'run', 'deploy-pages.yml', '--ref', 'main']);
+assert.equal(validateWorkflowFile('deploy-pages.yml'), 'deploy-pages.yml');
+assert.throws(() => validateWorkflowFile('../deploy.yml'), /safe workflow/);
 
 assert.equal(validateAutomationBranch('automation/daily-base-data-update'), 'automation/daily-base-data-update');
 assert.throws(() => validateAutomationBranch('main'), /automation/);

@@ -11,8 +11,8 @@ export const COMMIT_CANDIDATES = [
   'data/update-health.json',
   'data/prediction-audit.json',
   'data/calibration-state.json',
-  'data/backtest-audit.json'
-  ,'data/comparative-results.json'
+  'data/backtest-audit.json',
+  'data/comparative-results.json'
 ];
 
 export const VALIDATION_WORKFLOWS = [
@@ -36,6 +36,8 @@ export function parsePublishArgs(argv = [], env = process.env) {
     base: env.BASE_DATA_PR_BASE || 'main',
     token: env.GH_TOKEN || env.GITHUB_TOKEN || '',
     autoMerge: false,
+    deployWorkflow: env.BASE_DATA_DEPLOY_WORKFLOW || '',
+    recoverOnly: false,
     help: false
   };
   for (let i = 0; i < argv.length; i += 1) {
@@ -44,6 +46,10 @@ export function parsePublishArgs(argv = [], env = process.env) {
       options.help = true;
     } else if (arg === '--auto-merge') {
       options.autoMerge = true;
+    } else if (arg === '--recover-only') {
+      options.recoverOnly = true;
+    } else if (arg === '--deploy-workflow') {
+      options.deployWorkflow = argv[++i] || '';
     } else if (arg === '--branch') {
       options.branch = argv[++i] || '';
     } else if (arg === '--title') {
@@ -60,6 +66,8 @@ export function parsePublishArgs(argv = [], env = process.env) {
       options.message = arg.slice('--message='.length);
     } else if (arg.startsWith('--base=')) {
       options.base = arg.slice('--base='.length);
+    } else if (arg.startsWith('--deploy-workflow=')) {
+      options.deployWorkflow = arg.slice('--deploy-workflow='.length);
     } else {
       throw new Error(`Unknown option: ${arg}`);
     }
@@ -75,12 +83,22 @@ export function validateAutomationBranch(branch) {
   return value;
 }
 
+export function validateWorkflowFile(workflow) {
+  const value = String(workflow || '').trim();
+  if (value && !/^[A-Za-z0-9._-]+\.ya?ml$/.test(value)) {
+    throw new Error('Deployment workflow must be a safe workflow YAML filename.');
+  }
+  return value;
+}
+
 function usage() {
   return [
-    'Usage: node scripts/publish-base-data-pr.mjs --branch automation/name --title "Title" --message "Commit message" [--auto-merge]',
+    'Usage: node scripts/publish-base-data-pr.mjs --branch automation/name --title "Title" --message "Commit message" [--auto-merge] [--deploy-workflow deploy-pages.yml] [--recover-only]',
     '',
     'Publishes validated BASE_DATA artifacts to a bot branch and opens or updates a pull request.',
     'With --auto-merge, GitHub merges only after the required validation contexts pass.',
+    'With --deploy-workflow, success requires the merged commit to deploy successfully to Pages.',
+    'With --recover-only, an existing automation PR is revalidated, merged, and deployed without generating data.',
     'No changes are published when the validated candidate artifacts are unchanged.'
   ].join('\n');
 }
@@ -148,14 +166,14 @@ function postCommitStatus(options, sha, context, state, description, targetUrl =
   gh(args, `gh status ${context}`, options.token);
 }
 
-function latestWorkflowDispatchRun(options, workflow, sha) {
+function latestWorkflowDispatchRun(options, workflow, sha, branch = options.branch) {
   const result = gh([
     'run',
     'list',
     '--workflow',
     workflow,
     '--branch',
-    options.branch,
+    branch,
     '--event',
     'workflow_dispatch',
     '--json',
@@ -167,10 +185,10 @@ function latestWorkflowDispatchRun(options, workflow, sha) {
   return runs.find(run => run.headSha === sha) || null;
 }
 
-function waitForWorkflowDispatchRun(options, workflow, sha) {
+function waitForWorkflowDispatchRun(options, workflow, sha, branch = options.branch) {
   const deadline = Date.now() + VALIDATION_TIMEOUT_MS;
   while (Date.now() < deadline) {
-    const run = latestWorkflowDispatchRun(options, workflow, sha);
+    const run = latestWorkflowDispatchRun(options, workflow, sha, branch);
     if (run?.status === 'completed') return run;
     sleep(VALIDATION_POLL_MS);
   }
@@ -219,10 +237,61 @@ export function autoMergeArgs(prNumber) {
   return ['pr', 'merge', number, '--auto', '--merge', '--delete-branch=false'];
 }
 
+export function deploymentWorkflowArgs(workflow, base = 'main') {
+  return ['workflow', 'run', validateWorkflowFile(workflow), '--ref', String(base || 'main')];
+}
+
+function openPullRequestNumber(options) {
+  return gh([
+    'pr', 'list', '--base', options.base, '--head', options.branch, '--state', 'open',
+    '--json', 'number', '--jq', '.[0].number // ""'
+  ], 'gh pr list', options.token).stdout.trim();
+}
+
+function waitForPullRequestMerge(options, prNumber) {
+  const deadline = Date.now() + VALIDATION_TIMEOUT_MS;
+  while (Date.now() < deadline) {
+    const result = gh([
+      'pr', 'view', String(prNumber), '--json', 'state,mergedAt,mergeCommit,url'
+    ], `gh pr view #${prNumber}`, options.token);
+    const view = JSON.parse(result.stdout || '{}');
+    if (view.state === 'MERGED' && view.mergeCommit?.oid) return view;
+    if (view.state === 'CLOSED') throw new Error(`Validated BASE_DATA PR #${prNumber} closed without merging.`);
+    sleep(VALIDATION_POLL_MS);
+  }
+  throw new Error(`Timed out waiting for validated BASE_DATA PR #${prNumber} to merge.`);
+}
+
+function deployMergedPullRequest(options, merged) {
+  if (!options.deployWorkflow) return;
+  const sha = merged.mergeCommit.oid;
+  gh(deploymentWorkflowArgs(options.deployWorkflow, options.base), `gh workflow run ${options.deployWorkflow}`, options.token);
+  const run = waitForWorkflowDispatchRun(options, options.deployWorkflow, sha, options.base);
+  if (run.conclusion !== 'success') {
+    throw new Error(`${options.deployWorkflow} deployment failed with conclusion: ${run.conclusion || 'unknown'}`);
+  }
+  writeSummary([`Pages deployment passed for merged commit ${sha.slice(0, 12)}.`, run.url || '']);
+}
+
 function enableValidatedAutoMerge(options, prNumber) {
   if (!options.autoMerge) return;
   gh(autoMergeArgs(prNumber), `gh pr merge --auto #${prNumber}`, options.token);
-  writeSummary(['Validated BASE_DATA auto-merge enabled after required checks.']);
+  const merged = waitForPullRequestMerge(options, prNumber);
+  writeSummary([`Validated BASE_DATA PR #${prNumber} merged as ${merged.mergeCommit.oid.slice(0, 12)}.`]);
+  deployMergedPullRequest(options, merged);
+}
+
+function recoverExistingPullRequest(options, prNumber) {
+  if (!prNumber) {
+    console.log(`No open BASE_DATA PR to recover for ${options.branch}.`);
+    writeSummary([`No open BASE_DATA PR to recover for ${options.branch}.`]);
+    return;
+  }
+  git(['fetch', 'origin', `${options.branch}:refs/remotes/origin/${options.branch}`], 'git fetch automation branch');
+  const sha = git(['rev-parse', `refs/remotes/origin/${options.branch}`], 'git rev-parse automation branch', { stdio: 'pipe' }).stdout.trim();
+  dispatchValidationWorkflows(options, VALIDATION_WORKFLOWS, sha);
+  enableValidatedAutoMerge(options, prNumber);
+  console.log(`Recovered BASE_DATA update PR #${prNumber}.`);
 }
 
 function publishBranch(options, changedFiles) {
@@ -240,20 +309,7 @@ function publishBranch(options, changedFiles) {
   const bodyPath = path.join(os.tmpdir(), `base-data-pr-${Date.now()}.md`);
   fs.writeFileSync(bodyPath, buildPullRequestBody({ branch: options.branch, changedFiles }));
 
-  const existing = gh([
-    'pr',
-    'list',
-    '--base',
-    options.base,
-    '--head',
-    options.branch,
-    '--state',
-    'open',
-    '--json',
-    'number',
-    '--jq',
-    '.[0].number // ""'
-  ], 'gh pr list', options.token).stdout.trim();
+  const existing = openPullRequestNumber(options);
 
   if (existing) {
     gh(['pr', 'edit', existing, '--title', options.title, '--body-file', bodyPath], 'gh pr edit', options.token);
@@ -286,8 +342,7 @@ function publishBranch(options, changedFiles) {
   console.log(`BASE_DATA update PR created: ${created}`);
 }
 
-export function dispatchValidationWorkflows(options, workflows = VALIDATION_WORKFLOWS) {
-  const sha = currentHeadSha();
+export function dispatchValidationWorkflows(options, workflows = VALIDATION_WORKFLOWS, sha = currentHeadSha()) {
   for (const workflow of workflows) {
     const context = VALIDATION_STATUS_CONTEXTS[workflow];
     if (context) postCommitStatus(options, sha, context, 'pending', `${workflow} validation dispatched`);
@@ -316,14 +371,24 @@ export function runPublishBaseDataPr(options) {
     return 0;
   }
   options.branch = validateAutomationBranch(options.branch);
+  options.deployWorkflow = validateWorkflowFile(options.deployWorkflow);
+  if (!options.token) {
+    throw new Error('GITHUB_TOKEN or GH_TOKEN is required to publish or recover a BASE_DATA pull request.');
+  }
+  const existing = openPullRequestNumber(options);
+  if (options.recoverOnly) {
+    recoverExistingPullRequest(options, existing);
+    return 0;
+  }
   const changedFiles = changedCandidateFiles();
   if (!changedFiles.length) {
+    if (existing && options.autoMerge) {
+      recoverExistingPullRequest(options, existing);
+      return 0;
+    }
     console.log('No validated BASE_DATA changes to publish.');
     writeSummary(['', 'No validated BASE_DATA changes to publish.']);
     return 0;
-  }
-  if (!options.token) {
-    throw new Error('GITHUB_TOKEN or GH_TOKEN is required to open or update the BASE_DATA pull request.');
   }
   publishBranch(options, changedFiles);
   return 0;

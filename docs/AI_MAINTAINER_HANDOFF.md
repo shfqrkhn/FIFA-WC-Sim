@@ -131,7 +131,8 @@ Match-window workflow:
 - Repository setting required: GitHub Actions workflow permissions must allow Actions to create pull requests; otherwise validation and branch push can pass while `gh pr create` fails.
 - Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
 - Immutable audit reconciliation: both scheduled workflows fetch the daily and match-window automation branches and run `scripts/reconcile-prediction-audits.mjs` before updating, preserving distinct pre-kickoff forecasts while deduplicating equivalent records.
-- Validated publication gate: Actions proposes changes through a bot PR, dispatches required BASE_DATA and security checks, and requests GitHub auto-merge only after both contexts pass. Any failed/pending check leaves the PR open for maintainer review.
+- Transactional publication gate: Actions proposes changes through a bot PR, dispatches required BASE_DATA and security checks, requests GitHub auto-merge only after both contexts pass, waits for the merge, explicitly deploys that merged commit with `deploy-pages.yml`, and fails if merge or deployment is not proven.
+- Recovery watchdog: `publication-watchdog.yml` runs every 15 minutes during June/July and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded daily or match-window automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
 
 BASE_DATA PR check:
 
@@ -144,6 +145,12 @@ Static UI smoke:
 - File: `.github/workflows/ui-smoke.yml`
 - Runs on relevant `main` pushes and manual dispatch.
 - Executes Playwright against the static app.
+
+Pages deployment:
+
+- File: `.github/workflows/deploy-pages.yml`.
+- Runs for relevant `main` pushes and explicit publication dispatches.
+- Deploys the repository `docs/` artifact through GitHub Pages Actions and reports the deployed URL.
 
 If workflows fail, inspect logs first. Patch repo-caused failures only. Treat GitHub platform delays/outages as transient unless logs show a repo defect.
 

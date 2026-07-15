@@ -8,6 +8,8 @@ MATCH_WINDOW_WORKFLOW = '.github/workflows/match-window-data-update.yml'
 BASE_DATA_PR_CHECK_WORKFLOW = '.github/workflows/base-data-pr-check.yml'
 SECURITY_WORKFLOW = '.github/workflows/security-check.yml'
 UI_SMOKE_WORKFLOW = '.github/workflows/ui-smoke.yml'
+PAGES_WORKFLOW = '.github/workflows/deploy-pages.yml'
+PUBLICATION_WATCHDOG_WORKFLOW = '.github/workflows/publication-watchdog.yml'
 GITIGNORE = '.gitignore'
 PACKAGE = 'package.json'
 PACKAGE_LOCK = 'package-lock.json'
@@ -149,6 +151,7 @@ REQUIRED_WORKFLOW_STEPS = [
     'pull-requests: write',
     'statuses: write',
     'scripts/publish-base-data-pr.mjs',
+    '--deploy-workflow deploy-pages.yml',
     'automation/daily-base-data-update',
     'GH_TOKEN: ${{ github.token }}',
     'concurrency:',
@@ -175,6 +178,7 @@ REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
     'pull-requests: write',
     'statuses: write',
     'scripts/publish-base-data-pr.mjs',
+    '--deploy-workflow deploy-pages.yml',
     'automation/match-window-base-data-update',
     'GH_TOKEN: ${{ github.token }}',
     'concurrency:',
@@ -210,6 +214,29 @@ REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
     'npx playwright install --with-deps chromium',
     'npm run ui:smoke',
     'actions/upload-artifact@v7',
+]
+REQUIRED_PAGES_WORKFLOW_STEPS = [
+    'name: Deploy Pages',
+    'workflow_dispatch:',
+    'pages: write',
+    'id-token: write',
+    'actions/configure-pages@v6',
+    'actions/upload-pages-artifact@v5',
+    'actions/deploy-pages@v5',
+    'path: docs',
+]
+REQUIRED_PUBLICATION_WATCHDOG_WORKFLOW_STEPS = [
+    'name: BASE_DATA publication watchdog',
+    "cron: '7,22,37,52 * * 6,7 *'",
+    'actions: write',
+    'pull-requests: write',
+    'group: base-data-update-${{ github.ref }}',
+    'continue-on-error: true',
+    '--recover-only',
+    '--auto-merge',
+    '--deploy-workflow deploy-pages.yml',
+    'automation/daily-base-data-update',
+    'automation/match-window-base-data-update',
 ]
 REQUIRED_GITIGNORE_ENTRIES = [
     'data/scoreboards/',
@@ -615,6 +642,20 @@ if os.path.exists(UI_SMOKE_WORKFLOW):
             fail('missing UI smoke workflow marker: %s' % marker)
 else:
     fail('missing static UI smoke workflow')
+if os.path.exists(PAGES_WORKFLOW):
+    workflow = open(PAGES_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_PAGES_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing Pages deployment workflow marker: %s' % marker)
+else:
+    fail('missing Pages deployment workflow')
+if os.path.exists(PUBLICATION_WATCHDOG_WORKFLOW):
+    workflow = open(PUBLICATION_WATCHDOG_WORKFLOW, encoding='utf-8').read()
+    for marker in REQUIRED_PUBLICATION_WATCHDOG_WORKFLOW_STEPS:
+        if marker not in workflow:
+            fail('missing publication watchdog workflow marker: %s' % marker)
+else:
+    fail('missing publication watchdog workflow')
 if os.path.exists(GITIGNORE):
     gitignore = open(GITIGNORE, encoding='utf-8').read().splitlines()
     for entry in REQUIRED_GITIGNORE_ENTRIES:

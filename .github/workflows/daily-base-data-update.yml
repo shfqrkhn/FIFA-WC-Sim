@@ -56,3 +56,4 @@ jobs:
           --title "Daily World Cup BASE_DATA update"
           --message "Daily World Cup BASE_DATA update"
           --auto-merge
+          --deploy-workflow deploy-pages.yml

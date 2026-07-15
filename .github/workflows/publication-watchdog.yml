@@ -1,0 +1,52 @@
+name: BASE_DATA publication watchdog
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '7,22,37,52 * * 6,7 *'
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+  statuses: write
+
+concurrency:
+  group: base-data-update-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+      - name: Recover daily publication
+        id: daily
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          node scripts/publish-base-data-pr.mjs
+          --branch automation/daily-base-data-update
+          --recover-only
+          --auto-merge
+          --deploy-workflow deploy-pages.yml
+      - name: Recover match-window publication
+        id: match_window
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          node scripts/publish-base-data-pr.mjs
+          --branch automation/match-window-base-data-update
+          --recover-only
+          --auto-merge
+          --deploy-workflow deploy-pages.yml
+      - name: Fail if a publication could not be recovered
+        if: steps.daily.outcome == 'failure' || steps.match_window.outcome == 'failure'
+        run: exit 1
