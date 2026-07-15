@@ -21,7 +21,7 @@ assert(pkg.scripts?.['qa:full'] === 'npm test && npm run qa && npm run ui:smoke'
 assert(html.includes('function matchFinalOverdue(m,date=new Date())'), 'freshness checks must use the final-result grace helper.');
 assert(html.includes('kickoff+4*60*60*1000'), 'freshness checks must allow a four-hour match completion window.');
 assert(html.includes('merge its validated PR'), 'freshness recovery must explain the human publication gate.');
-assert(readme.includes('intentionally requires one human approval'), 'README must document the protected human publication gate.');
+assert(readme.includes('request GitHub auto-merge only after both contexts pass'), 'README must document validated auto-merge publication.');
 
 const forbiddenPathPattern =
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;

@@ -117,7 +117,7 @@ The match-window workflow runs `node scripts/match-window-update.mjs`. It no-ops
 
 The match-window workflow publishes the same validated artifact set to `automation/match-window-base-data-update` when it has source-backed changes to propose. Neither scheduled workflow pushes generated data directly to `main`.
 
-Both workflows reconcile immutable frozen-prediction records from the daily and match-window automation branches before updating. Branch protection intentionally requires one human approval: automation validates and proposes data, but a maintainer must review and merge the bot PR before Pages changes. Running a workflow alone does not publish its proposal.
+Both workflows reconcile immutable frozen-prediction records from the daily and match-window automation branches before updating. They publish through a bot PR, dispatch the required BASE_DATA and security checks, and request GitHub auto-merge only after both contexts pass. Failed or pending validation keeps the PR open; validated source-backed updates no longer wait indefinitely for a manual merge.
 
 Both update workflows write a GitHub Actions summary with data version, played-match counts, overdue unplayed count, latest scoreboard changes, prediction-audit counts, calibration status, and backtest metrics. `BASE_DATA PR check` validates pull requests before merge. `Static UI smoke` runs Playwright against `docs/index.html` for desktop and mobile layouts when relevant files change.
 

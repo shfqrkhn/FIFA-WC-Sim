@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {
   buildPullRequestBody,
+  autoMergeArgs,
   COMMIT_CANDIDATES,
   explainGitHubActionsPrPermission,
   parsePublishArgs,
@@ -30,6 +31,10 @@ assert.equal(parsed.branch, 'automation/match-window-base-data-update');
 assert.equal(parsed.title, 'Match-window World Cup BASE_DATA update');
 assert.equal(parsed.message, 'Match-window World Cup BASE_DATA update');
 assert.equal(parsed.token, 'test-token');
+assert.equal(parsed.autoMerge, false);
+assert.equal(parsePublishArgs(['--auto-merge'], {}).autoMerge, true);
+assert.deepEqual(autoMergeArgs(19), ['pr', 'merge', '19', '--auto', '--merge', '--delete-branch=false']);
+assert.throws(() => autoMergeArgs('x'), /invalid/);
 
 assert.equal(validateAutomationBranch('automation/daily-base-data-update'), 'automation/daily-base-data-update');
 assert.throws(() => validateAutomationBranch('main'), /automation/);

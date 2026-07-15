@@ -35,12 +35,15 @@ export function parsePublishArgs(argv = [], env = process.env) {
     message: env.BASE_DATA_COMMIT_MESSAGE || 'World Cup BASE_DATA update',
     base: env.BASE_DATA_PR_BASE || 'main',
     token: env.GH_TOKEN || env.GITHUB_TOKEN || '',
+    autoMerge: false,
     help: false
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
       options.help = true;
+    } else if (arg === '--auto-merge') {
+      options.autoMerge = true;
     } else if (arg === '--branch') {
       options.branch = argv[++i] || '';
     } else if (arg === '--title') {
@@ -74,9 +77,10 @@ export function validateAutomationBranch(branch) {
 
 function usage() {
   return [
-    'Usage: node scripts/publish-base-data-pr.mjs --branch automation/name --title "Title" --message "Commit message"',
+    'Usage: node scripts/publish-base-data-pr.mjs --branch automation/name --title "Title" --message "Commit message" [--auto-merge]',
     '',
     'Publishes validated BASE_DATA artifacts to a bot branch and opens or updates a pull request.',
+    'With --auto-merge, GitHub merges only after the required validation contexts pass.',
     'No changes are published when the validated candidate artifacts are unchanged.'
   ].join('\n');
 }
@@ -209,6 +213,18 @@ function writeSummary(lines) {
   fs.appendFileSync(target, `${lines.join('\n')}\n`);
 }
 
+export function autoMergeArgs(prNumber) {
+  const number = String(prNumber || '').trim();
+  if (!/^\d+$/.test(number)) throw new Error('validated BASE_DATA PR number is invalid');
+  return ['pr', 'merge', number, '--auto', '--merge', '--delete-branch=false'];
+}
+
+function enableValidatedAutoMerge(options, prNumber) {
+  if (!options.autoMerge) return;
+  gh(autoMergeArgs(prNumber), `gh pr merge --auto #${prNumber}`, options.token);
+  writeSummary(['Validated BASE_DATA auto-merge enabled after required checks.']);
+}
+
 function publishBranch(options, changedFiles) {
   git(['config', 'user.name', 'github-actions[bot]'], 'git config user.name');
   git(['config', 'user.email', '41898282+github-actions[bot]@users.noreply.github.com'], 'git config user.email');
@@ -242,6 +258,7 @@ function publishBranch(options, changedFiles) {
   if (existing) {
     gh(['pr', 'edit', existing, '--title', options.title, '--body-file', bodyPath], 'gh pr edit', options.token);
     dispatchValidationWorkflows(options);
+    enableValidatedAutoMerge(options, existing);
     writeSummary(['', `BASE_DATA update PR refreshed: #${existing}`, 'BASE_DATA validation workflows dispatched.']);
     console.log(`BASE_DATA update PR refreshed: #${existing}`);
     return;
@@ -260,6 +277,11 @@ function publishBranch(options, changedFiles) {
     bodyPath
   ], 'gh pr create', options.token).stdout.trim();
   dispatchValidationWorkflows(options);
+  const createdNumber = gh([
+    'pr', 'list', '--base', options.base, '--head', options.branch, '--state', 'open',
+    '--json', 'number', '--jq', '.[0].number // ""'
+  ], 'gh pr list after create', options.token).stdout.trim();
+  enableValidatedAutoMerge(options, createdNumber);
   writeSummary(['', `BASE_DATA update PR created: ${created}`, 'BASE_DATA validation workflows dispatched.']);
   console.log(`BASE_DATA update PR created: ${created}`);
 }
