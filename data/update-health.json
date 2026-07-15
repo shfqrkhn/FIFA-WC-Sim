@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-12T15:49:29Z",
+  "generatedAt": "2026-07-15T18:40:47Z",
   "scoreboard": {
-    "playedMatches": 100,
+    "playedMatches": 101,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 28,
+    "playedKnockoutMatches": 29,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-07-14",
+    "nextScheduledMatchDay": "2026-07-15",
     "currentStats": {
-      "updatedTo": "2026-07-11",
-      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-11",
-      "matchesPlayed": 100,
-      "goalsScored": 292,
-      "goalsPerMatch": 2.92,
+      "updatedTo": "2026-07-14",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-14",
+      "matchesPlayed": 101,
+      "goalsScored": 294,
+      "goalsPerMatch": 2.91,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -34,40 +34,28 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-07-12T14:39:16Z"
+      "lastUpdated": "2026-07-15T18:40:45Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-12T14:39:16Z",
-      "updatedThrough": "2026-07-11",
+      "generatedAt": "2026-07-15T18:40:45Z",
+      "updatedThrough": "2026-07-14",
       "scoreboard": {
-        "fetchedFinals": 2,
-        "appliedChanges": 2,
+        "fetchedFinals": 1,
+        "appliedChanges": 1,
         "kickoffUpdates": 0,
         "teamSlotUpdates": 0,
         "changes": [
           {
-            "match": 99,
+            "match": 101,
             "teams": [
-              "Norway",
-              "England"
+              "France",
+              "Spain"
             ],
             "score": [
-              1,
+              0,
               2
             ],
-            "event": "760512"
-          },
-          {
-            "match": 100,
-            "teams": [
-              "Argentina",
-              "Switzerland"
-            ],
-            "score": [
-              3,
-              1
-            ],
-            "event": "760513"
+            "event": "760514"
           }
         ],
         "scheduleChanges": [],
@@ -77,49 +65,49 @@
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 4,
+    "totalUnplayedMatches": 3,
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 75,
-    "settledPredictions": 69,
+    "frozenPredictions": 76,
+    "settledPredictions": 73,
     "calibrationStatus": "active",
-    "resolvedPredictions": 69,
+    "resolvedPredictions": 73,
     "minimumResolvedPredictions": 30
   },
   "backtestAudit": {
     "sampleStatus": "sufficient_for_calibration_review",
-    "resolvedPredictions": 69,
+    "resolvedPredictions": 73,
     "rawModel": {
-      "brier_score": 0.313791192318,
-      "log_loss": 0.578749198969,
-      "count": 69
+      "brier_score": 0.328569439791,
+      "log_loss": 0.600527089241,
+      "count": 73
     }
   },
   "comparativeResults": {
     "settledOnly": true,
     "denominators": {
-      "frozen": 75,
-      "settled_eligible_forecasts": 69,
-      "settled_matches": 31,
-      "excluded_duplicate_snapshots": 38,
-      "unresolved": 6,
+      "frozen": 76,
+      "settled_eligible_forecasts": 73,
+      "settled_matches": 32,
+      "excluded_duplicate_snapshots": 41,
+      "unresolved": 3,
       "rejected": 0
     },
     "outcomeAccuracy": {
-      "correct": 23,
-      "count": 31,
-      "rate": 0.741935
+      "correct": 24,
+      "count": 32,
+      "rate": 0.75
     }
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 100,
+      "playedMatches": 101,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 28,
+      "playedKnockoutMatches": 29,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -136,7 +124,7 @@
     "weather": {
       "status": "missing",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 4,
+      "totalUnplayedMatches": 3,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -196,7 +184,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-12T14:39:18Z"
+    "updatedAt": "2026-07-15T18:40:47Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

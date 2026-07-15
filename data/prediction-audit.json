@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-12T15:14:43Z",
+  "generated_at_utc": "2026-07-15T18:40:47Z",
   "source_note": "Frozen pre-match simulator predictions. Scored only after results are embedded; no external market data is used.",
   "predictions": [
     {
@@ -6520,15 +6520,15 @@
         "draw": 0,
         "away": 0.5217633473
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 0,
+      "actual_away_score": 2,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-15T18:40:47Z",
+      "brier_score": 0.58482586481,
+      "log_loss": 0.978049887296,
+      "scoreline_error": 1.846428,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-14T19:00:00Z",
       "venue": "AT&T Stadium",
       "group": null,
@@ -6615,15 +6615,15 @@
         "draw": 0,
         "away": 0.5226733596
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 0,
+      "actual_away_score": 2,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-15T18:40:47Z",
+      "brier_score": 0.583050323315,
+      "log_loss": 0.975577632807,
+      "scoreline_error": 1.843918,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-14T19:00:00Z",
       "venue": "AT&T Stadium",
       "group": null,
@@ -6710,15 +6710,15 @@
         "draw": 0,
         "away": 0.5226733596
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 0,
+      "actual_away_score": 2,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-15T18:40:47Z",
+      "brier_score": 0.583050323315,
+      "log_loss": 0.975577632807,
+      "scoreline_error": 1.843918,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-14T19:00:00Z",
       "venue": "AT&T Stadium",
       "group": null,
@@ -6900,15 +6900,15 @@
         "draw": 0,
         "away": 0.5226733596
       },
-      "actual_home_score": null,
-      "actual_away_score": null,
-      "actual_result": null,
-      "settled_at_utc": null,
-      "brier_score": null,
-      "log_loss": null,
-      "scoreline_error": null,
-      "calibration_bucket": null,
-      "failure_type": null,
+      "actual_home_score": 0,
+      "actual_away_score": 2,
+      "actual_result": "away_win",
+      "settled_at_utc": "2026-07-15T18:40:47Z",
+      "brier_score": 0.583050323315,
+      "log_loss": 0.975577632807,
+      "scoreline_error": 1.843918,
+      "calibration_bucket": "0.3-0.4",
+      "failure_type": "pure_variance",
       "kickoff_utc": "2026-07-14T19:00:00Z",
       "venue": "AT&T Stadium",
       "group": null,
@@ -6935,6 +6935,101 @@
       "model_version": "embedded-simulator-v1",
       "data_version": "2026-07-12-accuracy-enriched",
       "source_snapshot_hash": "3a9913acfff33206da78820bd17fe286eadabcc1a58925867109916adbdd9490",
+      "predicted_wdl_probs": {
+        "home_win": 0.2441956114,
+        "draw": 0.2778068031,
+        "away_win": 0.4779975855
+      },
+      "predicted_scoreline_distribution": [
+        {
+          "score": "1-1",
+          "probability": 0.13233836
+        },
+        {
+          "score": "0-1",
+          "probability": 0.11084932
+        },
+        {
+          "score": "1-2",
+          "probability": 0.09275739
+        },
+        {
+          "score": "0-2",
+          "probability": 0.09133172
+        },
+        {
+          "score": "0-0",
+          "probability": 0.08949556
+        },
+        {
+          "score": "1-0",
+          "probability": 0.07113386
+        },
+        {
+          "score": "2-1",
+          "probability": 0.06222414
+        },
+        {
+          "score": "2-2",
+          "probability": 0.04710265
+        },
+        {
+          "score": "1-3",
+          "probability": 0.04681055
+        },
+        {
+          "score": "0-3",
+          "probability": 0.04609108
+        },
+        {
+          "score": "2-0",
+          "probability": 0.04110006
+        },
+        {
+          "score": "2-3",
+          "probability": 0.02377063
+        }
+      ],
+      "predicted_advancement_probs": {
+        "home": 0.3830990129,
+        "draw": 0,
+        "away": 0.6169009871
+      },
+      "actual_home_score": null,
+      "actual_away_score": null,
+      "actual_result": null,
+      "settled_at_utc": null,
+      "brier_score": null,
+      "log_loss": null,
+      "scoreline_error": null,
+      "calibration_bucket": null,
+      "failure_type": null,
+      "kickoff_utc": "2026-07-15T19:00:00Z",
+      "venue": "Mercedes-Benz Stadium",
+      "group": null,
+      "feature_flags": {
+        "weather_adjustment_abs": 0,
+        "recent_form_adjustment_abs": 0,
+        "host_adjustment_abs": 0,
+        "attack_defense_weight": 0.14,
+        "lineups_missing": false,
+        "suspensions_missing": false,
+        "lineups_source_limited": true,
+        "suspensions_source_limited": true,
+        "injuries_source_limited": true,
+        "referees_source_limited": true
+      }
+    },
+    {
+      "prediction_id": "b607a7b616cd616497f25e8d",
+      "created_at_utc": "2026-07-14T21:28:53Z",
+      "match_id": 102,
+      "stage": "SF",
+      "home_team": "England",
+      "away_team": "Argentina",
+      "model_version": "embedded-simulator-v1",
+      "data_version": "2026-07-14-auto-daily",
+      "source_snapshot_hash": "89b78938312e4ca094390d0421de6d9eac5f4b432a00f4dfb6c776a89de7cc5d",
       "predicted_wdl_probs": {
         "home_win": 0.2441956114,
         "draw": 0.2778068031,

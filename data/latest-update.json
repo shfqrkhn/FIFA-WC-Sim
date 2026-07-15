@@ -1,35 +1,23 @@
 {
-  "generatedAt": "2026-07-12T14:39:16Z",
-  "updatedThrough": "2026-07-11",
+  "generatedAt": "2026-07-15T18:40:45Z",
+  "updatedThrough": "2026-07-14",
   "scoreboard": {
-    "fetchedFinals": 2,
-    "appliedChanges": 2,
+    "fetchedFinals": 1,
+    "appliedChanges": 1,
     "kickoffUpdates": 0,
     "teamSlotUpdates": 0,
     "changes": [
       {
-        "match": 99,
+        "match": 101,
         "teams": [
-          "Norway",
-          "England"
+          "France",
+          "Spain"
         ],
         "score": [
-          1,
+          0,
           2
         ],
-        "event": "760512"
-      },
-      {
-        "match": 100,
-        "teams": [
-          "Argentina",
-          "Switzerland"
-        ],
-        "score": [
-          3,
-          1
-        ],
-        "event": "760513"
+        "event": "760514"
       }
     ],
     "scheduleChanges": [],

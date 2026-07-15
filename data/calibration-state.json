@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-12T15:17:26Z",
+  "generated_at_utc": "2026-07-15T18:40:47Z",
   "calibration_status": "active",
   "active": true,
-  "resolved_predictions": 69,
+  "resolved_predictions": 73,
   "min_resolved_predictions": 30,
   "use_calibrated_probabilities": true,
   "method": "conservative_bucket_calibration",
@@ -67,10 +67,10 @@
     {
       "bucket": "0.5-0.6",
       "outcome": "home_win",
-      "count": 2,
-      "raw_confidence": 0.541727,
+      "count": 3,
+      "raw_confidence": 0.538937,
       "observed_frequency": 1,
-      "calibrated_confidence": 0.633382
+      "calibrated_confidence": 0.664681
     },
     {
       "bucket": "0.8-0.9",
@@ -91,37 +91,37 @@
     {
       "bucket": "0.4-0.5",
       "outcome": "home_win",
-      "count": 4,
+      "count": 6,
       "raw_confidence": 0.490548,
       "observed_frequency": 1,
-      "calibrated_confidence": 0.660366
+      "calibrated_confidence": 0.708885
     }
   ],
   "raw_validation_metrics": {
-    "brier_score": 0.149521447189,
-    "log_loss": 0.342606105552,
-    "count": 21
+    "brier_score": 0.198417910309,
+    "log_loss": 0.411203800492,
+    "count": 22
   },
   "validation_metrics": {
-    "brier_score": 0.09373483082,
-    "log_loss": 0.265991390163,
-    "count": 21
+    "brier_score": 0.126922825367,
+    "log_loss": 0.312896779781,
+    "count": 22
   },
   "benchmark_metrics": {
     "raw_model": {
-      "brier_score": 0.313791192318,
-      "log_loss": 0.578749198969,
-      "count": 69
+      "brier_score": 0.328569439791,
+      "log_loss": 0.600527089241,
+      "count": 73
     },
     "uniform_wdl": {
       "brier_score": 0.666666666667,
       "log_loss": 1.098612288668,
-      "count": 69
+      "count": 73
     },
     "rank_prior": {
-      "brier_score": 0.433850671625,
-      "log_loss": 0.772486278327,
-      "count": 69
+      "brier_score": 0.441916984771,
+      "log_loss": 0.783136906825,
+      "count": 73
     }
   },
   "last_update_decision": "promoted_validated_bucket_calibration",
