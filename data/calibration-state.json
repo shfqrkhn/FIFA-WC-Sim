@@ -1,131 +1,42 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-18T23:44:27Z",
-  "calibration_status": "active",
-  "active": true,
-  "resolved_predictions": 78,
+  "generated_at_utc": "2026-07-19T22:14:53Z",
+  "calibration_status": "validation_worsened_rollback",
+  "active": false,
+  "resolved_predictions": 82,
   "min_resolved_predictions": 30,
-  "use_calibrated_probabilities": true,
+  "use_calibrated_probabilities": false,
   "method": "conservative_bucket_calibration",
-  "bucket_adjustments": [
-    {
-      "bucket": "0.9-1.0",
-      "outcome": "away_win",
-      "count": 3,
-      "raw_confidence": 0.986126,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.98991
-    },
-    {
-      "bucket": "0.9-1.0",
-      "outcome": "home_win",
-      "count": 12,
-      "raw_confidence": 0.948598,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.979439
-    },
-    {
-      "bucket": "0.4-0.5",
-      "outcome": "away_win",
-      "count": 12,
-      "raw_confidence": 0.449821,
-      "observed_frequency": 0.333333,
-      "calibrated_confidence": 0.379928
-    },
-    {
-      "bucket": "0.6-0.7",
-      "outcome": "home_win",
-      "count": 2,
-      "raw_confidence": 0.642347,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.713878
-    },
-    {
-      "bucket": "0.3-0.4",
-      "outcome": "away_win",
-      "count": 6,
-      "raw_confidence": 0.373937,
-      "observed_frequency": 0.666667,
-      "calibrated_confidence": 0.499393
-    },
-    {
-      "bucket": "0.3-0.4",
-      "outcome": "home_win",
-      "count": 3,
-      "raw_confidence": 0.371606,
-      "observed_frequency": 0,
-      "calibrated_confidence": 0.270259
-    },
-    {
-      "bucket": "0.7-0.8",
-      "outcome": "home_win",
-      "count": 1,
-      "raw_confidence": 0.76816,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.79392
-    },
-    {
-      "bucket": "0.5-0.6",
-      "outcome": "home_win",
-      "count": 6,
-      "raw_confidence": 0.52777,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.730154
-    },
-    {
-      "bucket": "0.8-0.9",
-      "outcome": "home_win",
-      "count": 2,
-      "raw_confidence": 0.866534,
-      "observed_frequency": 0.5,
-      "calibrated_confidence": 0.793227
-    },
-    {
-      "bucket": "0.7-0.8",
-      "outcome": "away_win",
-      "count": 1,
-      "raw_confidence": 0.747799,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.775821
-    },
-    {
-      "bucket": "0.4-0.5",
-      "outcome": "home_win",
-      "count": 6,
-      "raw_confidence": 0.490548,
-      "observed_frequency": 1,
-      "calibrated_confidence": 0.708885
-    }
-  ],
+  "bucket_adjustments": [],
   "raw_validation_metrics": {
-    "brier_score": 0.249963557663,
-    "log_loss": 0.485539826584,
-    "count": 24
+    "brier_score": 0.336868249974,
+    "log_loss": 0.612656004659,
+    "count": 25
   },
   "validation_metrics": {
-    "brier_score": 0.241160131357,
-    "log_loss": 0.472840816077,
-    "count": 24
+    "brier_score": 0.361283069888,
+    "log_loss": 0.64473944093,
+    "count": 25
   },
   "benchmark_metrics": {
     "raw_model": {
-      "brier_score": 0.341990983429,
-      "log_loss": 0.620851191144,
-      "count": 78
+      "brier_score": 0.359888277698,
+      "log_loss": 0.646887480525,
+      "count": 82
     },
     "uniform_wdl": {
       "brier_score": 0.666666666667,
       "log_loss": 1.098612288668,
-      "count": 78
+      "count": 82
     },
     "rank_prior": {
-      "brier_score": 0.450379072551,
-      "log_loss": 0.794320349473,
-      "count": 78
+      "brier_score": 0.4587586996,
+      "log_loss": 0.80544695701,
+      "count": 82
     }
   },
-  "last_update_decision": "promoted_validated_bucket_calibration",
-  "rollback_count": 0,
+  "last_update_decision": "raw_model_only_previous_validation_worsened",
+  "rollback_count": 1,
   "notes": [
     "Calibration is disabled until enough frozen predictions have resolved.",
     "Base model output and calibrated output remain separate.",

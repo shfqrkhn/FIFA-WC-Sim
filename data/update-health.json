@@ -1,20 +1,20 @@
 {
-  "generatedAt": "2026-07-19T12:29:55Z",
+  "generatedAt": "2026-07-19T22:14:55Z",
   "scoreboard": {
-    "playedMatches": 103,
+    "playedMatches": 104,
     "totalMatches": 104,
     "playedGroupMatches": 72,
     "totalGroupMatches": 72,
-    "playedKnockoutMatches": 31,
+    "playedKnockoutMatches": 32,
     "totalKnockoutMatches": 32,
     "overdueUnplayedMatches": 0,
-    "nextScheduledMatchDay": "2026-07-19",
+    "nextScheduledMatchDay": null,
     "currentStats": {
-      "updatedTo": "2026-07-18",
-      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-18",
-      "matchesPlayed": 103,
-      "goalsScored": 307,
-      "goalsPerMatch": 2.98,
+      "updatedTo": "2026-07-19",
+      "source": "ESPN public scoreboard for completed World Cup matches through 2026-07-19",
+      "matchesPlayed": 104,
+      "goalsScored": 308,
+      "goalsPerMatch": 2.96,
       "attendance": null,
       "attendancePerMatch": null,
       "topScorers": [],
@@ -34,11 +34,11 @@
       "scoreSource": "ESPN scoreboard fifa.world; generated 2026-06-28T12:57:11Z.",
       "attendanceSource": "Not refreshed by automated scoreboard updater after score totals advanced.",
       "topScorersSource": "Not refreshed by automated scoreboard updater; no reliable player scorer feed is configured for automation. Official scorer snapshots remain unfilled unless manually patched.",
-      "lastUpdated": "2026-07-18T23:44:28Z"
+      "lastUpdated": "2026-07-19T22:14:54Z"
     },
     "latestUpdate": {
-      "generatedAt": "2026-07-18T23:44:28Z",
-      "updatedThrough": "2026-07-18",
+      "generatedAt": "2026-07-19T22:14:54Z",
+      "updatedThrough": "2026-07-19",
       "scoreboard": {
         "fetchedFinals": 1,
         "appliedChanges": 1,
@@ -46,16 +46,16 @@
         "teamSlotUpdates": 0,
         "changes": [
           {
-            "match": 103,
+            "match": 104,
             "teams": [
-              "France",
-              "England"
+              "Spain",
+              "Argentina"
             ],
             "score": [
-              4,
-              6
+              1,
+              0
             ],
-            "event": "760516"
+            "event": "760517"
           }
         ],
         "scheduleChanges": [],
@@ -65,54 +65,54 @@
   },
   "weather": {
     "coveredUnplayedMatches": 0,
-    "totalUnplayedMatches": 1,
+    "totalUnplayedMatches": 0,
     "failedMatches": []
   },
   "predictionAudit": {
     "frozenPredictions": 82,
-    "settledPredictions": 78,
-    "calibrationStatus": "active",
-    "resolvedPredictions": 78,
+    "settledPredictions": 82,
+    "calibrationStatus": "validation_worsened_rollback",
+    "resolvedPredictions": 82,
     "minimumResolvedPredictions": 30
   },
   "backtestAudit": {
     "sampleStatus": "sufficient_for_calibration_review",
-    "resolvedPredictions": 78,
+    "resolvedPredictions": 82,
     "rawModel": {
-      "brier_score": 0.341990983429,
-      "log_loss": 0.620851191144,
-      "count": 78
+      "brier_score": 0.359888277698,
+      "log_loss": 0.646887480525,
+      "count": 82
     }
   },
   "comparativeResults": {
     "settledOnly": true,
     "denominators": {
       "frozen": 82,
-      "settled_eligible_forecasts": 78,
-      "settled_matches": 34,
-      "excluded_duplicate_snapshots": 44,
-      "unresolved": 4,
+      "settled_eligible_forecasts": 82,
+      "settled_matches": 35,
+      "excluded_duplicate_snapshots": 47,
+      "unresolved": 0,
       "rejected": 0
     },
     "outcomeAccuracy": {
       "correct": 25,
-      "count": 34,
-      "rate": 0.735294
+      "count": 35,
+      "rate": 0.714286
     },
     "advancementAccuracy": {
       "correct": 23,
-      "count": 28,
-      "rate": 0.821429
+      "count": 29,
+      "rate": 0.793103
     }
   },
   "dataQuality": {
     "scores": {
       "status": "current",
-      "playedMatches": 103,
+      "playedMatches": 104,
       "totalMatches": 104,
       "playedGroupMatches": 72,
       "totalGroupMatches": 72,
-      "playedKnockoutMatches": 31,
+      "playedKnockoutMatches": 32,
       "totalKnockoutMatches": 32,
       "source": "scoreboard updater"
     },
@@ -127,9 +127,9 @@
       "source": "embedded schedule plus ESPN scoreboard event timestamps; automated pass cross-matches scoreboard events by teams or date/venue and fills missing kickoffUtc timestamps without overwriting existing venue fields"
     },
     "weather": {
-      "status": "missing",
+      "status": "current",
       "coveredUnplayedMatches": 0,
-      "totalUnplayedMatches": 1,
+      "totalUnplayedMatches": 0,
       "source": "open-meteo"
     },
     "restTravel": {
@@ -189,7 +189,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-18T23:44:29Z"
+    "updatedAt": "2026-07-19T22:14:55Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }
