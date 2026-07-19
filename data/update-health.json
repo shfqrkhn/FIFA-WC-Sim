@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-18T23:44:29Z",
+  "generatedAt": "2026-07-19T12:29:55Z",
   "scoreboard": {
     "playedMatches": 103,
     "totalMatches": 104,
@@ -69,7 +69,7 @@
     "failedMatches": []
   },
   "predictionAudit": {
-    "frozenPredictions": 81,
+    "frozenPredictions": 82,
     "settledPredictions": 78,
     "calibrationStatus": "active",
     "resolvedPredictions": 78,
@@ -87,11 +87,11 @@
   "comparativeResults": {
     "settledOnly": true,
     "denominators": {
-      "frozen": 81,
+      "frozen": 82,
       "settled_eligible_forecasts": 78,
       "settled_matches": 34,
       "excluded_duplicate_snapshots": 44,
-      "unresolved": 3,
+      "unresolved": 4,
       "rejected": 0
     },
     "outcomeAccuracy": {
