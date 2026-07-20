@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-20T11:43:54Z",
+  "generated_at_utc": "2026-07-20T11:54:51Z",
   "calibration_status": "validation_worsened_rollback",
   "active": false,
   "resolved_predictions": 82,
@@ -38,7 +38,7 @@
   "last_update_decision": "raw_model_only_validation_worsened",
   "rollback_count": 2,
   "notes": [
-    "Calibration is disabled until enough frozen predictions have resolved.",
+    "Calibration remains inactive because chronological held-out validation worsened Brier score and log loss.",
     "Base model output and calibrated output remain separate.",
     "Unavailable lineups, injuries, suspensions, referees, and incomplete discipline ledgers remain neutral unless patched from reliable sources."
   ]

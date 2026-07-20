@@ -37,6 +37,7 @@ const teamMap = new Map([['Alpha', { rank: 10 }], ['Beta', { rank: 40 }]]);
 const smallLedger = { predictions: Array.from({ length: 12 }, (_, i) => settled(i + 1, 1, { home_win: 0.8, draw: 0.1, away_win: 0.1 }, 'home_win')) };
 const smallState = updateCalibrationState(smallLedger, emptyCalibrationState(), { asOfUtc: '2026-07-01T00:00:00Z', teamMap });
 assert.equal(smallState.calibration_status, 'insufficient_sample');
+assert.match(smallState.notes[0], /until enough frozen predictions/);
 assert.equal(smallState.benchmark_metrics.raw_model.count, 12);
 assert.equal(smallState.benchmark_metrics.uniform_wdl.count, 12);
 assert.equal(smallState.benchmark_metrics.rank_prior.count, 12);
@@ -65,6 +66,7 @@ for (let i = 1; i <= 40; i++) {
 }
 const activeState = updateCalibrationState({ predictions: train }, emptyCalibrationState(), { asOfUtc: '2026-07-01T00:00:00Z', teamMap });
 assert.equal(activeState.calibration_status, 'active');
+assert.match(activeState.notes[0], /chronological held-out validation did not worsen/);
 assert.equal(activeState.resolved_predictions, 40);
 assert.equal(activeState.benchmark_metrics.raw_model.count, 40);
 assert.ok(activeState.validation_metrics.brier_score <= activeState.raw_validation_metrics.brier_score + 1e-12);
@@ -95,5 +97,6 @@ const staleRolledBack = updateCalibrationState(badLedger, staleBadState, { asOfU
 assert.equal(staleRolledBack.calibration_status, 'validation_worsened_rollback');
 assert.equal(staleRolledBack.active, false);
 assert.equal(staleRolledBack.last_update_decision, 'raw_model_only_previous_validation_worsened');
+assert.match(staleRolledBack.notes[0], /remains inactive.*validation worsened/);
 
 console.log('calibration tests passed');
