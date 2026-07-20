@@ -127,6 +127,19 @@ export function emptyCalibrationState(generatedAtUtc = utcNow()) {
   };
 }
 
+function calibrationNotes(status) {
+  const decision = status === 'active'
+    ? 'Calibration is active only because chronological held-out validation did not worsen Brier score or log loss.'
+    : status === 'validation_worsened_rollback'
+      ? 'Calibration remains inactive because chronological held-out validation worsened Brier score and log loss.'
+      : 'Calibration is disabled until enough frozen predictions have resolved.';
+  return [
+    decision,
+    'Base model output and calibrated output remain separate.',
+    'Unavailable lineups, injuries, suspensions, referees, and incomplete discipline ledgers remain neutral unless patched from reliable sources.'
+  ];
+}
+
 export function matchDateValue(match) {
   return match && (match.kickoffUtc || match.kickoff || match.kickoffLocal || match.date || match.utc || match.time);
 }
@@ -614,7 +627,8 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
     use_calibrated_probabilities: true,
     bucket_adjustments: buildBucketAdjustments(train),
     benchmark_metrics: benchmarks,
-    last_update_decision: 'candidate'
+    last_update_decision: 'candidate',
+    notes: calibrationNotes('active')
   };
   const rawMetrics = averageMetrics(validate);
   const candidateMetrics = averageMetrics(validate, candidate);
@@ -640,7 +654,8 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
       raw_validation_metrics: rawMetrics,
       validation_metrics: candidate.validation_metrics,
       benchmark_metrics: benchmarks,
-      last_update_decision: previousState.last_update_decision
+      last_update_decision: previousState.last_update_decision,
+      notes: calibrationNotes('validation_worsened_rollback')
     };
   }
 
@@ -658,7 +673,10 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
       stableJson(prev.benchmark_metrics || null) === stableJson(benchmarks);
   };
   if (improvesOrTies && isSameActiveContext()) {
-    return previousState;
+    const notes = calibrationNotes('active');
+    return stableJson(previousState.notes || []) === stableJson(notes)
+      ? previousState
+      : { ...previousState, notes };
   }
   if (improvesOrTies) {
     return { ...candidate, last_update_decision: 'promoted_validated_bucket_calibration' };
@@ -677,7 +695,8 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
         validation_metrics: previousMetrics,
         benchmark_metrics: benchmarks,
         last_update_decision: 'raw_model_only_previous_validation_worsened',
-        rollback_count: Number(previousState.rollback_count || 0) + 1
+        rollback_count: Number(previousState.rollback_count || 0) + 1,
+        notes: calibrationNotes('validation_worsened_rollback')
       };
     }
     return {
@@ -688,7 +707,8 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
       validation_metrics: previousMetrics,
       benchmark_metrics: benchmarks,
       last_update_decision: 'kept_previous_validated_bucket_calibration',
-      rollback_count: Number(previousState.rollback_count || 0) + 1
+      rollback_count: Number(previousState.rollback_count || 0) + 1,
+      notes: calibrationNotes('active')
     };
   }
 
@@ -700,7 +720,8 @@ export function updateCalibrationState(ledger, previousState = emptyCalibrationS
     validation_metrics: candidateMetrics,
     benchmark_metrics: benchmarks,
     last_update_decision: 'raw_model_only_validation_worsened',
-    rollback_count: Number(previousState?.rollback_count || 0) + 1
+    rollback_count: Number(previousState?.rollback_count || 0) + 1,
+    notes: calibrationNotes('validation_worsened_rollback')
   };
 }
 
