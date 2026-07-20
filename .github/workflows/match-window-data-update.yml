@@ -2,13 +2,7 @@ name: Match-window BASE_DATA update
 
 on:
   workflow_dispatch:
-  schedule:
-    # North American World Cup match windows can span Montreal morning through late night.
-    # GitHub cron is UTC only; local America/Montreal time shifts with DST.
-    # The script no-ops unless a match is near a pre-kickoff/post-match slot or inside the delayed-result recovery window.
-    - cron: '*/30 11-23 * 6,7 *'
-    - cron: '*/30 8-10 * 6,7 *'
-    - cron: '*/30 0-7 * 6,7 *'
+  # Scheduled tournament updates retired after 104/104.
 
 permissions:
   actions: write
@@ -25,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
       - name: Reconcile immutable audit records from automation branches

@@ -76,12 +76,23 @@ played = [m for m in all_match_rows if m.get('played') and isinstance(m.get('sco
 played_group = [m for m in matches if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
 played_knockout = [m for m in knockout if m.get('played') and isinstance(m.get('scoreA'), int) and isinstance(m.get('scoreB'), int)]
 unplayed = [m for m in all_match_rows if not m.get('played')]
+tournament_complete = len(all_match_rows) == 104 and len(played) == 104 and not unplayed
 weather = data.get('weatherByMatch') if isinstance(data.get('weatherByMatch'), dict) else {}
 rest = data.get('restTravel') if isinstance(data.get('restTravel'), dict) else {}
 model_inputs = data.get('modelInputs') if isinstance(data.get('modelInputs'), dict) else {}
 kickoff_rows = [m for m in all_match_rows if has_full_kickoff(m)]
 kickoff_group = [m for m in matches if has_full_kickoff(m)]
 kickoff_knockout = [m for m in knockout if has_full_kickoff(m)]
+automation_schedule = (
+    'Tournament cron schedules were retired after 104/104 source-backed finals. Daily and match-window workflows remain available through workflow_dispatch for reproducible source-backed corrections; workflow-run recovery and the local WC_DATA_RESCUE path remain guarded and manual.'
+    if tournament_complete else
+    'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'
+)
+match_window_source = (
+    'scripts/match-window-update.mjs retained for workflow_dispatch reproduction and source-backed corrections; its former tournament cron schedule is retired'
+    if tournament_complete else
+    'scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, pre/post kickoff slots, and bounded stale-result recovery'
+)
 quality_core = {
     'scores': {'status': status(bool(played)), 'playedMatches': len(played), 'totalMatches': len(all_match_rows), 'playedGroupMatches': len(played_group), 'totalGroupMatches': len(matches), 'playedKnockoutMatches': len(played_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'scoreboard updater'},
     'fixtures': {'status': status(len(kickoff_rows) == len(all_match_rows), bool(kickoff_rows)), 'coveredMatches': len(kickoff_rows), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len(kickoff_group), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len(kickoff_knockout), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule plus ESPN scoreboard event timestamps; automated pass cross-matches scoreboard events by teams or date/venue and fills missing kickoffUtc timestamps without overwriting existing venue fields'},
@@ -89,8 +100,8 @@ quality_core = {
     'restTravel': {'status': status(len(rest) >= len(all_match_rows), bool(rest)), 'coveredMatches': len(rest), 'totalMatches': len(all_match_rows), 'coveredGroupMatches': len([m for m in matches if str(m.get('no')) in rest]), 'totalGroupMatches': len(matches), 'coveredKnockoutMatches': len([m for m in knockout if str(m.get('no')) in rest]), 'totalKnockoutMatches': len(knockout), 'source': 'embedded schedule and venue coordinates'},
     'modelInputs': {'status': status(bool(model_inputs)), 'features': model_inputs.get('features', []) if model_inputs else []},
     'awardProjections': {'status': 'partial', 'source': 'simulator-side projections from embedded team/star assumptions and Monte Carlo progression; official player award feeds are not configured'},
-    'automation': {'status': 'current', 'schedule': 'GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs.'},
-    'matchWindowAutomation': {'status': 'current', 'source': 'scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, pre/post kickoff slots, and bounded stale-result recovery'},
+    'automation': {'status': 'current', 'schedule': automation_schedule},
+    'matchWindowAutomation': {'status': 'current', 'source': match_window_source},
     'lineups': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official lineup adapter configured; source-backed availability fields are applied only when verified data is patched'},
     'injuries': {'status': 'missing', 'reason': 'no reliable automated source configured'},
     'suspensions': {'status': 'neutral_unless_verified', 'reason': 'no reliable automated official discipline adapter configured; confirmed suspensions can be applied from source-backed availability fields'},
@@ -98,7 +109,11 @@ quality_core = {
     'referees': {'status': 'missing', 'reason': 'no reliable automated source configured; referee effects remain neutral to avoid overfitting'},
     'principle': 'Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.'
 }
-source_note = 'Automated BASE_DATA update with score, form, rank-seeded Elo-style prior, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'
+source_note = (
+    'Final 104-match source-backed tournament snapshot with immutable prediction audit, comparative scoring, raw-only calibration rollback, and manual-only guarded update paths.'
+    if tournament_complete else
+    'Automated BASE_DATA update with score, form, rank-seeded Elo-style prior, rest/travel, weather, and data-quality enrichment. Companion UI shell is not rewritten.'
+)
 quality_changed = stable(data.get('dataQuality')) != quality_core
 source_note_changed = data.get('sourceNote') != source_note
 sources_before = json.dumps(data.get('sources'), sort_keys=True)
@@ -115,10 +130,10 @@ upsert_source(data, {
 upsert_source(data, {
     'name': 'GitHub Actions match-window updater',
     'url': '.github/workflows/match-window-data-update.yml',
-    'use': 'Pre-kickoff freeze/refresh and post-match score/calibration checks near scheduled match windows',
+    'use': 'Manual reproduction of the guarded pre-kickoff and post-match update path after tournament completion' if tournament_complete else 'Pre-kickoff freeze/refresh and post-match score/calibration checks near scheduled match windows',
     'tier': 'internal automation',
     'confidence': 'high',
-    'maintenanceNote': 'Runs every 30 minutes during June/July UTC days; scripts/match-window-update.mjs no-ops outside slots/recovery windows, refuses full active-match updates, retries stale unplayed results for a bounded window, and can freeze later pre-kickoff predictions during overlap.'
+    'maintenanceNote': 'Cron schedule retired after 104/104; workflow_dispatch and workflow-run recovery remain for reproducible source-backed corrections.' if tournament_complete else 'Runs every 30 minutes during June/July UTC days; scripts/match-window-update.mjs no-ops outside slots/recovery windows, refuses full active-match updates, retries stale unplayed results for a bounded window, and can freeze later pre-kickoff predictions during overlap.'
 })
 upsert_source(data, {
     'name': 'Source-backed availability hooks',
@@ -131,24 +146,35 @@ upsert_source(data, {
 upsert_source(data, {
     'name': 'GitHub Actions daily updater',
     'url': '.github/workflows/daily-base-data-update.yml',
-    'use': 'Scheduled and manual BASE_DATA update automation',
+    'use': 'Manual BASE_DATA reproduction and source-backed correction workflow' if tournament_complete else 'Scheduled and manual BASE_DATA update automation',
     'tier': 'internal automation',
     'confidence': 'high',
-    'maintenanceNote': 'Runs morning plus safety pass in UTC; commits only after validation and only when tracked artifacts change.'
+    'maintenanceNote': 'Cron schedule retired after 104/104; workflow_dispatch remains and publishes only validated tracked changes.' if tournament_complete else 'Runs morning plus safety pass in UTC; commits only after validation and only when tracked artifacts change.'
 })
 upsert_source(data, {
     'name': 'Local rescue update trigger',
     'url': 'scripts/manual-update-trigger.mjs',
-    'use': 'Operator-triggered fallback when scheduled and manual GitHub Actions updates are unavailable',
+    'use': 'Operator-triggered fallback when GitHub Actions is unavailable',
     'tier': 'internal automation',
     'confidence': 'high',
     'maintenanceNote': 'Requires exact trigger WC_DATA_RESCUE, refuses dirty candidate artifacts, restores candidate files on validation failure, and commits only when explicitly requested.'
 })
 maintenance = data.get('maintenance') if isinstance(data.get('maintenance'), dict) else {}
-maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
-    'risk': 'Scheduled data updates can be delayed, skipped, or blocked by source/network failures.',
-    'mitigation': 'Workflow has a morning run, a later safety run, manual workflow_dispatch, rollback-capable updater script, local WC_DATA_RESCUE trigger, and commit-after-validation guard.'
-}, 'risk')
+if tournament_complete:
+    retired_risks = {
+        'Scheduled data updates can be delayed, skipped, or blocked by source/network failures.',
+        'Active in-progress matches must not mutate predictions from partial scores or weather/context refreshes.'
+    }
+    maintenance['knownRisks'] = [row for row in maintenance.get('knownRisks', []) if not (isinstance(row, dict) and row.get('risk') in retired_risks)]
+    maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
+        'risk': 'Post-tournament source corrections are intentionally manual and may not appear until an operator runs the guarded workflow.',
+        'mitigation': 'workflow_dispatch, workflow-run publication recovery, WC_DATA_RESCUE, immutable audit reconciliation, validation, and exact-commit Pages deployment remain available.'
+    }, 'risk')
+else:
+    maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
+        'risk': 'Scheduled data updates can be delayed, skipped, or blocked by source/network failures.',
+        'mitigation': 'Workflow has a morning run, a later safety run, manual workflow_dispatch, rollback-capable updater script, local WC_DATA_RESCUE trigger, and commit-after-validation guard.'
+    }, 'risk')
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'risk': 'Automated score updates use ESPN scoreboard data, while official FIFA remains the preferred manual authority.',
     'mitigation': 'Source ledger labels ESPN as the machine-readable automation feed; official FIFA fixtures/reports should be checked for disputed results, cards, lineups, injuries, and regulations.'
@@ -158,25 +184,32 @@ maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'mitigation': 'Stats displays separate actual top-scorer snapshots from model-side award projections; player-age, goalkeeper, and discipline gaps are marked neutral instead of invented.'
 }, 'risk')
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
-    'risk': 'Active in-progress matches must not mutate predictions from partial scores or weather/context refreshes.',
-    'mitigation': 'Match-window automation refuses full updates during the active-match lock, permits only freeze-only later-match records during overlap, and the scoreboard applicator only accepts completed/final events.'
+    'risk': 'Any manual replay of an active-match window must not mutate predictions from partial scores or weather/context refreshes.',
+    'mitigation': 'The retained match-window path refuses full updates during the active-match lock, permits only freeze-only later-match records during overlap, and the scoreboard applicator only accepts completed/final events.'
 }, 'risk')
 maintenance['knownRisks'] = append_unique(maintenance.get('knownRisks'), {
     'risk': 'Confirmed lineup, goalkeeper, suspension, and injury inputs are high-value but source availability is inconsistent.',
     'mitigation': 'Availability hooks are neutral unless verified source metadata is present; expected lineup rumors and referee bias assumptions are not automated.'
 }, 'risk')
-maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If the morning scheduled run fails or GitHub delays it, trigger Daily BASE_DATA update manually from Actions or run node scripts/update-base-data.mjs locally, then validate before committing.')
-maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If GitHub Actions itself is unavailable, provide trigger WC_DATA_RESCUE and run node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE locally; add --commit or --push only after validation is intended.')
-maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'Before kickoff, rely on match-window automation to refresh/freeze predictions; during the active-match lock, only freeze later pre-kickoff matches and avoid mutating the active match until final status is available.')
+if tournament_complete:
+    maintenance['nextUpdateChecklist'] = [
+        'Run a manual update only for a documented source-backed correction; never rewrite immutable frozen forecasts or refit calibration on final outcomes.',
+        'Use workflow_dispatch or WC_DATA_RESCUE, reconcile both audit branches, and require validation plus exact-commit Pages deployment before publication.',
+        'Regenerate health, comparative, calibration, and backtest receipts and keep permanent source gaps neutral and visible.'
+    ]
+else:
+    maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If the morning scheduled run fails or GitHub delays it, trigger Daily BASE_DATA update manually from Actions or run node scripts/update-base-data.mjs locally, then validate before committing.')
+    maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'If GitHub Actions itself is unavailable, provide trigger WC_DATA_RESCUE and run node scripts/manual-update-trigger.mjs --trigger WC_DATA_RESCUE locally; add --commit or --push only after validation is intended.')
+    maintenance['nextUpdateChecklist'] = append_unique_text(maintenance.get('nextUpdateChecklist'), 'Before kickoff, rely on match-window automation to refresh/freeze predictions; during the active-match lock, only freeze later pre-kickoff matches and avoid mutating the active match until final status is available.')
 maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
     'gate': 'Daily automation safety',
-    'method': 'GitHub Actions runs rollback-capable updater, validation, idempotence test, and simulation smoke before committing changed artifacts.',
+    'method': 'Manual workflow_dispatch runs the rollback-capable updater, validation, idempotence test, and simulation smoke before publishing changed artifacts.' if tournament_complete else 'GitHub Actions runs rollback-capable updater, validation, idempotence test, and simulation smoke before committing changed artifacts.',
     'status': 'passed',
-    'lastRun': 'automated on each workflow run'
+    'lastRun': 'validated on each manual workflow run' if tournament_complete else 'automated on each workflow run'
 }, 'gate')
 maintenance['validationMatrix'] = append_unique(maintenance.get('validationMatrix'), {
     'gate': 'Match-window automation safety',
-    'method': 'tests/match-window-update.test.mjs verifies pre-kickoff slots, post-match slots, delayed stale-result recovery, outside-window no-op, and active-match lock behavior.',
+    'method': 'Former scheduled behavior remains reproducible through workflow_dispatch; tests cover pre-kickoff, post-match, delayed recovery, outside-window no-op, and active-match lock behavior.' if tournament_complete else 'tests/match-window-update.test.mjs verifies pre-kickoff slots, post-match slots, delayed stale-result recovery, outside-window no-op, and active-match lock behavior.',
     'status': 'passed',
     'lastRun': 'node tests/run-all.mjs'
 }, 'gate')
@@ -186,6 +219,13 @@ maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'validation': 'scripts/update-base-data.mjs, validate_base_data, idempotence, and run-sim smoke',
     'risk': 'Official lineup/injury/suspension/referee feeds remain neutral unless reliable data is manually patched.'
 }, 'version')
+if tournament_complete:
+    maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
+        'version': '2026.07.20-post-tournament-closure',
+        'reason': 'Freeze the final 104-match public snapshot, retain raw-only calibration rollback, and retire tournament cron schedules while preserving manual reproducibility.',
+        'validation': 'full QA, immutable audit reconciliation, comparative/calibration/backtest checks, repository ZIP inspection, GitHub checks, and live Pages verification',
+        'risk': 'Source gaps and accessibility limits remain disclosed; future corrections require an intentional guarded manual run.'
+    }, 'version')
 maintenance['patchReceipts'] = append_unique(maintenance.get('patchReceipts'), {
     'version': '2026.06.27-match-window-prediction-inputs',
     'reason': 'Add match-window update automation, active-match lock, final group-table incentive input, and source-backed availability hooks.',

@@ -15,6 +15,11 @@ const readme = read('README.md');
 const html = read('docs/index.html');
 const codeqlWorkflow = read('.github/workflows/codeql.yml');
 const codeqlConfig = read('.github/codeql/codeql-config.yml');
+const dailyWorkflow = read('.github/workflows/daily-base-data-update.yml');
+const matchWindowWorkflow = read('.github/workflows/match-window-data-update.yml');
+const baseDataCheckWorkflow = read('.github/workflows/base-data-pr-check.yml');
+const securityWorkflow = read('.github/workflows/security-check.yml');
+const uiSmokeWorkflow = read('.github/workflows/ui-smoke.yml');
 const publicationWatchdog = read('.github/workflows/publication-watchdog.yml');
 const pkg = JSON.parse(read('package.json'));
 
@@ -23,9 +28,17 @@ assert(html.includes('function matchFinalOverdue(m,date=new Date())'), 'freshnes
 assert(html.includes('kickoff+4*60*60*1000'), 'freshness checks must allow a four-hour match completion window.');
 assert(html.includes('confirm its validated automatic deployment'), 'freshness recovery must explain automatic checked publication.');
 assert(readme.includes('fails unless that exact merged commit deploys successfully'), 'README must document transactional publication.');
-assert(readme.includes('publication watchdog'), 'README must document automatic stranded-PR recovery.');
-assert(publicationWatchdog.includes('workflow_run:'), 'publication watchdog must run after updater workflows, not rely only on cron.');
+assert(readme.includes('publication watchdog'), 'README must document guarded stranded-PR recovery.');
+assert(publicationWatchdog.includes('workflow_run:'), 'publication watchdog must run after manually dispatched updater workflows.');
 assert(publicationWatchdog.includes('Match-window BASE_DATA update'), 'publication watchdog must follow match-window updates.');
+for (const [name, workflow] of [['daily', dailyWorkflow], ['match-window', matchWindowWorkflow], ['watchdog', publicationWatchdog]]) {
+  assert(workflow.includes('workflow_dispatch:'), `${name} workflow must preserve manual reproducibility.`);
+  assert(!/^\s{2}schedule:/m.test(workflow), `${name} tournament schedule must remain retired after 104/104.`);
+}
+for (const [name, workflow] of [['daily', dailyWorkflow], ['match-window', matchWindowWorkflow], ['watchdog', publicationWatchdog], ['BASE_DATA check', baseDataCheckWorkflow], ['security', securityWorkflow], ['UI smoke', uiSmokeWorkflow]]) {
+  assert(workflow.includes('actions/setup-node@v7'), `${name} workflow must use the validated setup-node major.`);
+  assert(!workflow.includes('actions/setup-node@v6'), `${name} workflow must not retain the obsolete setup-node marker.`);
+}
 
 const forbiddenPathPattern =
   /(^|\/)(node_modules|offline|linkedin-post-package|test-results|playwright-report|\.codex-remote-attachments)(\/|$)|(^|\/)scripts\/__pycache__(\/|$)|(^|\/)data\/(manual-overrides\.json|latest-simulation\.json|scoreboards)(\/|$)|(^|\/).*\.((env)|(pem)|(key)|(p12)|(pfx))$/i;

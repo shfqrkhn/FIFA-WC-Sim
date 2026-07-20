@@ -69,6 +69,16 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 - Frozen-prediction audit labels may classify verified-missing or neutral-unless-verified availability statuses as source-limited evidence, but they must not change frozen forecast probabilities or invent match facts.
 - Any future adapter for these fields must record provenance, freshness, and failure behavior before the public UI, README, or model can claim coverage.
 
+## Final Tournament Closure Evidence
+
+- Source-data checkpoint `cb2bad1` embeds 104/104 ESPN completed finals with no overdue or unplayed matches: M103 France 4-6 England (`760516`) and M104 Spain 1-0 Argentina after extra time (`760517`). Spain is champion and England is third.
+- The immutable ledger contains 82 frozen and 82 settled forecasts, with 0 unresolved and 0 rejected. The match report selects one latest eligible pre-kickoff record for each of 35 settled matches and retains 47 earlier snapshots only in the audit ledger.
+- Final match-level metrics are W/D/L 25/35, exact score 0/35, and knockout advancement 23/29. These are prospective source-bounded diagnostics, not historical replay or certainty claims.
+- Calibration is inactive as `validation_worsened_rollback`: the rebuilt proposal, trained only on the earlier chronological partition, worsened held-out Brier from `0.336868249974` to `0.358304915269` and log loss from `0.612656004659` to `0.636251719016` at n=25. Raw probabilities remain active; final outcomes were not used to relax, tune, or replace the gate.
+- Tournament cron schedules are retired. Daily and match-window workflows retain `workflow_dispatch`; publication recovery retains `workflow_run` and `workflow_dispatch`; local `WC_DATA_RESCUE` remains available. Any future correction must be intentional, source-backed, validated, and deployed from the exact merge commit.
+- Permanent limits remain: ESPN is the machine-readable score feed rather than an official-completeness guarantee; scorer, attendance, lineup, injury, suspension, goalkeeper, referee, and full discipline inputs remain unavailable or neutral unless separately verified; accessibility evidence does not certify every assistive technology.
+- Closure class: `PASS_WITH_LIMITATIONS` unless the current publication pass also proves clean/synced main, required checks, no open PR or unique automation artifact, zero GitHub alerts/releases, protected-path and ZIP safety, and exact-commit live Pages deployment.
+
 ## Claim Boundaries
 
 | Area | Class | Evidence | Limit |
@@ -76,8 +86,8 @@ This public-safe receipt keeps FIFA-WC-Sim claims tied to evidence instead of ch
 | Static/offline app | `PASS` | README, `docs/index.html`, local-file behavior, `npm run ui:smoke` | Browser storage availability can still vary by device. |
 | No betting/odds/markets | `PASS` | README, validator, public-surface tests | Do not add market-derived inputs. |
 | Source-backed match data | `PASS_WITH_LIMITATIONS` | BASE_DATA automation, source notes, validator, source gap disclosure | Unknown kickoff, scorer, discipline, lineup, injury, availability, goalkeeper, and referee data remain neutral unless verified. |
-| Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Requires continued freeze-before-kickoff discipline. |
-| Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Calibration stays disabled until sample thresholds are met. |
+| Frozen predictions/no future leakage | `PASS_WITH_LIMITATIONS` | prediction audit, calibration tests, no-leakage tests | Any future correction must preserve all frozen records and settled scores. |
+| Raw/calibrated separation | `PASS_WITH_LIMITATIONS` | calibration state and tests | Final held-out validation worsened; raw-only rollback must remain active unless the unchanged prospective gate proves otherwise. |
 | Repository ZIP safety | `PASS_WITH_LIMITATIONS` | `docs/REPO_ZIP_POLICY.md`, `git archive`, protected-path scan | GitHub-generated ZIP should be rechecked before public-facing download changes. |
 | Input accessibility | `PASS_WITH_LIMITATIONS` | `npm run ui:smoke`, responsive UI checks, public-surface tests | Does not certify screen-reader behavior or every browser assistive setup. |
 | Single input operation | `PASS_WITH_LIMITATIONS` | input accessibility evidence, UI smoke, static controls, no browser popup policy | Does not certify every OS assistive technology or unusual HID/browser pairing. |

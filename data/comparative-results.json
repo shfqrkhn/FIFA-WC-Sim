@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-19T22:14:53Z",
+  "generated_at_utc": "2026-07-20T11:43:54Z",
   "source_note": "Settled-only comparison of immutable pre-kickoff simulator forecasts against embedded ESPN completed finals. No market data is used.",
   "settled_only": true,
   "denominators": {
@@ -53,8 +53,8 @@
         "count": 25
       },
       "validation_metrics": {
-        "brier_score": 0.361283069888,
-        "log_loss": 0.64473944093,
+        "brier_score": 0.358304915269,
+        "log_loss": 0.636251719016,
         "count": 25
       }
     }
