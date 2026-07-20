@@ -134,10 +134,9 @@ REQUIRED_BRACKET_UI = [
     'title="${teamA}"',
 ]
 REQUIRED_WORKFLOW_STEPS = [
-    "on:\n  workflow_dispatch:\n  schedule:",
-    "cron: '37 11 * * *'",
-    "cron: '37 17 * * *'",
-    'actions/setup-node@v6',
+    "on:\n  workflow_dispatch:",
+    'Scheduled tournament updates retired after 104/104.',
+    'actions/setup-node@v7',
     'python3 -m py_compile scripts/*.py',
     'node --check "$f"',
     'node scripts/update-base-data.mjs',
@@ -162,11 +161,9 @@ REQUIRED_WORKFLOW_STEPS = [
     'data/backtest-audit.json',
 ]
 REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS = [
-    "on:\n  workflow_dispatch:\n  schedule:",
-    "cron: '*/30 11-23 * 6,7 *'",
-    "cron: '*/30 8-10 * 6,7 *'",
-    "cron: '*/30 0-7 * 6,7 *'",
-    'actions/setup-node@v6',
+    "on:\n  workflow_dispatch:",
+    'Scheduled tournament updates retired after 104/104.',
+    'actions/setup-node@v7',
     'node --check scripts/match-window-update.mjs',
     'node scripts/match-window-update.mjs',
     'python3 scripts/validate_base_data.py',
@@ -188,7 +185,7 @@ REQUIRED_BASE_DATA_PR_CHECK_WORKFLOW_STEPS = [
     'name: BASE_DATA PR check',
     'pull_request:',
     'workflow_dispatch:',
-    'actions/setup-node@v6',
+    'actions/setup-node@v7',
     "node-version: '24'",
     'python3 -m py_compile scripts/*.py',
     'node --check "$f"',
@@ -200,7 +197,7 @@ REQUIRED_BASE_DATA_PR_CHECK_WORKFLOW_STEPS = [
 REQUIRED_SECURITY_WORKFLOW_STEPS = [
     'name: Security Check',
     'pull_request:',
-    'actions/setup-node@v6',
+    'actions/setup-node@v7',
     "node-version: '24'",
     'npm audit --audit-level=moderate',
 ]
@@ -208,7 +205,7 @@ REQUIRED_UI_SMOKE_WORKFLOW_STEPS = [
     'name: Static UI smoke',
     'workflow_dispatch',
     'branches: [main]',
-    'actions/setup-node@v6',
+    'actions/setup-node@v7',
     "node-version: '24'",
     'npm ci',
     'npx playwright install --with-deps chromium',
@@ -227,11 +224,13 @@ REQUIRED_PAGES_WORKFLOW_STEPS = [
 ]
 REQUIRED_PUBLICATION_WATCHDOG_WORKFLOW_STEPS = [
     'name: BASE_DATA publication watchdog',
+    'workflow_dispatch:',
     'workflow_run:',
     'Daily BASE_DATA update',
     'Match-window BASE_DATA update',
     'types: [completed]',
-    "cron: '7,22,37,52 * * 6,7 *'",
+    'Scheduled tournament recovery retired after 104/104.',
+    'actions/setup-node@v7',
     'actions: write',
     'pull-requests: write',
     'group: base-data-update-${{ github.ref }}',
@@ -630,6 +629,8 @@ if os.path.exists(WORKFLOW):
     for marker in REQUIRED_WORKFLOW_STEPS:
         if marker not in workflow:
             fail('missing workflow automation marker: %s' % marker)
+    if re.search(r'^\s{2}schedule:', workflow, re.MULTILINE):
+        fail('daily BASE_DATA schedule must remain retired after 104/104')
 else:
     fail('missing daily BASE_DATA workflow')
 if os.path.exists(MATCH_WINDOW_WORKFLOW):
@@ -637,6 +638,8 @@ if os.path.exists(MATCH_WINDOW_WORKFLOW):
     for marker in REQUIRED_MATCH_WINDOW_WORKFLOW_STEPS:
         if marker not in workflow:
             fail('missing match-window workflow marker: %s' % marker)
+    if re.search(r'^\s{2}schedule:', workflow, re.MULTILINE):
+        fail('match-window schedule must remain retired after 104/104')
 else:
     fail('missing match-window BASE_DATA workflow')
 if os.path.exists(BASE_DATA_PR_CHECK_WORKFLOW):
@@ -672,6 +675,8 @@ if os.path.exists(PUBLICATION_WATCHDOG_WORKFLOW):
     for marker in REQUIRED_PUBLICATION_WATCHDOG_WORKFLOW_STEPS:
         if marker not in workflow:
             fail('missing publication watchdog workflow marker: %s' % marker)
+    if re.search(r'^\s{2}schedule:', workflow, re.MULTILINE):
+        fail('publication watchdog schedule must remain retired after 104/104')
 else:
     fail('missing publication watchdog workflow')
 if os.path.exists(GITIGNORE):

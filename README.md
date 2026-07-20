@@ -6,7 +6,7 @@
 
 Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026 format. It combines embedded results, FIFA-style group ranking, knockout rules, venue/weather/rest/travel context, transparent model assumptions, seeded randomness, and Monte Carlo tournament runs into one portable web app.
 
-- **Status:** Active flagship
+- **Status:** Completed tournament snapshot; simulator and audit remain available
 - **Live Demo:** [shfqrkhn.github.io/FIFA-WC-Sim](https://shfqrkhn.github.io/FIFA-WC-Sim/)
 - **Repository ZIP:** [Download current main ZIP](https://github.com/shfqrkhn/FIFA-WC-Sim/archive/refs/heads/main.zip)
 - **License:** MIT
@@ -26,6 +26,17 @@ Static, offline-capable simulator for the 48-team, 104-match FIFA World Cup 2026
 4. Use **Groups**, **Bracket**, and **Chances** for more detail.
 5. Open **Prediction settings** only if you want to adjust seed, run count, match style, host boost, or weather.
 6. Use **Stats**, **How**, **Data**, **Checks**, **Health**, and **Sources** for deeper audit detail.
+
+## Final Tournament Snapshot
+
+- ESPN-backed completed results: **104 / 104**; no overdue or unplayed matches.
+- Champion: **Spain**, after a 1–0 extra-time final win over Argentina (ESPN event `760517`).
+- Third place: **England**, after a 6–4 win over France (ESPN event `760516`).
+- Immutable audit: **82 frozen / 82 settled / 0 unresolved / 0 rejected** forecasts.
+- Match-level comparison: **35** latest eligible pre-kickoff rows; **47** earlier snapshots remain audit-only. Field-score W/D/L accuracy is **25/35** and knockout advancement accuracy is **23/29**.
+- Calibration is inactive (`validation_worsened_rollback`): the unchanged chronological held-out gate worsened both Brier score and log loss, so the public simulator retains raw probabilities.
+
+This is a source-bounded project snapshot, not an official-completeness, historical-replay, certainty, or betting claim.
 
 ## Repository Layout
 
@@ -98,32 +109,23 @@ Do not retrofit or deploy a model fit on already-settled tournament outcomes. Th
 
 Current match counts, overdue-match status, audit sample size, calibration status, backtest scores, and comparative statistics are generated artifacts. Check **Stats**, **Data**, **Checks**, and **Health** plus `data/update-health.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
 
-## Automated Updates
+## Post-Tournament Update Reproduction
 
-Daily auto-update exists at `.github/workflows/daily-base-data-update.yml`.
+Tournament cron schedules are retired after 104/104. The following guarded paths remain available through `workflow_dispatch` for a documented source-backed correction or reproducibility check:
 
-Schedules:
+- `.github/workflows/daily-base-data-update.yml` runs the full updater, idempotence, calibration, unit, simulation, and BASE_DATA gates.
+- `.github/workflows/match-window-data-update.yml` preserves the pre/post-match and active-match-lock behavior for audit reproduction.
+- `.github/workflows/publication-watchdog.yml` still follows manually dispatched updater runs and can also be dispatched directly to recover a stranded bot PR.
 
-- `37 11 * * *` UTC: morning run, 07:37 America/Montreal during EDT and 06:37 during EST.
-- `37 17 * * *` UTC: safety run for delayed feeds or a missed morning run.
-- `*/30 0-23 * 6,7 *` UTC, represented as three UTC-hour blocks in `.github/workflows/match-window-data-update.yml`: match-window checks every 30 minutes during June/July.
-- `workflow_dispatch`: manual fallback from GitHub Actions.
+The retained active-match lock still rejects partial-score mutation during any manual replay. The publication watchdog provides guarded stranded-PR recovery after manually dispatched updater runs; it no longer needs a tournament cron schedule.
 
-GitHub cron is UTC-only and best-effort; it can be delayed or skipped. The safety run, match-window checks, and manual dispatch are intentional because one morning-only run is not reliable enough.
+Both updater paths reconcile immutable frozen records from the former automation branches before changing artifacts. A validated change is proposed through a bot PR; required BASE_DATA and security contexts must pass before auto-merge. The publisher then dispatches `deploy-pages.yml` and fails unless that exact merged commit deploys successfully. No update workflow pushes generated data directly to `main`.
 
-The daily workflow runs `node scripts/update-base-data.mjs`, then idempotence, calibration validation, unit tests, simulation smoke, and base-data validation. If validated generated artifacts changed, it opens or updates `automation/daily-base-data-update` as a bot pull request containing only `docs/index.html`, `data/latest-update.json`, `data/update-health.json`, `data/prediction-audit.json`, `data/calibration-state.json`, `data/backtest-audit.json`, and `data/comparative-results.json`.
-
-The match-window workflow runs `node scripts/match-window-update.mjs`. It no-ops unless the current UTC time is near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window. Its active-match lock refuses full updates during live-match windows; if a later match needs a pre-kickoff audit record during that lock, it uses a freeze-only path.
-
-The match-window workflow publishes the same validated artifact set to `automation/match-window-base-data-update` when it has source-backed changes to propose. Neither scheduled workflow pushes generated data directly to `main`.
-
-Both workflows reconcile immutable frozen-prediction records from the daily and match-window automation branches before updating. They publish through a bot PR, dispatch the required BASE_DATA and security checks, and request GitHub auto-merge only after both contexts pass. The publisher waits for the merge, explicitly dispatches `deploy-pages.yml`, and fails unless that exact merged commit deploys successfully. The publication watchdog runs after every daily or match-window workflow, every 15 minutes throughout June/July, and via manual dispatch, revalidating and recovering any stranded automation PR; failed validation or deployment stays visible as a failed Action instead of a silent stale site.
-
-Both update workflows write a GitHub Actions summary with data version, played-match counts, overdue unplayed count, latest scoreboard changes, prediction-audit counts, calibration status, and backtest metrics. `BASE_DATA PR check` validates pull requests before merge. `Static UI smoke` runs Playwright against `docs/index.html` for desktop and mobile layouts when relevant files change.
+The workflows write an Actions summary with the final data version, 104/104 progress, audit counts, raw-only calibration status, and backtest metrics. `BASE_DATA PR check` validates pull requests, while `Static UI smoke` covers desktop and mobile layouts. Future corrections must remain source-backed and must never rewrite frozen forecasts or tune on final outcomes.
 
 ## Sources
 
-Automated sources:
+Sources and retained update adapters:
 
 - ESPN public soccer scoreboard API for completed match scores and matched kickoff timestamps.
 - Open-Meteo for upcoming-match venue weather where available.

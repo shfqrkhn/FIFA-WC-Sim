@@ -1,9 +1,9 @@
 # AI Maintainer Handoff
 
-Last audited: 2026-07-15
+Last audited: 2026-07-20
 Branch at audit: `main`
 HEAD at audit: verify current `main` before relying on this snapshot.
-Refresh context: post-parallel update pass reconciliation for a future unified GitHub projects chat.
+Refresh context: final 104/104 post-tournament closure.
 
 This document is a public-safe continuation map for a future expert AI agent. Treat it as a starting receipt, not as a substitute for re-reading the current repo.
 
@@ -14,7 +14,7 @@ Maintain the static, offline-capable World Cup 2026 simulator in `docs/index.htm
 The app must remain:
 
 - Static and GitHub Pages friendly.
-- Autonomous through guarded GitHub Actions updates.
+- Reproducible through guarded manual GitHub Actions updates.
 - Offline-capable from embedded `BASE_DATA`.
 - Transparent about probabilistic assumptions and data gaps.
 - Free of tracking, hidden remote scripts, betting, odds, gambling, sportsbook, market-edge, or prediction-market features.
@@ -44,22 +44,25 @@ Verify these values before relying on them; they describe the repo at the audit 
 
 - App entrypoint: `docs/index.html`.
 - App version: `1.2.2` from `package.json`.
-- Embedded data version: `2026-07-15-accuracy-enriched`.
-- Embedded data generated at: `2026-07-15T21:15:26Z`.
-- Latest source-backed update settled M102 England 1-2 Argentina from ESPN completed-final event `760515`; M101 France 0-2 Spain is also embedded from event `760514`.
+- Embedded data version: `2026-07-19-accuracy-enriched`.
+- Embedded data generated at: `2026-07-19T22:14:55Z` before the documentation-only closure regeneration.
+- Final source-backed results: M103 France 4-6 England from ESPN completed-final event `760516`; M104 Spain 1-0 Argentina after extra time from event `760517`.
+- Champion: Spain. Third place: England.
 - Latest update receipt: `data/latest-update.json`.
 - Health receipt: `data/update-health.json`.
-- Played matches: 102 of 104.
+- Played matches: 104 of 104.
 - Group matches: 72 of 72 played.
-- Knockout matches: 30 of 32 played.
+- Knockout matches: 32 of 32 played.
 - Overdue unplayed matches: 0.
-- Next scheduled match day in embedded data: `2026-07-18`.
-- Frozen prediction records: 80.
-- Settled frozen predictions: 76; comparative report presents 33 settled matches, one latest eligible pre-kickoff forecast per match, with 43 earlier snapshots retained only in the immutable audit.
-- Calibration status: `active`, retained only because the chronological held-out Brier and log-loss gate passed.
+- Next scheduled match day in embedded data: none; the tournament is complete.
+- Frozen prediction records: 82.
+- Settled frozen predictions: 82; unresolved: 0; rejected: 0. The comparative report presents 35 settled matches, one latest eligible pre-kickoff forecast per match, with 47 earlier snapshots retained only in the immutable audit.
+- Match-level field-score W/D/L accuracy: 25/35. Knockout advancement accuracy: 23/29. Exact-score accuracy: 0/35.
+- Calibration status: `validation_worsened_rollback`, inactive/raw-only because the unchanged chronological held-out gate worsened both Brier and log loss.
 - Calibration threshold: 30 resolved predictions.
 - Backtest status: `sufficient_for_calibration_review`, prospective frozen-ledger audit only.
-- Raw frozen-ledger benchmark: Brier `0.331805570014`, log loss `0.606026648862`, count `76`.
+- Raw frozen-ledger benchmark: Brier `0.359888277698`, log loss `0.646887480525`, count `82`.
+- Held-out raw vs rebuilt proposed calibration: Brier `0.336868249974` vs `0.358304915269`; log loss `0.612656004659` vs `0.636251719016`; count `25`. The proposal is trained only on the earlier chronological partition and evaluated on the immutable held-out partition; do not reactivate or tune from final outcomes.
 - Ignored local runtime file currently expected after simulation/test runs: `data/latest-simulation.json`.
 
 ## Public Files To Know
@@ -78,7 +81,7 @@ Verify these values before relying on them; they describe the repo at the audit 
 - `data/manual-overrides.example.json`: source-backed override schema example.
 - `scripts/`: update, enrichment, scoring, calibration, QA, idempotence, and rescue tools.
 - `tests/`: unit, regression, no-leakage, workflow, calibration, backtest, and UI smoke tests.
-- `.github/workflows/`: daily update, match-window update, BASE_DATA PR check, security, and static UI smoke workflows.
+- `.github/workflows/`: manual-only daily/match-window reproduction, workflow-run recovery, BASE_DATA PR check, security, deployment, and static UI smoke workflows.
 - `.github/FUNDING.yml`: GitHub Sponsor metadata.
 
 ## Private Or Ignored Files
@@ -115,15 +118,16 @@ The second command should print nothing.
 Daily update workflow:
 
 - File: `.github/workflows/daily-base-data-update.yml`
-- Schedule: `37 11 * * *` UTC and `37 17 * * *` UTC.
-- Purpose: morning update plus safety update for delayed feeds or missed runs.
-- Manual fallback: `workflow_dispatch`.
+- Schedule: retired after 104/104.
+- Purpose: manual reproduction or a documented source-backed correction.
+- Trigger: `workflow_dispatch` only.
 - Publish path: opens or updates `automation/daily-base-data-update` as a bot pull request after validation; it must not push generated data directly to `main`.
 
 Match-window workflow:
 
 - File: `.github/workflows/match-window-data-update.yml`
-- Schedule: every 30 minutes during June/July UTC days.
+- Schedule: retired after 104/104.
+- Trigger: `workflow_dispatch` only.
 - Script: `node scripts/match-window-update.mjs`.
 - Behavior: no-ops unless near a pre-kickoff slot, post-match slot, or bounded stale-result recovery window.
 - Guardrail: active-match lock refuses full updates during live-match windows and permits freeze-only records for later matches when safe.
@@ -132,7 +136,7 @@ Match-window workflow:
 - Bot PR checks: publisher dispatches `base-data-pr-check.yml` and `security-check.yml` on the automation branch because PRs created with `GITHUB_TOKEN` do not reliably trigger pull-request workflows.
 - Immutable audit reconciliation: both scheduled workflows fetch the daily and match-window automation branches and run `scripts/reconcile-prediction-audits.mjs` before updating, preserving distinct pre-kickoff forecasts while deduplicating equivalent records.
 - Transactional publication gate: Actions proposes changes through a bot PR, dispatches required BASE_DATA and security checks, requests GitHub auto-merge only after both contexts pass, waits for the merge, explicitly deploys that merged commit with `deploy-pages.yml`, and fails if merge or deployment is not proven.
-- Recovery watchdog: `publication-watchdog.yml` runs after every daily or match-window updater, every 15 minutes throughout June/July, and via `workflow_dispatch`. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
+- Recovery watchdog: `publication-watchdog.yml` follows manually dispatched daily or match-window runs and retains `workflow_dispatch`. Its cron schedule is retired. It revalidates, merges, and deploys any stranded automation PR; validation conflicts remain failed and visible rather than discarding immutable records.
 
 BASE_DATA PR check:
 

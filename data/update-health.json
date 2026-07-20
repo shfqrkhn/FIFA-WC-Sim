@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-19T22:14:55Z",
+  "generatedAt": "2026-07-20T11:40:40Z",
   "scoreboard": {
     "playedMatches": 104,
     "totalMatches": 104,
@@ -162,11 +162,11 @@
     },
     "automation": {
       "status": "current",
-      "schedule": "GitHub Actions runs at 11:37 UTC and 17:37 UTC plus match-window checks every 30 minutes during June/July UTC days. The match-window script no-ops unless near a kickoff slot, a normal post-match slot, or the bounded stale-result recovery window for unplayed matches; it refuses full updates during active-match windows and permits freeze-only pre-kickoff records for later matches. America/Montreal local time shifts with DST because cron is UTC. If Actions is unavailable, WC_DATA_RESCUE runs the same guarded local update path through scripts/manual-update-trigger.mjs."
+      "schedule": "Tournament cron schedules were retired after 104/104 source-backed finals. Daily and match-window workflows remain available through workflow_dispatch for reproducible source-backed corrections; workflow-run recovery and the local WC_DATA_RESCUE path remain guarded and manual."
     },
     "matchWindowAutomation": {
       "status": "current",
-      "source": "scripts/match-window-update.mjs with active-match lock, freeze-only overlap path, pre/post kickoff slots, and bounded stale-result recovery"
+      "source": "scripts/match-window-update.mjs retained for workflow_dispatch reproduction and source-backed corrections; its former tournament cron schedule is retired"
     },
     "lineups": {
       "status": "neutral_unless_verified",
@@ -189,7 +189,7 @@
       "reason": "no reliable automated source configured; referee effects remain neutral to avoid overfitting"
     },
     "principle": "Missing factors remain neutral; stale or conflicting factors must lower confidence rather than force precision.",
-    "updatedAt": "2026-07-19T22:14:55Z"
+    "updatedAt": "2026-07-20T11:40:39Z"
   },
   "principle": "Failed or missing sources degrade to neutral inputs unless validated data is available."
 }

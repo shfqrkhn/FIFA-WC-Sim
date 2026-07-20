@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "generated_at_utc": "2026-07-19T22:14:53Z",
+  "generated_at_utc": "2026-07-20T11:43:54Z",
   "calibration_status": "validation_worsened_rollback",
   "active": false,
   "resolved_predictions": 82,
@@ -14,8 +14,8 @@
     "count": 25
   },
   "validation_metrics": {
-    "brier_score": 0.361283069888,
-    "log_loss": 0.64473944093,
+    "brier_score": 0.358304915269,
+    "log_loss": 0.636251719016,
     "count": 25
   },
   "benchmark_metrics": {
@@ -35,8 +35,8 @@
       "count": 82
     }
   },
-  "last_update_decision": "raw_model_only_previous_validation_worsened",
-  "rollback_count": 1,
+  "last_update_decision": "raw_model_only_validation_worsened",
+  "rollback_count": 2,
   "notes": [
     "Calibration is disabled until enough frozen predictions have resolved.",
     "Base model output and calibrated output remain separate.",

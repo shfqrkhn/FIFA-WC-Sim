@@ -2,13 +2,7 @@ name: Daily BASE_DATA update
 
 on:
   workflow_dispatch:
-  schedule:
-    # Morning run: 11:37 UTC is 07:37 America/Montreal during EDT.
-    # GitHub cron is UTC only; the same time is 06:37 during EST.
-    - cron: '37 11 * * *'
-    # Safety run: catches delayed score feeds or a missed/delayed morning run.
-    # 17:37 UTC is 13:37 America/Montreal during EDT, 12:37 during EST.
-    - cron: '37 17 * * *'
+  # Scheduled tournament updates retired after 104/104.
 
 permissions:
   actions: write
@@ -25,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
       - name: Reconcile immutable audit records from automation branches
