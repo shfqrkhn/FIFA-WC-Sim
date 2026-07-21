@@ -303,7 +303,7 @@ Minimum expected structural invariants:
 - Award projections are simulator-side estimates, not official FIFA predictions.
 - Full discipline, lineups, injuries, suspensions, goalkeeper changes, and referee assignments are not automatically ingested.
 - The backtest is prospective from frozen records, not a historical replay.
-- Calibration is currently inactive because the resolved sample is below threshold.
+- Calibration is inactive because the final chronological held-out validation worsened both Brier score and log loss; the threshold was met, but the proposed calibration failed the quality gate and raw probabilities remain authoritative.
 
 ## High-ROI Future Work
 
@@ -313,7 +313,7 @@ Only implement if source-backed and covered by tests:
 - Populate source-backed discipline/fair-play ledger patches when reliable source data is available.
 - Populate source-backed availability patches for confirmed suspensions, key absences, and goalkeeper changes when reliable source data is available.
 - Improve workflow observability only where it reduces real debugging time.
-- Keep expanding frozen-prediction audit sample through the rest of the tournament.
+- Preserve the completed 82-record frozen-prediction audit and its 35 latest eligible match-level comparison rows; do not manufacture post-tournament forecasts or tune from final outcomes.
 
 Avoid:
 
