@@ -14,6 +14,6 @@
     "qa:full": "npm test && npm run qa && npm run ui:smoke"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.64.1"
   }
 }
